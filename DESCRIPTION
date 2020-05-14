@@ -1,0 +1,27 @@
+Package: SimSurvNMarker
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Authors@R: c(person("Benjamin", "Christoffersen", 
+                    email = "boennecd@gmail.com", 
+                    role = c("cre", "aut")), 
+             person("Mark", "Clements",  
+                    role = "cph"), 
+             person("Ignace", "Bogaert", 
+                    role = "cph"))
+Maintainer: Benjamin Christoffersen <boennecd@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 2.1.0), 
+    splines
+RoxygenNote: 7.0.1
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
+Imports: 
+    Rcpp
+SystemRequirements: C++14
