@@ -211,7 +211,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>    3.92    0.00    3.92
+#>    3.83    0.00    3.84
 ```
 
 Finally, we show a few of the first rows along with some summary statistics.

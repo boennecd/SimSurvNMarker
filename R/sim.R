@@ -7,12 +7,16 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
     ptr_obj <- get_ns_ptr(knots          = knots[-c(1L, length(knots))],
                           boundary_knots = knots[ c(1L, length(knots))],
                           intercept = intercept)
-    if(do_log)
+    out <- if(do_log)
       function(x)
         ns_cpp(x = log(x), ns_ptr = ptr_obj)
     else
       function(x)
         ns_cpp(x =     x , ns_ptr = ptr_obj)
+
+    attributes(out) <- list(
+      knots = knots, intercept = intercept, do_log = do_log)
+    out
   })
 
 .surv_func_inner <- function(x, omega, b_func)
@@ -50,10 +54,12 @@ eval_marker <- function(ti, B, m_func)
   vapply(ti, .eval_marker_inner, FUN.VALUE = numeric(NCOL(B)),
          B = B, m_func = m_func)
 
+#' @importFrom stats rnorm
 #' @export
 draw_U <- function(Psi_chol)
-  drop(rnorm(length(B)) %*%  Psi_chol)
+  drop(rnorm(NCOL(Psi_chol)) %*%  Psi_chol)
 
+#' @importFrom stats rnorm
 #' @export
 sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func){
   n_markes <- r_n_marker()
@@ -94,7 +100,7 @@ surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
   exp(exp(delta) * cum_haz_fac)
 }
 
-#' @importFrom stats uniroot
+#' @importFrom stats uniroot runif
 #' @export
 sim_joint_data_set <- function(
   n_obs, B, Psi, omega, delta, alpha, sigma, b_func, m_func,
@@ -116,7 +122,8 @@ sim_joint_data_set <- function(
 
     stopifnot(
       is.matrix(B), NCOL(B) == n_y,
-      NCOL(Psi) == K,
+      is.matrix(Psi), NCOL(Psi) == K,
+      is.matrix(sigma),
       is.numeric(alpha), length(alpha) == n_y,
       is.numeric(b_func(1)), length(b_func(1)) == d_b,
       is.numeric(m_func(1)), length(m_func(1)) == d_m,
@@ -194,7 +201,7 @@ sim_joint_data_set <- function(
     rbind, lapply(ids, function(i){
       dat_i <- out[[i]][c("z", "left_trunc", "y", "event")]
       dat_i$z <- matrix(
-        dat_i$z, nr = 1L,
+        dat_i$z, nrow = 1L,
         dimnames = list(NULL, paste0("Z", seq_along(dat_i$z))))
       dat_i$id <- i
       names(dat_i)[1L] <- ""
@@ -213,5 +220,6 @@ sim_joint_data_set <- function(
        complete_data = out,
        params        = list(
          B = B, Psi = Psi, omega = omega, delta = delta, alpha = alpha,
-         sigma = sigma, b_knots = b_ks, m_knots = m_ks))
+         sigma = sigma, b_attr = attributes(b_func),
+         m_attr = attributes(m_func)))
 }

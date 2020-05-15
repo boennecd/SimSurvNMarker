@@ -8,12 +8,12 @@
 using namespace Rcpp;
 
 // eval_marker
-arma::vec eval_marker(arma::mat const& B, arma::vec const& m);
+Rcpp::NumericVector eval_marker(SEXP B, SEXP m);
 RcppExport SEXP _SimSurvNMarker_eval_marker(SEXP BSEXP, SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat const& >::type B(BSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type m(mSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type B(BSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type m(mSEXP);
     rcpp_result_gen = Rcpp::wrap(eval_marker(B, m));
     return rcpp_result_gen;
 END_RCPP
