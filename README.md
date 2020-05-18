@@ -16,13 +16,13 @@ model
 
 <!-- \vec\mu(s, \vec u) &= -->
 
-<!--   X_{ij}\vec\beta + B^\top\vec g(s) + U^\top\vec m(s) -->
+<!--   \Gamma^\top \vec x_i + B^\top\vec g(s) + U^\top\vec m(s) -->
 
 <!--   \\ -->
 
-<!-- &= X_{ij}\vec\beta -->
+<!-- &= \left(I \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
 
-<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B  -->
+<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B -->
 
 <!--      + \left(I \otimes \vec m(s)^\top\right) \vec u -->
 
@@ -50,7 +50,9 @@ model
 
 <!--   \vec z_i^\top\vec\delta -->
 
-<!--   + \vec\alpha^\top X_{ij}\vec\beta -->
+<!--   + \vec 1^\top\left( -->
+
+<!--   \text{diag}(\vec \alpha) \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
 
 <!--   + \vec 1^\top\left( -->
 
@@ -67,20 +69,22 @@ model
   
 ![\\begin{align\*} \\vec Y\_{ij} \\mid \\vec U\_i = \\vec u\_i &\\sim
 N^{(r)}(\\vec \\mu\_i(s\_{ij}, \\vec u\_i), \\Sigma) \\\\ \\vec\\mu(s,
-\\vec u) &= X\_{ij}\\vec\\beta + B^\\top\\vec g(s) + U^\\top\\vec m(s)
-\\\\ &= X\_{ij}\\vec\\beta + \\left(I \\otimes \\vec
+\\vec u) &= \\Gamma^\\top \\vec x\_i + B^\\top\\vec g(s) + U^\\top\\vec
+m(s) \\\\ &= \\left(I \\otimes \\vec
+x\_i^\\top\\right)\\text{vec}\\Gamma + \\left(I \\otimes \\vec
 g(s)^\\top\\right)\\text{vec} B + \\left(I \\otimes \\vec
 m(s)^\\top\\right) \\vec u \\\\ \\vec U\_i &\\sim N^{(K)}(\\vec 0,
 \\Psi) \\\\ h(t\\mid \\vec u) &= \\exp\\left( \\vec\\omega^\\top\\vec
 b(t) + \\vec z\_i^\\top\\vec\\delta + \\vec\\alpha^\\top\\vec\\mu(t,
 \\vec u) \\right) \\\\ &= \\exp\\Bigg( \\vec\\omega^\\top\\vec b(t) +
-\\vec z\_i^\\top\\vec\\delta + \\vec\\alpha^\\top X\_{ij}\\vec\\beta +
+\\vec z\_i^\\top\\vec\\delta + \\vec 1^\\top\\left( \\text{diag}(\\vec
+\\alpha) \\otimes \\vec x\_i^\\top\\right)\\text{vec}\\Gamma +
 \\vec 1^\\top\\left( \\text{diag}(\\vec \\alpha) \\otimes \\vec
 g(t)^\\top\\right)\\text{vec} B \\\\ &\\hspace{50pt}+
 \\vec 1^\\top\\left( \\text{diag}(\\vec \\alpha) \\otimes \\vec
 m(t)^\\top\\right)\\vec u \\Bigg)
-\\end{align\*}](https://latex.codecogs.com/svg.latex?%5Cbegin%7Balign%2A%7D%20%5Cvec%20Y_%7Bij%7D%20%5Cmid%20%5Cvec%20U_i%20%3D%20%5Cvec%20u_i%20%20%20%26%5Csim%20N%5E%7B%28r%29%7D%28%5Cvec%20%5Cmu_i%28s_%7Bij%7D%2C%20%5Cvec%20u_i%29%2C%20%5CSigma%29%20%20%20%5C%5C%20%5Cvec%5Cmu%28s%2C%20%5Cvec%20u%29%20%26%3D%20%20%20X_%7Bij%7D%5Cvec%5Cbeta%20%2B%20B%5E%5Ctop%5Cvec%20g%28s%29%20%2B%20U%5E%5Ctop%5Cvec%20m%28s%29%20%20%20%5C%5C%20%26%3D%20X_%7Bij%7D%5Cvec%5Cbeta%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20g%28s%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20m%28s%29%5E%5Ctop%5Cright%29%20%5Cvec%20u%20%20%20%5C%5C%20%5Cvec%20U_i%20%26%5Csim%20N%5E%7B%28K%29%7D%28%5Cvec%200%2C%20%5CPsi%29%20%20%20%5C%5C%20h%28t%5Cmid%20%5Cvec%20u%29%20%26%3D%20%5Cexp%5Cleft%28%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%2B%20%20%20%5Cvec%5Calpha%5E%5Ctop%5Cvec%5Cmu%28t%2C%20%5Cvec%20u%29%20%20%20%5Cright%29%20%20%20%5C%5C%20%26%3D%20%5Cexp%5CBigg%28%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%20%20%2B%20%5Cvec%5Calpha%5E%5Ctop%20X_%7Bij%7D%5Cvec%5Cbeta%20%20%20%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20g%28t%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%5C%5C%20%26%5Chspace%7B50pt%7D%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20m%28t%29%5E%5Ctop%5Cright%29%5Cvec%20u%20%20%20%5CBigg%29%20%5Cend%7Balign%2A%7D
-"\\begin{align*} \\vec Y_{ij} \\mid \\vec U_i = \\vec u_i   &\\sim N^{(r)}(\\vec \\mu_i(s_{ij}, \\vec u_i), \\Sigma)   \\\\ \\vec\\mu(s, \\vec u) &=   X_{ij}\\vec\\beta + B^\\top\\vec g(s) + U^\\top\\vec m(s)   \\\\ &= X_{ij}\\vec\\beta      + \\left(I \\otimes \\vec g(s)^\\top\\right)\\text{vec} B       + \\left(I \\otimes \\vec m(s)^\\top\\right) \\vec u   \\\\ \\vec U_i &\\sim N^{(K)}(\\vec 0, \\Psi)   \\\\ h(t\\mid \\vec u) &= \\exp\\left(   \\vec\\omega^\\top\\vec b(t) +   \\vec z_i^\\top\\vec\\delta +   \\vec\\alpha^\\top\\vec\\mu(t, \\vec u)   \\right)   \\\\ &= \\exp\\Bigg(   \\vec\\omega^\\top\\vec b(t) +   \\vec z_i^\\top\\vec\\delta   + \\vec\\alpha^\\top X_{ij}\\vec\\beta   + \\vec 1^\\top\\left(   \\text{diag}(\\vec \\alpha) \\otimes \\vec g(t)^\\top\\right)\\text{vec} B \\\\ &\\hspace{50pt}+ \\vec 1^\\top\\left(   \\text{diag}(\\vec \\alpha) \\otimes \\vec m(t)^\\top\\right)\\vec u   \\Bigg) \\end{align*}")  
+\\end{align\*}](https://latex.codecogs.com/svg.latex?%5Cbegin%7Balign%2A%7D%20%20%5Cvec%20Y_%7Bij%7D%20%5Cmid%20%5Cvec%20U_i%20%3D%20%5Cvec%20u_i%20%20%20%20%26%5Csim%20N%5E%7B%28r%29%7D%28%5Cvec%20%5Cmu_i%28s_%7Bij%7D%2C%20%5Cvec%20u_i%29%2C%20%5CSigma%29%20%20%20%20%5C%5C%20%20%5Cvec%5Cmu%28s%2C%20%5Cvec%20u%29%20%26%3D%20%20%20%20%5CGamma%5E%5Ctop%20%5Cvec%20x_i%20%2B%20B%5E%5Ctop%5Cvec%20g%28s%29%20%2B%20U%5E%5Ctop%5Cvec%20m%28s%29%20%20%20%20%5C%5C%20%20%26%3D%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%20%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20g%28s%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20m%28s%29%5E%5Ctop%5Cright%29%20%5Cvec%20u%20%20%20%20%5C%5C%20%20%5Cvec%20U_i%20%26%5Csim%20N%5E%7B%28K%29%7D%28%5Cvec%200%2C%20%5CPsi%29%20%20%20%20%5C%5C%20%20h%28t%5Cmid%20%5Cvec%20u%29%20%26%3D%20%5Cexp%5Cleft%28%20%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%2B%20%20%20%20%5Cvec%5Calpha%5E%5Ctop%5Cvec%5Cmu%28t%2C%20%5Cvec%20u%29%20%20%20%20%5Cright%29%20%20%20%20%5C%5C%20%20%26%3D%20%5Cexp%5CBigg%28%20%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%20%20%20%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%20%20%20%20%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20g%28t%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%5C%5C%20%20%26%5Chspace%7B50pt%7D%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20m%28t%29%5E%5Ctop%5Cright%29%5Cvec%20u%20%20%20%20%5CBigg%29%20%20%5Cend%7Balign%2A%7D
+"\\begin{align*}  \\vec Y_{ij} \\mid \\vec U_i = \\vec u_i    &\\sim N^{(r)}(\\vec \\mu_i(s_{ij}, \\vec u_i), \\Sigma)    \\\\  \\vec\\mu(s, \\vec u) &=    \\Gamma^\\top \\vec x_i + B^\\top\\vec g(s) + U^\\top\\vec m(s)    \\\\  &= \\left(I \\otimes \\vec x_i^\\top\\right)\\text{vec}\\Gamma       + \\left(I \\otimes \\vec g(s)^\\top\\right)\\text{vec} B       + \\left(I \\otimes \\vec m(s)^\\top\\right) \\vec u    \\\\  \\vec U_i &\\sim N^{(K)}(\\vec 0, \\Psi)    \\\\  h(t\\mid \\vec u) &= \\exp\\left(    \\vec\\omega^\\top\\vec b(t) +    \\vec z_i^\\top\\vec\\delta +    \\vec\\alpha^\\top\\vec\\mu(t, \\vec u)    \\right)    \\\\  &= \\exp\\Bigg(    \\vec\\omega^\\top\\vec b(t) +    \\vec z_i^\\top\\vec\\delta    + \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec x_i^\\top\\right)\\text{vec}\\Gamma    + \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec g(t)^\\top\\right)\\text{vec} B \\\\  &\\hspace{50pt}+ \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec m(t)^\\top\\right)\\vec u    \\Bigg)  \\end{align*}")  
 
 where ![\\vec Y\_{ij}\\in\\mathbb
 R^{n\_y}](https://latex.codecogs.com/svg.latex?%5Cvec%20Y_%7Bij%7D%5Cin%5Cmathbb%20R%5E%7Bn_y%7D
@@ -122,7 +126,8 @@ and ![\\vec\\alpha =
 "\\vec z_i") are individual specific known covariates.
 
 The package is not too well documented at this point. Instead we provide
-an example of how to use the package here.
+an example of how to use the package here and the
+[inst/test-data](inst/test-data) directory.
 
 ## Example
 
@@ -166,7 +171,7 @@ B <- structure(c(0.97, 0.01, -0.07, -0.78, -0.86, 0.98), .Dim = 3:2)
 sig <- diag(c(.2, .1)^2)
 alpha <- c(0.7, 0.6)
 delta <- 0.
-beta <- numeric()
+gamma <- numeric()
 ```
 
 ``` r
@@ -321,7 +326,7 @@ system.time(dat <- sim_joint_data_set(
   alpha = alpha, sigma = sig, b_func = b_func, g_func = g_func,
   m_func = m_func, gl_dat = gl_dat, r_z = r_z, r_left_trunc = r_left_trunc, 
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
-  r_obs_time = r_obs_time, y_max = 10, beta = beta, r_x = r_x))
+  r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
 #>    3.78    0.00    3.78
 ```
@@ -380,17 +385,10 @@ NROW(dat$marker_data) / NROW(dat$survival_data)
 
 ## TODOs
 
-  - Implement
-    ![X\_{ij}\\vec\\beta](https://latex.codecogs.com/svg.latex?X_%7Bij%7D%5Cvec%5Cbeta
-    "X_{ij}\\vec\\beta").
-  - Different basis for fixed time-varying effect and the random
-    time-varying effect in
-    ![\\vec\\mu](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu
-    "\\vec\\mu"). Typically, one might one a more flexible fixed effect.
   - Allow for derivatives of
     ![\\vec\\mu](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu
     "\\vec\\mu") in the hazard.  
   - Handle missing components, e.g. no ![\\vec\\delta^\\top\\vec
     z\_i](https://latex.codecogs.com/svg.latex?%5Cvec%5Cdelta%5E%5Ctop%5Cvec%20z_i
-    "\\vec\\delta^\\top\\vec z_i").
+    "\\vec\\delta^\\top\\vec z_i"). Check that this works.
   - Check that everything works with a univariate marker.

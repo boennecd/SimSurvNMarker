@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
   fig.width = 7)
 options(digits = 3)
 ```
+
 # SimSurvNMarker
 
 The `SimSurvNMarker` package reasonably fast simulates from a joint survival 
@@ -25,10 +26,10 @@ and marker model. Specifically, the package can simulate from the model
 <!--   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma) -->
 <!--   \\ -->
 <!-- \vec\mu(s, \vec u) &= -->
-<!--   X_{ij}\vec\beta + B^\top\vec g(s) + U^\top\vec m(s) -->
+<!--   \Gamma^\top \vec x_i + B^\top\vec g(s) + U^\top\vec m(s) -->
 <!--   \\ -->
-<!-- &= X_{ij}\vec\beta -->
-<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B  -->
+<!-- &= \left(I \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
+<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B -->
 <!--      + \left(I \otimes \vec m(s)^\top\right) \vec u -->
 <!--   \\ -->
 <!-- \vec U_i &\sim N^{(K)}(\vec 0, \Psi) -->
@@ -42,7 +43,8 @@ and marker model. Specifically, the package can simulate from the model
 <!-- &= \exp\Bigg( -->
 <!--   \vec\omega^\top\vec b(t) + -->
 <!--   \vec z_i^\top\vec\delta -->
-<!--   + \vec\alpha^\top X_{ij}\vec\beta -->
+<!--   + \vec 1^\top\left( -->
+<!--   \text{diag}(\vec \alpha) \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
 <!--   + \vec 1^\top\left( -->
 <!--   \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\ -->
 <!-- &\hspace{50pt}+ \vec 1^\top\left( -->
@@ -50,7 +52,7 @@ and marker model. Specifically, the package can simulate from the model
 <!--   \Bigg) -->
 <!-- \end{align*}$$ -->
 
-$$\begin{align*} \vec Y_{ij} \mid \vec U_i = \vec u_i   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)   \\ \vec\mu(s, \vec u) &=   X_{ij}\vec\beta + B^\top\vec g(s) + U^\top\vec m(s)   \\ &= X_{ij}\vec\beta      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B       + \left(I \otimes \vec m(s)^\top\right) \vec u   \\ \vec U_i &\sim N^{(K)}(\vec 0, \Psi)   \\ h(t\mid \vec u) &= \exp\left(   \vec\omega^\top\vec b(t) +   \vec z_i^\top\vec\delta +   \vec\alpha^\top\vec\mu(t, \vec u)   \right)   \\ &= \exp\Bigg(   \vec\omega^\top\vec b(t) +   \vec z_i^\top\vec\delta   + \vec\alpha^\top X_{ij}\vec\beta   + \vec 1^\top\left(   \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\ &\hspace{50pt}+ \vec 1^\top\left(   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u   \Bigg) \end{align*}$$
+$$\begin{align*}  \vec Y_{ij} \mid \vec U_i = \vec u_i    &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)    \\  \vec\mu(s, \vec u) &=    \Gamma^\top \vec x_i + B^\top\vec g(s) + U^\top\vec m(s)    \\  &= \left(I \otimes \vec x_i^\top\right)\text{vec}\Gamma       + \left(I \otimes \vec g(s)^\top\right)\text{vec} B       + \left(I \otimes \vec m(s)^\top\right) \vec u    \\  \vec U_i &\sim N^{(K)}(\vec 0, \Psi)    \\  h(t\mid \vec u) &= \exp\left(    \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta +    \vec\alpha^\top\vec\mu(t, \vec u)    \right)    \\  &= \exp\Bigg(    \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta    + \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec x_i^\top\right)\text{vec}\Gamma    + \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\  &\hspace{50pt}+ \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u    \Bigg)  \end{align*}$$
 
 where $\vec Y_{ij}\in\mathbb R^{n_y}$ is individual $i$'s 
 $j$th observed marker at time $s_{ij}$, 
@@ -68,7 +70,8 @@ when a first polynomial is used and $\vec\alpha = \vec 0$. $X_{ij}$ and
 $\vec z_i$ are individual specific known covariates.
 
 The package is not too well documented at this point. Instead we provide an 
-example of how to use the package here. 
+example of how to use the package here and the 
+[inst/test-data](inst/test-data) directory.
 
 ## Example
 We start by assigning all the variables that we will pass to the function
@@ -111,7 +114,7 @@ B <- structure(c(0.97, 0.01, -0.07, -0.78, -0.86, 0.98), .Dim = 3:2)
 sig <- diag(c(.2, .1)^2)
 alpha <- c(0.7, 0.6)
 delta <- 0.
-beta <- numeric()
+gamma <- numeric()
 ```
 
 ```{r get_splines}
@@ -250,7 +253,7 @@ system.time(dat <- sim_joint_data_set(
   alpha = alpha, sigma = sig, b_func = b_func, g_func = g_func,
   m_func = m_func, gl_dat = gl_dat, r_z = r_z, r_left_trunc = r_left_trunc, 
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
-  r_obs_time = r_obs_time, y_max = 10, beta = beta, r_x = r_x))
+  r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 ```
 
 Finally, we show a few of the first rows along with some summary statistics.
@@ -281,10 +284,7 @@ NROW(dat$marker_data) / NROW(dat$survival_data)
 
 ## TODOs 
 
-* Implement $X_{ij}\vec\beta$.
-* Different basis for fixed time-varying effect and the random time-varying 
-  effect in $\vec\mu$. Typically, one might one a more flexible fixed 
-  effect. 
 * Allow for derivatives of $\vec\mu$ in the hazard.  
-* Handle missing components, e.g. no $\vec\delta^\top\vec z_i$. 
+* Handle missing components, e.g. no $\vec\delta^\top\vec z_i$. Check that 
+  this works.
 * Check that everything works with a univariate marker.

@@ -42,7 +42,10 @@ eval_surv_base_fun <- function(
     ti, .eval_surv_base_fun_outer, FUN.VALUE = numeric(1L),
     omega = omega, b_func = b_func, gl_dat = gl_dat)
 
-  exp(exp(delta) * cum_haz_fac)
+  if(length(delta) > 0)
+    exp(exp(delta) * cum_haz_fac)
+  else
+    exp(cum_haz_fac)
 }
 
 .eval_marker_inner <- function(ti, B, m_func)
@@ -94,7 +97,7 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   n_y <- NCOL(sigma_chol)
 
   noise <- matrix(rnorm(n_markes * n_y), ncol = n_y)  %*% sigma_chol
-  y_obs <- c(eval_marker(
+  y_obs <- t(eval_marker(
     ti = obs_time, B = B, g_func = g_func, m_func = m_func, offset = offset,
     U = U)) + noise
   list(obs_time = obs_time, y_obs = y_obs)
@@ -138,7 +141,7 @@ surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
 #' @importFrom stats uniroot runif
 #' @export
 sim_joint_data_set <- function(
-  n_obs, B, Psi, omega, delta, alpha, sigma, beta, b_func, m_func, g_func,
+  n_obs, B, Psi, omega, delta, alpha, sigma, gamma, b_func, m_func, g_func,
   gl_dat = get_gl_rule(30L), r_z, r_left_trunc, r_right_cens,
   r_n_marker, r_x, r_obs_time, y_max){
   Psi_chol <- chol(Psi)
@@ -150,7 +153,7 @@ sim_joint_data_set <- function(
   d_m <- NROW(B)
   d_b <- length(omega)
   d_z <- length(delta)
-  d_x <- length(beta)
+  d_x <- length(gamma) / n_y
   K <- length(m_func(1L)) * n_y
 
   local({
@@ -158,9 +161,9 @@ sim_joint_data_set <- function(
     on.exit(.GlobalEnv$.Random.seed <- old_seed)
 
     stopifnot(
-      is.matrix(B), NCOL(B) == n_y,
-      is.matrix(Psi), NCOL(Psi) == K,
-      is.matrix(sigma),
+      is.matrix(B), is.numeric(B), NCOL(B) == n_y,
+      is.matrix(Psi), is.numeric(Psi), NCOL(Psi) == K,
+      is.matrix(sigma), is.numeric(sigma),
       is.numeric(alpha), length(alpha) == n_y,
       is.numeric(b_func(1)), length(b_func(1)) == d_b,
       is.numeric(m_func(1)),
@@ -169,6 +172,8 @@ sim_joint_data_set <- function(
       length(gl_dat$node) == length(gl_dat$weight),
       is.numeric(r_z()), length(r_z()) == d_z,
       is.numeric(r_x()), length(r_x()) == d_x,
+      length(gamma) == 0L || is.matrix(gamma), is.numeric(gamma),
+      length(gamma) == 0L || NROW(gamma) == n_y,
       is.numeric(r_left_trunc()),
       is.numeric(r_right_cens()),
       is.integer(r_n_marker()),
@@ -180,7 +185,6 @@ sim_joint_data_set <- function(
     out[[i]] <- {
       # keep going till we get a none left-truncated event
       has_sample <- FALSE
-
 
       z_delta <- if(d_z == 0L){
         z <- numeric()
@@ -196,7 +200,7 @@ sim_joint_data_set <- function(
         NULL
       } else {
         x <- r_x()
-        drop(x %*% beta)
+        eval_marker_cpp(B = gamma, m = x)
       }
 
       while(!has_sample){
@@ -268,7 +272,16 @@ sim_joint_data_set <- function(
 
   marker_dat <- do.call(
     rbind, lapply(ids, function(i){
-      out <- as.data.frame(out[[i]][["markers"]])
+      markers <- out[[i]][["markers"]]
+      n_y <- NROW(markers)
+      if(d_x > 0){
+        x <- structure(rep(out[[i]]$x, each = n_y),
+                       dimnames = list(NULL, paste0("X", seq_len(d_x))),
+                       dim = c(n_y, d_x))
+        markers <- cbind(markers, x)
+      }
+
+      out <- as.data.frame(markers)
       out$id <- i
       out
     }))

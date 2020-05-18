@@ -5,6 +5,10 @@ eval_marker_cpp <- function(B, m) {
     .Call(`_SimSurvNMarker_eval_marker`, B, m)
 }
 
+get_commutation <- function(m) {
+    .Call(`_SimSurvNMarker_get_commutation`, m)
+}
+
 #' @export
 get_gl_rule <- function(n) {
     .Call(`_SimSurvNMarker_get_gl_rule`, n)
