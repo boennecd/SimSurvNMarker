@@ -21,35 +21,36 @@ The `SimSurvNMarker` package reasonably fast simulates from a joint survival
 and marker model. Specifically, the package can simulate from the model 
 
 <!-- $$\begin{align*} -->
-<!-- \vec Y_{ij} \mid \vec U_i = \vec u_i  -->
-<!--   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)  -->
+<!-- \vec Y_{ij} \mid \vec U_i = \vec u_i -->
+<!--   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma) -->
 <!--   \\ -->
-<!-- \vec\mu(s, \vec u) &=  -->
-<!--   X_{ij}\vec\beta + \left(B^\top + U^\top\right)\vec m(s)  -->
+<!-- \vec\mu(s, \vec u) &= -->
+<!--   X_{ij}\vec\beta + B^\top\vec g(s) + U^\top\vec m(s) -->
 <!--   \\ -->
-<!-- &= X_{ij}\vec\beta  -->
-<!--      + \left(I \otimes \vec m(s)^\top\right) -->
-<!--        \left(\text{vec} B + \vec u\right)  -->
+<!-- &= X_{ij}\vec\beta -->
+<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B  -->
+<!--      + \left(I \otimes \vec m(s)^\top\right) \vec u -->
 <!--   \\ -->
 <!-- \vec U_i &\sim N^{(K)}(\vec 0, \Psi) -->
 <!--   \\ -->
 <!-- h(t\mid \vec u) &= \exp\left( -->
-<!--   \vec\omega^\top\vec b(t) +  -->
+<!--   \vec\omega^\top\vec b(t) + -->
 <!--   \vec z_i^\top\vec\delta + -->
 <!--   \vec\alpha^\top\vec\mu(t, \vec u) -->
-<!--   \right)  -->
+<!--   \right) -->
 <!--   \\ -->
-<!-- &= \exp\left( -->
-<!--   \vec\omega^\top\vec b(t) +  -->
+<!-- &= \exp\Bigg( -->
+<!--   \vec\omega^\top\vec b(t) + -->
 <!--   \vec z_i^\top\vec\delta -->
 <!--   + \vec\alpha^\top X_{ij}\vec\beta -->
 <!--   + \vec 1^\top\left( -->
-<!--   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right) -->
-<!--   \left(\text{vec} B + \vec u\right) -->
-<!--   \right) -->
+<!--   \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\ -->
+<!-- &\hspace{50pt}+ \vec 1^\top\left( -->
+<!--   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u -->
+<!--   \Bigg) -->
 <!-- \end{align*}$$ -->
 
-$$\begin{align*} \vec Y_{ij} \mid \vec U_i = \vec u_i    &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)    \\ \vec\mu(s, \vec u) &=    X_{ij}\vec\beta + \left(B^\top + U^\top\right)\vec m(s)    \\ &= X_{ij}\vec\beta       + \left(I \otimes \vec m(s)^\top\right)        \left(\text{vec} B + \vec u\right)    \\ \vec U_i &\sim N^{(K)}(\vec 0, \Psi)   \\ h(t\mid \vec u) &= \exp\left(   \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta +   \vec\alpha^\top\vec\mu(t, \vec u)   \right)    \\ &= \exp\left(   \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta   + \vec\alpha^\top X_{ij}\vec\beta   + \vec 1^\top\left(   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)   \left(\text{vec} B + \vec u\right)   \right) \end{align*}$$
+$$\begin{align*} \vec Y_{ij} \mid \vec U_i = \vec u_i   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)   \\ \vec\mu(s, \vec u) &=   X_{ij}\vec\beta + B^\top\vec g(s) + U^\top\vec m(s)   \\ &= X_{ij}\vec\beta      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B       + \left(I \otimes \vec m(s)^\top\right) \vec u   \\ \vec U_i &\sim N^{(K)}(\vec 0, \Psi)   \\ h(t\mid \vec u) &= \exp\left(   \vec\omega^\top\vec b(t) +   \vec z_i^\top\vec\delta +   \vec\alpha^\top\vec\mu(t, \vec u)   \right)   \\ &= \exp\Bigg(   \vec\omega^\top\vec b(t) +   \vec z_i^\top\vec\delta   + \vec\alpha^\top X_{ij}\vec\beta   + \vec 1^\top\left(   \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\ &\hspace{50pt}+ \vec 1^\top\left(   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u   \Bigg) \end{align*}$$
 
 where $\vec Y_{ij}\in\mathbb R^{n_y}$ is individual $i$'s 
 $j$th observed marker at time $s_{ij}$, 
@@ -84,6 +85,7 @@ gl_dat <- get_gl_rule(30L)
 # spline functions
 b_ks <- seq(log(1), log(10), length.out = 4)
 m_ks <- seq(0, 10, length.out = 3)
+g_ks <- m_ks
 
 # simulation functions
 r_n_marker <- function()
@@ -92,6 +94,8 @@ r_obs_time <- function(n_markes)
   sort(runif(n_markes, 0, 10))
 r_z <- function()
   as.numeric(runif(1L) > .5)
+r_x <- function()
+  numeric()
 r_left_trunc <- function()
    rbeta(1, 1, 2) * 3
 r_right_cens <- function()
@@ -107,11 +111,13 @@ B <- structure(c(0.97, 0.01, -0.07, -0.78, -0.86, 0.98), .Dim = 3:2)
 sig <- diag(c(.2, .1)^2)
 alpha <- c(0.7, 0.6)
 delta <- 0.
+beta <- numeric()
 ```
 
 ```{r get_splines}
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
+g_func <- get_ns_spline(g_ks, do_log = FALSE)
 ```
 
 We show the baseline hazard function and the survival function without 
@@ -142,7 +148,7 @@ points are observed markers, $\vec y_{ij}$.
 
 ```{r show_sim_marker, fig.height=9, fig.width=9}
 set.seed(1)
-show_mark_mean <- function(B, Psi, sigma, m_func){
+show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
   tis <- seq(0, 10, length.out = 100)
   Psi_chol <- chol(Psi)
   
@@ -151,23 +157,28 @@ show_mark_mean <- function(B, Psi, sigma, m_func){
   par(mar = c(4, 3, 1, 1), mfcol = c(4, 4))
   
   sigma_chol <- chol(sigma)
+  n_y <- NCOL(sigma_chol)
   for(i in 1:16){
-    U <- draw_U(Psi_chol)
-    y_non_rng <- t(eval_marker(tis, B    , m_func))
-    y_rng     <- t(eval_marker(tis, B + U, m_func))
+    U <- draw_U(Psi_chol, n_y = n_y)
+    y_non_rng <- t(eval_marker(tis, B = B, g_func = g_func, U = NULL, 
+                               offset = NULL, m_func = m_func))
+    y_rng     <- t(eval_marker(tis, B = B, g_func = g_func, U = U, 
+                               offset = NULL, m_func = m_func))
 
     sds <- sapply(tis, function(ti){
-      M <- (diag(NCOL(B)) %x% m_func(ti))
+      M <- (diag(n_y) %x% m_func(ti))
+      G <- (diag(n_y) %x% g_func(ti))
       sds <- sqrt(diag(tcrossprod(M %*% Psi, M)))
-      cbind(drop(M %*% c(B)) - 1.96 * sds,
-            drop(M %*% c(B)) + 1.96 * sds)
+      cbind(drop(G %*% c(B)) - 1.96 * sds,
+            drop(G %*% c(B)) + 1.96 * sds)
     }, simplify = "array")
     lbs <- t(sds[, 1, ])
     ubs <- t(sds[, 2, ])
 
     y_obs <- sim_marker(B = B, U = U, sigma_chol = sigma_chol, 
                         m_func = m_func, r_n_marker = r_n_marker, 
-                        r_obs_time = r_obs_time)
+                        r_obs_time = r_obs_time, g_func = g_func, 
+                        offset = NULL)
 
     matplot(tis, y_non_rng, type = "l", lty = 2, ylab = "", xlab = "Time",
             ylim = range(y_non_rng, y_rng, lbs, ubs, y_obs$y_obs))
@@ -182,7 +193,8 @@ show_mark_mean <- function(B, Psi, sigma, m_func){
   }
   invisible()
 }
-show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func)
+show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func, 
+               g_func = g_func)
 ```
 
 We sample a number of random effects and plot the hazard curves and survival 
@@ -197,12 +209,16 @@ local({
 
   # hazard functions
   tis <- seq(1e-4, 10, length.out = 50)
-  Us <- replicate(100, draw_U(chol(Psi)))
+  n_y <- NCOL(sig)
+  Us <- replicate(100, draw_U(chol(Psi), n_y = n_y), 
+                  simplify = "array")
 
-  hz <- apply(Us, 2L, function(U)
+  hz <- apply(Us, 3L, function(U)
     vapply(tis, function(x)
       exp(drop(delta + b_func(x) %*% omega +
-                 alpha %*% eval_marker(ti = x, B = B + U, m_func))),
+                 alpha %*% eval_marker(ti = x, B = B, m_func = m_func, 
+                                       g_func = g_func, U = U, 
+                                       offset = NULL))),
       FUN.VALUE = numeric(1L)))
 
   matplot(tis, hz, lty = 1, type = "l", col = rgb(0, 0, 0, .1),
@@ -210,10 +226,10 @@ local({
           xlab = "time", ylab = "Hazard")
 
   # survival functions
-  ys <- apply(Us, 2L, surv_func_joint,
+  ys <- apply(Us, 3L, surv_func_joint,
               ti = tis, B = B, omega = omega, delta = delta,
               alpha = alpha, b_func = b_func, m_func = m_func, 
-              gl_dat = gl_dat)
+              gl_dat = gl_dat, g_func = g_func, offset = NULL)
 
   matplot(tis, ys, lty = 1, type = "l", col = rgb(0, 0, 0, .1),
           xaxs = "i", bty = "l", yaxs = "i", ylim = c(0, 1),
@@ -231,10 +247,10 @@ set.seed(70483614)
 delta_vec <- 1
 system.time(dat <- sim_joint_data_set(
   n_obs = 1000L, B = B, Psi = Psi, omega = omega, delta = delta_vec,
-  alpha = alpha, sigma = sig, b_func = b_func, 
+  alpha = alpha, sigma = sig, b_func = b_func, g_func = g_func,
   m_func = m_func, gl_dat = gl_dat, r_z = r_z, r_left_trunc = r_left_trunc, 
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
-  r_obs_time = r_obs_time, y_max = 10))
+  r_obs_time = r_obs_time, y_max = 10, beta = beta, r_x = r_x))
 ```
 
 Finally, we show a few of the first rows along with some summary statistics.
