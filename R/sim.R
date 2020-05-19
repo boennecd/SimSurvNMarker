@@ -66,7 +66,7 @@ eval_marker <- function(ti, B, g_func, U, m_func, offset){
     return(out)
   }
 
-  out <- numeric(length(ti))
+  out <- 0.
   if(length(B) > 0)
     out <- out + vapply(
       ti, .eval_marker_inner, FUN.VALUE = numeric(NCOL(B)), B = B,
@@ -166,7 +166,9 @@ sim_joint_data_set <- function(
     on.exit(.GlobalEnv$.Random.seed <- old_seed)
 
     stopifnot(
-      is.matrix(B), is.numeric(B), NCOL(B) == n_y,
+      length(B) == 0L || is.matrix(B),
+      length(B) == 0L || is.numeric(B),
+      length(B) == 0L || NCOL(B) == n_y,
       is.matrix(Psi), is.numeric(Psi), NCOL(Psi) == K,
       is.matrix(sigma), is.numeric(sigma),
       is.numeric(alpha), length(alpha) == n_y,
@@ -177,7 +179,8 @@ sim_joint_data_set <- function(
       length(gl_dat$node) == length(gl_dat$weight),
       is.numeric(r_z()), length(r_z()) == d_z,
       is.numeric(r_x()), length(r_x()) == d_x,
-      length(gamma) == 0L || is.matrix(gamma), is.numeric(gamma),
+      length(gamma) == 0L || is.matrix(gamma),
+      length(gamma) == 0L || is.numeric(gamma),
       length(gamma) == 0L || NCOL(gamma) == n_y,
       is.numeric(r_left_trunc()),
       is.numeric(r_right_cens()),
@@ -267,11 +270,14 @@ sim_joint_data_set <- function(
   survival_dat <- do.call(
     rbind, lapply(ids, function(i){
       dat_i <- out[[i]][c("z", "left_trunc", "y", "event")]
-      dat_i$z <- matrix(
-        dat_i$z, nrow = 1L,
-        dimnames = list(NULL, paste0("Z", seq_along(dat_i$z))))
+      if(d_z > 0){
+        dat_i$z <- matrix(
+          dat_i$z, nrow = 1L,
+          dimnames = list(NULL, paste0("Z", seq_along(dat_i$z))))
+        names(dat_i)[1L] <- ""
+      } else
+        dat_i$z <- NULL
       dat_i$id <- i
-      names(dat_i)[1L] <- ""
       do.call(data.frame, dat_i)
     }))
 

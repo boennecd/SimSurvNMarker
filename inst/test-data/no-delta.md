@@ -1,37 +1,34 @@
----
-output:
-  github_document
----  
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  out.width = "100%",  
-  fig.height = 4, 
-  fig.width = 7, 
-  fig.path = file.path("fig", paste0(file_name, "-")),
-  error = FALSE, 
-  dpi = 300)
-options(digits = 3)
-```
 
 Show configurations
 
-```{r show_par}
+``` r
 dput(alpha)
+#> c(0.24, 0.49)
 dput(omega)
+#> c(-4.11, -1.28)
 dput(delta)
+#> NULL
 dput(gamma)
+#> structure(c(0.15, -0.21, 0.24, -0.21, 0.16, -0.23, 0.24, -0.18
+#> ), .Dim = c(4L, 2L))
 dput(B)
+#> structure(c(0.95, -0.02, -0.22, -0.27, -0.45, 0.39, -0.05, -0.39
+#> ), .Dim = c(4L, 2L))
 dput(sig) # Sigma
+#> structure(c(0.08, 0, 0, 0.02), .Dim = c(2L, 2L))
 dput(Psi)
+#> structure(c(2.64, 0.29, -0.34, 1.12, 0.14, 0.74, 0.29, 1.97, 
+#> -0.23, -0.1, 0.07, -0.79, -0.34, -0.23, 2.87, -0.45, 0.22, 0.12, 
+#> 1.12, -0.1, -0.45, 1.23, 0.45, -0.32, 0.14, 0.07, 0.22, 0.45, 
+#> 2.49, 0.09, 0.74, -0.79, 0.12, -0.32, 0.09, 2.03), .Dim = c(6L, 
+#> 6L))
 dput(n_obs)
+#> 2000L
 ```
 
 Define sampling functions
 
-```{r def_sample}
+``` r
 r_n_marker <- function()
   rpois(1, 10) + 1L
 r_obs_time <- function(n_markes)
@@ -48,7 +45,7 @@ r_right_cens <- function()
 
 Get splines
 
-```{r get_splines}
+``` r
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
@@ -56,22 +53,27 @@ g_func <- get_ns_spline(g_ks, do_log = FALSE)
 
 Get the Gauss-Legendre quadrature nodes we need
 
-```{r get_gl}
+``` r
 gl_dat <- get_gl_rule(30L)
 ```
 
 Plot baseline hazard and survival function without the marker
 
-```{r attach_SimSurvNMarker}
+``` r
 library(SimSurvNMarker)
 ```
 
-```{r plot_wo_marker}
+``` r
 # hazard function without marker
 par(mar = c(5, 5, 1, 1))
 plot(function(x) exp(drop(b_func(x) %*% omega)),
      xlim = c(1e-8, 10), ylim = c(0, .61), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i", bty = "l")
+```
+
+<img src="fig/no-delta-plot_wo_marker-1.png" width="100%" />
+
+``` r
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -83,9 +85,11 @@ abline(h = .75, lty = 3)
 abline(h = .25, lty = 3)
 ```
 
+<img src="fig/no-delta-plot_wo_marker-2.png" width="100%" />
+
 Simulate a few markers as an example
 
-```{r show_sim_marker, fig.height=9, fig.width=9}
+``` r
 set.seed(1)
 show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
   tis <- seq(0, 10, length.out = 100)
@@ -159,9 +163,11 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
                g_func = g_func)
 ```
 
+<img src="fig/no-delta-show_sim_marker-1.png" width="100%" />
+
 Illustrate a few conditional hazard functions and survival functions
 
-```{r show_draw_surv_curves}
+``` r
 set.seed(1)
 local({
   par_old <- par(no.readonly = TRUE)
@@ -200,9 +206,11 @@ local({
 })
 ```
 
+<img src="fig/no-delta-show_draw_surv_curves-1.png" width="100%" />
+
 Simulate a data set
 
-```{r sim_dat}
+``` r
 set.seed(1)
 system.time(dat <- sim_joint_data_set(
   n_obs = n_obs, B = B, Psi = Psi, omega = omega, delta = delta, 
@@ -210,34 +218,59 @@ system.time(dat <- sim_joint_data_set(
   m_func = m_func, g_func = g_func, gl_dat = gl_dat, r_z = r_z, 
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
+#>    user  system elapsed 
+#>    6.38    0.27    6.65
 ```
 
 Show stats
 
-```{r show_stats}
+``` r
 # survival data
 head(dat$survival_data)
+#>   left_trunc     y event id
+#> 1     0.0122 0.875  TRUE  1
+#> 2     1.1822 7.429 FALSE  2
+#> 3     0.4808 8.640 FALSE  3
+#> 4     1.5553 6.064  TRUE  4
+#> 5     0.6044 2.830  TRUE  5
+#> 6     0.1165 5.609 FALSE  6
 
 # marker data
 head(dat$marker_data, 10)
+#>    obs_time      Y1      Y2 X1 X2 X3 X4 id
+#> 1     0.134  1.1326  1.0328  0  0  1  1  1
+#> 2     1.217 -0.2416 -0.0713  0  0  0  1  2
+#> 3     1.433  0.5727  0.0418  0  0  0  1  2
+#> 4     2.396 -0.2878 -0.3242  0  0  0  1  2
+#> 5     2.455 -0.0765 -0.0767  0  0  0  1  2
+#> 6     4.101 -0.0236 -0.1264  0  0  0  1  2
+#> 7     4.553  0.0581 -0.1275  0  0  0  1  2
+#> 8     6.423 -0.0578 -0.1016  0  0  0  1  2
+#> 9     7.111 -0.4707 -0.1517  0  0  0  1  2
+#> 10    1.892 -0.0661  0.8521  1  0  0  1  3
 
 # rate of observed events
 mean(dat$survival_data$event) 
+#> [1] 0.466
 
 # mean event time
 mean(subset(dat$survival_data, event)$y)
+#> [1] 3.74
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
+#>     0%    25%    50%    75%   100% 
+#> 0.0106 1.8424 3.4080 5.3775 9.7474
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
+#> [1] 5.64
 ```
 
-Fixed mixed linear mixed model and see that we get estimates which are close
-to the true values
+Fixed mixed linear mixed model and see that we get estimates which are
+close to the true values
 
-```{r est_lin_mix}
+``` r
 library(lme4)
 library(reshape2)
 library(splines)
@@ -325,20 +358,67 @@ local({
 
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
+#> $gamma
+#>        [,1]   [,2]
+#> [1,]  0.152  0.166
+#> [2,] -0.192 -0.176
+#> [3,]  0.234  0.208
+#> [4,] -0.200 -0.159
+#> 
+#> $B
+#>         [,1]   [,2]
+#> [1,]  0.8701 -0.580
+#> [2,] -0.0538  0.324
+#> [3,] -0.2752 -0.156
+#> [4,] -0.2286 -0.312
+#> 
+#> $Psi
+#>        [,1]    [,2]    [,3]    [,4]   [,5]    [,6]
+#> [1,]  2.784  0.3048 -0.4208  1.0019 0.1597  0.7366
+#> [2,]  0.305  1.8800 -0.3365 -0.0614 0.0385 -0.6881
+#> [3,] -0.421 -0.3365  3.1927 -0.3706 0.3303  0.0911
+#> [4,]  1.002 -0.0614 -0.3706  1.0311 0.4739 -0.2757
+#> [5,]  0.160  0.0385  0.3303  0.4739 2.2944  0.0761
+#> [6,]  0.737 -0.6881  0.0911 -0.2757 0.0761  1.7286
+#> 
+#> $Sigma
+#>      [,1] [,2]
+#> [1,] 0.05 0.00
+#> [2,] 0.00 0.05
 ```
 
 Compare with the true values
 
-```{r true_lin_mix_par}
+``` r
 gamma
+#>       [,1]  [,2]
+#> [1,]  0.15  0.16
+#> [2,] -0.21 -0.23
+#> [3,]  0.24  0.24
+#> [4,] -0.21 -0.18
 B
+#>       [,1]  [,2]
+#> [1,]  0.95 -0.45
+#> [2,] -0.02  0.39
+#> [3,] -0.22 -0.05
+#> [4,] -0.27 -0.39
 Psi
+#>       [,1]  [,2]  [,3]  [,4] [,5]  [,6]
+#> [1,]  2.64  0.29 -0.34  1.12 0.14  0.74
+#> [2,]  0.29  1.97 -0.23 -0.10 0.07 -0.79
+#> [3,] -0.34 -0.23  2.87 -0.45 0.22  0.12
+#> [4,]  1.12 -0.10 -0.45  1.23 0.45 -0.32
+#> [5,]  0.14  0.07  0.22  0.45 2.49  0.09
+#> [6,]  0.74 -0.79  0.12 -0.32 0.09  2.03
 sig
+#>      [,1] [,2]
+#> [1,] 0.08 0.00
+#> [2,] 0.00 0.02
 ```
 
 Fit Cox model with only the observed markers (likely biased)
 
-```{r est_coxph}
+``` r
 local({
   library(survival)
   tdat <- tmerge(dat$survival_data, dat$survival_data, id = id, 
@@ -369,11 +449,32 @@ local({
   print(summary(fit))  
   invisible(fit)
 })
+#> Call:
+#> coxph(formula = sformula, data = tdat)
+#> 
+#>   n= 11286, number of events= 3208 
+#> 
+#>      coef exp(coef) se(coef)    z Pr(>|z|)    
+#> Y1 0.2045    1.2269   0.0172 11.8   <2e-16 ***
+#> Y2 0.2794    1.3224   0.0202 13.8   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#>    exp(coef) exp(-coef) lower .95 upper .95
+#> Y1      1.23      0.815      1.19      1.27
+#> Y2      1.32      0.756      1.27      1.38
+#> 
+#> Concordance= 0.605  (se = 0.005 )
+#> Likelihood ratio test= 385  on 2 df,   p=<2e-16
+#> Wald test            = 382  on 2 df,   p=<2e-16
+#> Score (logrank) test = 382  on 2 df,   p=<2e-16
 ```
 
 Compare with the true value
 
-```{r true_coxph}
+``` r
 delta
+#> NULL
 alpha
+#> [1] 0.24 0.49
 ```

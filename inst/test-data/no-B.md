@@ -1,37 +1,33 @@
----
-output:
-  github_document
----  
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  out.width = "100%",  
-  fig.height = 4, 
-  fig.width = 7, 
-  fig.path = file.path("fig", paste0(file_name, "-")),
-  error = FALSE, 
-  dpi = 300)
-options(digits = 3)
-```
 
 Show configurations
 
-```{r show_par}
+``` r
 dput(alpha)
+#> c(0.2, -0.25, 0.1)
 dput(omega)
+#> c(-0.79, -1.25, -4.46, 0.14)
 dput(delta)
+#> c(-0.05, 0.05, -0.15, -0.16)
 dput(gamma)
+#> structure(c(-0.23, -0.15, 0.19, -0.16, -0.22, -0.17, 0.2, -0.21, 
+#> -0.1, 0.09, 0.13, 0.14), .Dim = 4:3)
 dput(B)
+#> NULL
 dput(sig) # Sigma
+#> structure(c(0.14, 0, 0, 0, 0.14, 0, 0, 0, 0.02), .Dim = c(3L, 
+#> 3L))
 dput(Psi)
+#> structure(c(2.58, -0.59, 0.87, -0.61, 0.13, 0.52, -0.59, 1, -0.3, 
+#> 0.27, 0.02, 0.2, 0.87, -0.3, 1.12, 0.03, -0.36, 0, -0.61, 0.27, 
+#> 0.03, 2.19, -0.2, 0.06, 0.13, 0.02, -0.36, -0.2, 0.85, 0.32, 
+#> 0.52, 0.2, 0, 0.06, 0.32, 1.32), .Dim = c(6L, 6L))
 dput(n_obs)
+#> 2000L
 ```
 
 Define sampling functions
 
-```{r def_sample}
+``` r
 r_n_marker <- function()
   rpois(1, 10) + 1L
 r_obs_time <- function(n_markes)
@@ -48,7 +44,7 @@ r_right_cens <- function()
 
 Get splines
 
-```{r get_splines}
+``` r
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
@@ -56,22 +52,27 @@ g_func <- get_ns_spline(g_ks, do_log = FALSE)
 
 Get the Gauss-Legendre quadrature nodes we need
 
-```{r get_gl}
+``` r
 gl_dat <- get_gl_rule(30L)
 ```
 
 Plot baseline hazard and survival function without the marker
 
-```{r attach_SimSurvNMarker}
+``` r
 library(SimSurvNMarker)
 ```
 
-```{r plot_wo_marker}
+``` r
 # hazard function without marker
 par(mar = c(5, 5, 1, 1))
 plot(function(x) exp(drop(b_func(x) %*% omega)),
      xlim = c(1e-8, 10), ylim = c(0, .61), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i", bty = "l")
+```
+
+<img src="fig/no-B-plot_wo_marker-1.png" width="100%" />
+
+``` r
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -83,9 +84,11 @@ abline(h = .75, lty = 3)
 abline(h = .25, lty = 3)
 ```
 
+<img src="fig/no-B-plot_wo_marker-2.png" width="100%" />
+
 Simulate a few markers as an example
 
-```{r show_sim_marker, fig.height=9, fig.width=9}
+``` r
 set.seed(1)
 show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
   tis <- seq(0, 10, length.out = 100)
@@ -159,9 +162,11 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
                g_func = g_func)
 ```
 
+<img src="fig/no-B-show_sim_marker-1.png" width="100%" />
+
 Illustrate a few conditional hazard functions and survival functions
 
-```{r show_draw_surv_curves}
+``` r
 set.seed(1)
 local({
   par_old <- par(no.readonly = TRUE)
@@ -200,9 +205,11 @@ local({
 })
 ```
 
+<img src="fig/no-B-show_draw_surv_curves-1.png" width="100%" />
+
 Simulate a data set
 
-```{r sim_dat}
+``` r
 set.seed(1)
 system.time(dat <- sim_joint_data_set(
   n_obs = n_obs, B = B, Psi = Psi, omega = omega, delta = delta, 
@@ -210,34 +217,59 @@ system.time(dat <- sim_joint_data_set(
   m_func = m_func, g_func = g_func, gl_dat = gl_dat, r_z = r_z, 
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
+#>    user  system elapsed 
+#>    4.92    0.00    4.92
 ```
 
 Show stats
 
-```{r show_stats}
+``` r
 # survival data
 head(dat$survival_data)
+#>   Z1 Z2 Z3 Z4 left_trunc    y event id
+#> 1  0  0  1  1      0.344 3.43  TRUE  1
+#> 2  1  1  1  1      0.999 5.54  TRUE  2
+#> 3  1  1  1  0      1.240 7.60 FALSE  3
+#> 4  1  0  0  1      0.247 8.57  TRUE  4
+#> 5  1  1  1  0      0.902 6.90  TRUE  5
+#> 6  0  1  0  0      1.184 2.97  TRUE  6
 
 # marker data
 head(dat$marker_data, 10)
+#>    obs_time     Y1      Y2      Y3 X1 X2 X3 X4 id
+#> 1     0.707 -1.187 -0.6774  1.2201  0  1  1  1  1
+#> 2     2.448 -1.223 -0.8644  0.9657  0  1  1  1  1
+#> 3     2.848  0.412 -0.4768  0.4690  1  1  1  1  2
+#> 4     3.355 -0.114 -0.5799  0.7326  1  1  1  1  2
+#> 5     4.131  0.383  0.1429  0.5038  1  1  1  1  2
+#> 6     4.462  0.123 -0.2854  0.9292  1  1  1  1  2
+#> 7     2.477 -1.190  0.2983 -0.0365  0  0  1  0  3
+#> 8     3.729 -0.626 -0.6280 -0.0972  0  0  1  0  3
+#> 9     4.707 -1.280 -0.0714 -0.1979  0  0  1  0  3
+#> 10    4.850 -0.580 -0.2998 -0.2789  0  0  1  0  3
 
 # rate of observed events
 mean(dat$survival_data$event) 
+#> [1] 0.628
 
 # mean event time
 mean(subset(dat$survival_data, event)$y)
+#> [1] 4.02
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
+#>     0%    25%    50%    75%   100% 
+#> 0.0987 2.1472 3.7732 5.6947 9.9889
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
+#> [1] 5.16
 ```
 
-Fixed mixed linear mixed model and see that we get estimates which are close
-to the true values
+Fixed mixed linear mixed model and see that we get estimates which are
+close to the true values
 
-```{r est_lin_mix}
+``` r
 library(lme4)
 library(reshape2)
 library(splines)
@@ -325,20 +357,61 @@ local({
 
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
+#> $gamma
+#>          [,1]   [,2]   [,3]
+#> [1,] -0.00177 -0.217 -0.195
+#> [2,] -0.09549 -0.146 -0.178
+#> [3,]  0.07747  0.166  0.194
+#> [4,]  0.14810 -0.128 -0.178
+#> 
+#> $B
+#>      [,1] [,2] [,3]
+#> 
+#> $Psi
+#>         [,1]    [,2]   [,3]   [,4]    [,5]   [,6]
+#> [1,]  2.5781 -0.6194  0.837 -0.627  0.0742  0.433
+#> [2,] -0.6194  1.0533 -0.383  0.224  0.0619  0.170
+#> [3,]  0.8373 -0.3832  1.160  0.054 -0.3384 -0.118
+#> [4,] -0.6275  0.2236  0.054  2.246 -0.1396  0.059
+#> [5,]  0.0742  0.0619 -0.338 -0.140  0.7514  0.284
+#> [6,]  0.4325  0.1705 -0.118  0.059  0.2837  1.059
+#> 
+#> $Sigma
+#>       [,1]  [,2]  [,3]
+#> [1,] 0.101 0.000 0.000
+#> [2,] 0.000 0.101 0.000
+#> [3,] 0.000 0.000 0.101
 ```
 
 Compare with the true values
 
-```{r true_lin_mix_par}
+``` r
 gamma
+#>       [,1]  [,2]  [,3]
+#> [1,] -0.23 -0.22 -0.10
+#> [2,] -0.15 -0.17  0.09
+#> [3,]  0.19  0.20  0.13
+#> [4,] -0.16 -0.21  0.14
 B
+#> NULL
 Psi
+#>       [,1]  [,2]  [,3]  [,4]  [,5] [,6]
+#> [1,]  2.58 -0.59  0.87 -0.61  0.13 0.52
+#> [2,] -0.59  1.00 -0.30  0.27  0.02 0.20
+#> [3,]  0.87 -0.30  1.12  0.03 -0.36 0.00
+#> [4,] -0.61  0.27  0.03  2.19 -0.20 0.06
+#> [5,]  0.13  0.02 -0.36 -0.20  0.85 0.32
+#> [6,]  0.52  0.20  0.00  0.06  0.32 1.32
 sig
+#>      [,1] [,2] [,3]
+#> [1,] 0.14 0.00 0.00
+#> [2,] 0.00 0.14 0.00
+#> [3,] 0.00 0.00 0.02
 ```
 
 Fit Cox model with only the observed markers (likely biased)
 
-```{r est_coxph}
+``` r
 local({
   library(survival)
   tdat <- tmerge(dat$survival_data, dat$survival_data, id = id, 
@@ -369,11 +442,42 @@ local({
   print(summary(fit))  
   invisible(fit)
 })
+#> Call:
+#> coxph(formula = sformula, data = tdat)
+#> 
+#>   n= 10329, number of events= 4707 
+#> 
+#>        coef exp(coef) se(coef)     z Pr(>|z|)    
+#> Z1 -0.20236   0.81680  0.02931 -6.90  5.1e-12 ***
+#> Z2  0.12134   1.12901  0.02930  4.14  3.4e-05 ***
+#> Z3 -0.00593   0.99409  0.02927 -0.20   0.8395    
+#> Z4 -0.25721   0.77320  0.02938 -8.75  < 2e-16 ***
+#> Y1  0.09817   1.10315  0.01673  5.87  4.4e-09 ***
+#> Y2 -0.11792   0.88877  0.01985 -5.94  2.8e-09 ***
+#> Y3  0.08118   1.08457  0.02523  3.22   0.0013 ** 
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#>    exp(coef) exp(-coef) lower .95 upper .95
+#> Z1     0.817      1.224     0.771     0.865
+#> Z2     1.129      0.886     1.066     1.196
+#> Z3     0.994      1.006     0.939     1.053
+#> Z4     0.773      1.293     0.730     0.819
+#> Y1     1.103      0.906     1.068     1.140
+#> Y2     0.889      1.125     0.855     0.924
+#> Y3     1.085      0.922     1.032     1.140
+#> 
+#> Concordance= 0.564  (se = 0.004 )
+#> Likelihood ratio test= 202  on 7 df,   p=<2e-16
+#> Wald test            = 202  on 7 df,   p=<2e-16
+#> Score (logrank) test = 202  on 7 df,   p=<2e-16
 ```
 
 Compare with the true value
 
-```{r true_coxph}
+``` r
 delta
+#> [1] -0.05  0.05 -0.15 -0.16
 alpha
+#> [1]  0.20 -0.25  0.10
 ```

@@ -19,3 +19,6 @@ knit_example <- function(file_name){
 
 knit_example("w-all.R")
 knit_example("one-marker.R")
+knit_example("no-gamma.R")
+knit_example("no-B.R")
+knit_example("no-delta.R")

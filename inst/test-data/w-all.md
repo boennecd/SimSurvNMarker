@@ -104,6 +104,11 @@ show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
                              offset = NULL, m_func = m_func)
     y_rng     <- eval_marker(tis, B = B, g_func = g_func, U = U, 
                              offset = NULL, m_func = m_func)
+    if(length(B) == 0L){
+      y_non_rng <- y_rng
+      y_non_rng[] <- 0.
+    }
+    
     if(!is.vector(y_non_rng)){
       y_non_rng <- t(y_non_rng)
       y_rng     <- t(y_rng)
@@ -116,8 +121,11 @@ show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
       M <- (diag(n_y) %x% m_func(ti))
       G <- (diag(n_y) %x% g_func(ti))
       sds <- sqrt(diag(tcrossprod(M %*% Psi, M)))
-      cbind(drop(G %*% c(B)) - 1.96 * sds,
-            drop(G %*% c(B)) + 1.96 * sds)
+      if(length(B) > 0)
+        cbind(drop(G %*% c(B)) - 1.96 * sds,
+              drop(G %*% c(B)) + 1.96 * sds)
+      else 
+        cbind(- 1.96 * sds, 1.96 * sds)
     }, simplify = "array")
     lbs <- sds[, 1, ]
     ubs <- sds[, 2, ]
@@ -208,7 +216,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   5.946   0.046   5.992
+#>    5.70    0.04    5.74
 ```
 
 Show stats
@@ -282,12 +290,19 @@ local({
                   value.name = "XXTHEVALUEXX")
   
   if(length(alpha) > 1){
-    frm <- substitute(
-      XXTHEVALUEXX ~
-        XXTHEVARIABLEXX : ns_func(ti, g_ks) - 1L +
-        (XXTHEVARIABLEXX : ns_func(ti, m_ks) - 1L | i),
-      list(ti = as.name("obs_time"), i = as.name("id"), 
-           g_ks = as.name("g_ks"), m_ks = as.name("m_ks")))
+    if(length(B) > 0L)
+      frm <- substitute(
+        XXTHEVALUEXX ~
+          XXTHEVARIABLEXX : ns_func(ti, g_ks) - 1L +
+          (XXTHEVARIABLEXX : ns_func(ti, m_ks) - 1L | i),
+        list(ti = as.name("obs_time"), i = as.name("id"), 
+             g_ks = as.name("g_ks"), m_ks = as.name("m_ks")))
+    else 
+      frm <- substitute(
+        XXTHEVALUEXX ~
+          (XXTHEVARIABLEXX : ns_func(ti, m_ks) - 1L | i),
+        list(ti = as.name("obs_time"), i = as.name("id"), 
+             m_ks = as.name("m_ks")))
     frm <- eval(frm)
     
     if(d_x > 0)
@@ -299,12 +314,19 @@ local({
       }
     
   } else {
-    frm <- substitute(
-      XXTHEVALUEXX ~
-        ns_func(ti, g_ks) - 1L +
-        (ns_func(ti, m_ks) - 1L | i),
-      list(ti = as.name("obs_time"), i = as.name("id"), 
-           g_ks = as.name("g_ks"), m_ks = as.name("m_ks")))
+    if(length(B) > 0L)
+      frm <- substitute(
+        XXTHEVALUEXX ~
+          ns_func(ti, g_ks) - 1L +
+          (ns_func(ti, m_ks) - 1L | i),
+        list(ti = as.name("obs_time"), i = as.name("id"), 
+             g_ks = as.name("g_ks"), m_ks = as.name("m_ks")))
+    else 
+      frm <- substitute(
+        XXTHEVALUEXX ~
+          (ns_func(ti, m_ks) - 1L | i),
+        list(ti = as.name("obs_time"), i = as.name("id"), 
+             m_ks = as.name("m_ks")))
     frm <- eval(frm)
     
     if(d_x > 0)
@@ -326,7 +348,7 @@ local({
   Psi <- vc$id
   attr(Psi, "correlation") <- attr(Psi, "stddev") <- NULL
   dimnames(Psi) <- NULL
-  K <- SimSurvNMarker:::get_commutation(d_m, n_y)
+  K <- SimSurvNMarker:::get_commutation(n_y, d_m)
   Psi <- tcrossprod(K %*% Psi, K)
 
   Sigma <- diag(attr(vc, "sc")^2, n_y)
