@@ -108,7 +108,9 @@ u)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu%28t%2C%5Cvec%20u%29
 u)](https://latex.codecogs.com/svg.latex?h%28t%5Cmid%20%5Cvec%20u%29
 "h(t\\mid \\vec u)"). ![\\vec
 m(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20m%28t%29
-"\\vec m(t)") and ![\\vec
+"\\vec m(t)"), ![\\vec
+g(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20g%28t%29
+"\\vec g(t)") and ![\\vec
 b(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20b%28t%29
 "\\vec b(t)") are basis expansions of time. As an example, these can be
 a polynomial, a B-spline, or a natural cubic spline. The expansion for
@@ -120,8 +122,8 @@ t](https://latex.codecogs.com/svg.latex?%5Clog%20t "\\log t") instead of
 model reduces to a Weibull distribution when a first polynomial is used
 and ![\\vec\\alpha =
 \\vec 0](https://latex.codecogs.com/svg.latex?%5Cvec%5Calpha%20%3D%20%5Cvec%200
-"\\vec\\alpha = \\vec 0").
-![X\_{ij}](https://latex.codecogs.com/svg.latex?X_%7Bij%7D "X_{ij}") and
+"\\vec\\alpha = \\vec 0"). ![\\vec
+x\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20x_i "\\vec x_i") and
 ![\\vec z\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20z_i
 "\\vec z_i") are individual specific known covariates.
 
@@ -132,7 +134,7 @@ an example of how to use the package here and the
 ## Example
 
 We start by assigning all the variables that we will pass to the
-function in the package.
+functions in the package.
 
 ``` r
 library(SimSurvNMarker)
@@ -208,7 +210,7 @@ abline(h = .25, lty = 3)
 <img src="man/figures/README-plot_wo_marker-2.png" width="100%" />
 
 Next, we simulate individual specific markers. Each plot is for a given
-individual. The dashed curve is the mean of ![\\vec\\mu(s,
+individual. The dashed curve is the mean, ![\\vec\\mu(s,
 \\vec 0)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu%28s%2C%20%5Cvec%200%29
 "\\vec\\mu(s, \\vec 0)"), the fully drawn curve is the individual
 specific curve, ![\\vec\\mu(s, \\vec
@@ -328,7 +330,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>    3.78    0.00    3.78
+#>     3.8     0.0     3.8
 ```
 
 Finally, we show a few of the first rows along with some summary
@@ -388,7 +390,4 @@ NROW(dat$marker_data) / NROW(dat$survival_data)
   - Allow for derivatives of
     ![\\vec\\mu](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu
     "\\vec\\mu") in the hazard.  
-  - Handle missing components, e.g. no ![\\vec\\delta^\\top\\vec
-    z\_i](https://latex.codecogs.com/svg.latex?%5Cvec%5Cdelta%5E%5Ctop%5Cvec%20z_i
-    "\\vec\\delta^\\top\\vec z_i"). Check that this works.
-  - Check that everything works with a univariate marker.
+  - Provide example in the `man` files that needs it.

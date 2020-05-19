@@ -6,6 +6,49 @@
 \usage{
 get_ns_spline(knots, intercept = TRUE, do_log = TRUE)
 }
+\arguments{
+\item{knots}{numeric vector with boundary and interior knots.}
+
+\item{intercept}{logical for whether to include an intercept.}
+
+\item{do_log}{logical for whether to evaluate the spline at \code{log(x)}
+or \code{x}.}
+}
 \description{
 Faster Pointwise function than ns
+}
+\examples{
+# compare with splines
+library(splines)
+library(SimSurvNMarker)
+xs <- seq(1, 5, length.out = 10L)
+bks <- c(1, 5)
+iks <- 2:4
+
+# we get the same
+stopifnot(isTRUE(all.equal(
+  unclass(ns(xs, knots = iks, Boundary.knots = bks, intercept = TRUE)),
+  get_ns_spline(knots = sort(c(iks, bks)), intercept = TRUE,
+                do_log = FALSE)(xs),
+  check.attributes = FALSE)))
+
+stopifnot(isTRUE(all.equal(
+  unclass(ns(log(xs), knots = log(iks), Boundary.knots = log(bks),
+             intercept = TRUE)),
+  get_ns_spline(knots = log(sort(c(iks, bks))), intercept = TRUE,
+                do_log = TRUE)(xs),
+  check.attributes = FALSE)))
+
+# the latter is faster
+system.time(
+  replicate(100,
+            ns(xs, knots = iks, Boundary.knots = bks, intercept = TRUE)))
+system.time(
+  replicate(100,
+            get_ns_spline(knots = sort(c(iks, bks)), intercept = TRUE,
+                          do_log = FALSE)(xs)))
+func <- get_ns_spline(knots = sort(c(iks, bks)), intercept = TRUE,
+                      do_log = FALSE)
+system.time(replicate(100, func(xs)))
+
 }

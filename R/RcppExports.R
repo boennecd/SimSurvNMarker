@@ -9,6 +9,15 @@ get_commutation <- function(n, m) {
     .Call(`_SimSurvNMarker_get_commutation`, n, m)
 }
 
+#' Get Gauss–Legendre Quadrature Nodes and Weights
+#'
+#' @param n number of nodes.
+#'
+#' @examples
+#' library(SimSurvNMarker)
+#' get_gl_rule(4)
+#' get_gl_rule(25)
+#'
 #' @export
 get_gl_rule <- function(n) {
     .Call(`_SimSurvNMarker_get_gl_rule`, n)

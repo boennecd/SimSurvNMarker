@@ -61,12 +61,13 @@ $h$ is the instantaneous hazard rate for the time-to-event outcome.
 $\vec\alpha$ is the so-called
 association parameter. It shows the strength of the relation between the 
 latent mean function, $\vec\mu(t,\vec u)$, and the log of the 
-instantaneous rate, $h(t\mid \vec u)$. $\vec m(t)$ and $\vec b(t)$ are 
+instantaneous rate, $h(t\mid \vec u)$. $\vec m(t)$, $\vec g(t)$ 
+and $\vec b(t)$ are 
 basis expansions of time. As an example, these can be a polynomial, 
 a B-spline, or a natural cubic spline. The expansion for the baseline
 hazard, $\vec b(t)$, is typically made on $\log t$ instead of $t$. 
 One reason is that the model reduces to a Weibull distribution
-when a first polynomial is used and $\vec\alpha = \vec 0$. $X_{ij}$ and 
+when a first polynomial is used and $\vec\alpha = \vec 0$. $\vec x_i$ and 
 $\vec z_i$ are individual specific known covariates.
 
 The package is not too well documented at this point. Instead we provide an 
@@ -74,7 +75,7 @@ example of how to use the package here and the
 [inst/test-data](inst/test-data) directory.
 
 ## Example
-We start by assigning all the variables that we will pass to the function
+We start by assigning all the variables that we will pass to the functions
 in the package.
 
 ```{r attach_pkg}
@@ -144,7 +145,7 @@ abline(h = .25, lty = 3)
 ```
 
 Next, we simulate individual specific markers. Each plot is for a given 
-individual. The dashed curve is the mean of $\vec\mu(s, \vec 0)$, the 
+individual. The dashed curve is the mean, $\vec\mu(s, \vec 0)$, the 
 fully drawn curve is the individual specific curve, $\vec\mu(s, \vec U_i)$,
 the shaded areas are pointwise 95% interval for each mean curve, and the 
 points are observed markers, $\vec y_{ij}$.
@@ -285,6 +286,4 @@ NROW(dat$marker_data) / NROW(dat$survival_data)
 ## TODOs 
 
 * Allow for derivatives of $\vec\mu$ in the hazard.  
-* Handle missing components, e.g. no $\vec\delta^\top\vec z_i$. Check that 
-  this works.
-* Check that everything works with a univariate marker.
+* Provide example in the `man` files that needs it. 

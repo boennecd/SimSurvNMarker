@@ -4,8 +4,61 @@
 \alias{eval_marker}
 \title{Fast Evaluation of Time-varying Marker Mean Term}
 \usage{
-eval_marker(ti, B, m_func)
+eval_marker(ti, B, g_func, U, m_func, offset)
+}
+\arguments{
+\item{ti}{time points.}
+
+\item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
+
+\item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
+
+\item{U}{random effect matrix for time-varying random effects. Use \code{NULL} if there is no effect.}
+
+\item{m_func}{basis function for \code{U} like \code{\link{poly}}.}
+
+\item{offset}{vector with non-time-varying fixed effects.}
 }
 \description{
 Fast Evaluation of Time-varying Marker Mean Term
+}
+\examples{
+# compare R version with this function
+library(SimSurvNMarker)
+set.seed(1)
+n <- 100L
+n_y <- 3L
+
+ti <- seq(0, 1, length.out = n)
+offset <- runif(n_y)
+B <- matrix(runif(5L * n_y), nr = 5L)
+g_func <- function(x)
+  matrix(c(1, x, x^2, x^3, x^4), nr = 1L)
+U <- matrix(runif(3L * n_y), nr = 3L)
+m_func <- function(x)
+  matrix(c(1, x, x^2), nr = 1L)
+
+r_version <- function(ti, B, g_func, U, m_func, offset){
+  n_y <- NCOL(B)
+  B <- c(B)
+  U <- c(U)
+  func <- function(ti)
+    drop((diag(n_y) \%x\% g_func(ti)) \%*\% B) +
+      drop((diag(n_y) \%x\% m_func(ti)) \%*\% U)
+
+  vapply(ti, func, numeric(n_y)) + offset
+}
+
+# check that we get the same
+stopifnot(isTRUE(all.equal(
+  c(r_version  (ti[1], B, g_func, U, m_func, offset)),
+    eval_marker(ti[1], B, g_func, U, m_func, offset))))
+stopifnot(isTRUE(all.equal(
+  r_version  (ti, B, g_func, U, m_func, offset),
+  eval_marker(ti, B, g_func, U, m_func, offset))))
+
+# check the computation time
+system.time(replicate(100, r_version  (ti, B, g_func, U, m_func, offset)))
+system.time(replicate(100, eval_marker(ti, B, g_func, U, m_func, offset)))
+
 }

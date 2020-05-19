@@ -411,6 +411,15 @@ template
 
 } // namespace fastgl
 
+//' Get Gauss–Legendre Quadrature Nodes and Weights
+//'
+//' @param n number of nodes.
+//'
+//' @examples
+//' library(SimSurvNMarker)
+//' get_gl_rule(4)
+//' get_gl_rule(25)
+//'
 //' @export
 // [[Rcpp::export(rng = false)]]
 Rcpp::List get_gl_rule(unsigned const n){

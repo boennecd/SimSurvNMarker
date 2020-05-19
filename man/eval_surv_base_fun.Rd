@@ -2,16 +2,39 @@
 % Please edit documentation in R/sim.R
 \name{eval_surv_base_fun}
 \alias{eval_surv_base_fun}
-\title{Evalutes the Survival Function without a Marker}
+\title{Evaluates the Survival Function without a Marker}
 \usage{
-eval_surv_base_fun(
-  ti,
-  omega,
-  b_func,
-  gl_dat = SimSurvNMarker:::get_gl_rule(30L),
-  delta = 0
-)
+eval_surv_base_fun(ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = 0)
+}
+\arguments{
+\item{ti}{time points.}
+
+\item{omega}{coefficient for baseline hazard.}
+
+\item{b_func}{basis function for baseline hazard like \code{\link{poly}}.}
+
+\item{gl_dat}{Gauss–Legendre quadrature data.}
+
+\item{delta}{offset on the log hazard scale. Use \code{NULL} if there is no effect.}
 }
 \description{
-Evalutes the Survival Function without a Marker
+Evaluates the Survival Function without a Marker
+}
+\examples{
+# Example of a hazard function
+b_func <- function(x)
+  cbind(1, sin(2 * pi * x), x)
+omega <- c(-3, 3, .25)
+haz_fun <- function(x)
+  exp(drop(b_func(x) \%*\% omega))
+
+plot(haz_fun, xlim = c(0, 10))
+
+# plot the hazard
+library(SimSurvNMarker)
+gl_dat <- get_gl_rule(60L)
+plot(function(x) eval_surv_base_fun(ti = x, omega = omega,
+                                    b_func = b_func, gl_dat = gl_dat),
+     xlim = c(1e-4, 10), ylim = c(0, 1), bty = "l", xlab = "time",
+     ylab = "Survival", yaxs = "i")
 }
