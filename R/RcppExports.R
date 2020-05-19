@@ -5,8 +5,8 @@ eval_marker_cpp <- function(B, m) {
     .Call(`_SimSurvNMarker_eval_marker`, B, m)
 }
 
-get_commutation <- function(m) {
-    .Call(`_SimSurvNMarker_get_commutation`, m)
+get_commutation <- function(n, m) {
+    .Call(`_SimSurvNMarker_get_commutation`, n, m)
 }
 
 #' @export

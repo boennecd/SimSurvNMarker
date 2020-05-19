@@ -97,9 +97,14 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   n_y <- NCOL(sigma_chol)
 
   noise <- matrix(rnorm(n_markes * n_y), ncol = n_y)  %*% sigma_chol
-  y_obs <- t(eval_marker(
+  mu <- eval_marker(
     ti = obs_time, B = B, g_func = g_func, m_func = m_func, offset = offset,
-    U = U)) + noise
+    U = U)
+  y_obs <- if(is.vector(mu))
+      mu  + noise
+  else
+    t(mu) + noise
+
   list(obs_time = obs_time, y_obs = y_obs)
 }
 
@@ -173,7 +178,7 @@ sim_joint_data_set <- function(
       is.numeric(r_z()), length(r_z()) == d_z,
       is.numeric(r_x()), length(r_x()) == d_x,
       length(gamma) == 0L || is.matrix(gamma), is.numeric(gamma),
-      length(gamma) == 0L || NROW(gamma) == n_y,
+      length(gamma) == 0L || NCOL(gamma) == n_y,
       is.numeric(r_left_trunc()),
       is.numeric(r_right_cens()),
       is.integer(r_n_marker()),

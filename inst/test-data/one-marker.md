@@ -3,21 +3,20 @@ Show configurations
 
 ``` r
 dput(alpha)
-#> c(-0.4, 0.5)
+#> -0.62
 dput(omega)
-#> c(-1.68, -1.93, -0.62, -5.11, -0.26)
+#> c(-0.84, -2.67, -0.37, -4.62, 0.63)
 dput(delta)
-#> c(-0.09, -0.22)
+#> c(-0.1, -0.3)
 dput(gamma)
-#> structure(c(-0.15, 0.19, 0.06, -0.23), .Dim = c(2L, 2L))
+#> structure(c(0.11, 0.33), .Dim = 2:1)
 dput(B)
-#> structure(c(-0.43, 0.33, 0.04, 0.47, -0.37, -0.88, 0.48, -0.16, 
-#> -0.06, -0.14), .Dim = c(5L, 2L))
+#> structure(c(0.26, 0.3, 0.48, 0.8, 0.83), .Dim = c(5L, 1L))
 dput(sig) # Sigma
-#> structure(c(0.02, 0, 0, 0.14), .Dim = c(2L, 2L))
+#> structure(0.02, .Dim = c(1L, 1L))
 dput(Psi)
-#> structure(c(5.52, 1.09, 0.24, 0.28, 1.09, 3.52, 0.56, -0.37, 
-#> 0.24, 0.56, 1.85, 0.5, 0.28, -0.37, 0.5, 1.96), .Dim = c(4L, 
+#> structure(c(1.02, 0.18, -1.27, -0.39, 0.18, 1.33, 0.47, -0.74, 
+#> -1.27, 0.47, 3.63, 0.2, -0.39, -0.74, 0.2, 1.56), .Dim = c(4L, 
 #> 4L))
 dput(n_obs)
 #> 2000L
@@ -68,7 +67,7 @@ plot(function(x) exp(drop(b_func(x) %*% omega)),
      ylab = "Hazard (no marker)", xaxs = "i", bty = "l")
 ```
 
-<img src="fig/w-all-plot_wo_marker-1.png" width="100%" />
+<img src="fig/one-marker-plot_wo_marker-1.png" width="100%" />
 
 ``` r
 
@@ -82,7 +81,7 @@ abline(h = .75, lty = 3)
 abline(h = .25, lty = 3)
 ```
 
-<img src="fig/w-all-plot_wo_marker-2.png" width="100%" />
+<img src="fig/one-marker-plot_wo_marker-2.png" width="100%" />
 
 Simulate a few markers as an example
 
@@ -152,7 +151,7 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
                g_func = g_func)
 ```
 
-<img src="fig/w-all-show_sim_marker-1.png" width="100%" />
+<img src="fig/one-marker-show_sim_marker-1.png" width="100%" />
 
 Illustrate a few conditional hazard functions and survival functions
 
@@ -195,7 +194,7 @@ local({
 })
 ```
 
-<img src="fig/w-all-show_draw_surv_curves-1.png" width="100%" />
+<img src="fig/one-marker-show_draw_surv_curves-1.png" width="100%" />
 
 Simulate a data set
 
@@ -208,7 +207,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   5.945   0.003   5.949
+#>   5.996   0.033   6.030
 ```
 
 Show stats
@@ -217,43 +216,43 @@ Show stats
 # survival data
 head(dat$survival_data)
 #>   Z1 Z2 left_trunc    y event id
-#> 1  0  0      1.735 4.62  TRUE  1
-#> 2  0  0      0.338 3.74  TRUE  2
-#> 3  1  0      1.320 3.58  TRUE  3
-#> 4  0  1      2.150 2.31  TRUE  4
-#> 5  1  1      0.727 6.32 FALSE  5
-#> 6  1  0      0.627 2.27  TRUE  6
+#> 1  0  0      1.335 4.63  TRUE  1
+#> 2  0  0      0.506 6.37 FALSE  2
+#> 3  0  0      0.810 3.80  TRUE  3
+#> 4  1  1      0.196 9.17 FALSE  4
+#> 5  0  0      0.104 1.43  TRUE  5
+#> 6  1  0      0.311 5.70  TRUE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time     Y1     Y2 X1 X2 id
-#> 1      1.86 -1.611  0.989  1  1  1
-#> 2      4.11 -0.522  0.717  1  1  1
-#> 3      1.29  1.093 -0.390  1  0  2
-#> 4      2.13  0.698 -1.006  1  0  2
-#> 5      2.70  0.804 -0.209  1  0  2
-#> 6      3.53  0.644 -0.609  1  0  2
-#> 7      1.81  0.744 -0.619  0  0  3
-#> 8      2.19  0.658 -0.548  0  0  3
-#> 9      2.68  0.814 -0.114  0  0  3
-#> 10     2.69  0.744 -0.359  0  0  3
+#>    obs_time   Y1 X1 X2 id
+#> 1      1.86 1.46  1  1  1
+#> 2      2.12 1.32  1  1  1
+#> 3      2.67 1.26  1  1  1
+#> 4      3.40 1.10  1  1  1
+#> 5      3.82 1.26  1  1  1
+#> 6      3.86 1.35  1  1  1
+#> 7      4.10 1.55  1  1  2
+#> 8      4.55 2.13  1  1  2
+#> 9      6.05 2.26  1  1  2
+#> 10     1.05 0.61  1  1  3
 
 # rate of observed events
 mean(dat$survival_data$event) 
-#> [1] 0.531
+#> [1] 0.595
 
 # mean event time
 mean(subset(dat$survival_data, event)$y)
-#> [1] 3.73
+#> [1] 3.93
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 #>     0%    25%    50%    75%   100% 
-#> 0.0711 1.9541 3.3230 5.3027 9.8106
+#> 0.0172 2.2756 3.7454 5.3123 9.8700
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
-#> [1] 5.41
+#> [1] 5.12
 ```
 
 Fixed mixed linear mixed model and see that we get estimates which are
@@ -334,55 +333,53 @@ local({
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
 #> $gamma
-#>        [,1]    [,2]
-#> [1,] -0.114  0.0524
-#> [2,]  0.178 -0.2113
+#>       [,1]
+#> [1,] 0.105
+#> [2,] 0.342
 #> 
 #> $B
-#>         [,1]   [,2]
-#> [1,] -0.3220 -0.940
-#> [2,]  0.4245  0.436
-#> [3,]  0.0848 -0.241
-#> [4,]  0.6978 -0.218
-#> [5,] -0.3817 -0.194
+#>       [,1]
+#> [1,] 0.271
+#> [2,] 0.348
+#> [3,] 0.538
+#> [4,] 0.842
+#> [5,] 0.767
 #> 
 #> $Psi
-#>       [,1]   [,2]  [,3]   [,4]
-#> [1,] 5.464  1.045 0.418  0.376
-#> [2,] 1.045  3.037 0.558 -0.310
-#> [3,] 0.418  0.558 1.789  0.463
-#> [4,] 0.376 -0.310 0.463  2.146
+#>        [,1]   [,2]   [,3]   [,4]
+#> [1,]  0.983  0.156 -1.232 -0.369
+#> [2,]  0.156  1.243  0.452 -0.673
+#> [3,] -1.232  0.452  3.462  0.111
+#> [4,] -0.369 -0.673  0.111  1.610
 #> 
 #> $Sigma
-#>        [,1]   [,2]
-#> [1,] 0.0792 0.0000
-#> [2,] 0.0000 0.0792
+#>        [,1]
+#> [1,] 0.0206
 ```
 
 Compare with the true values
 
 ``` r
 gamma
-#>       [,1]  [,2]
-#> [1,] -0.15  0.06
-#> [2,]  0.19 -0.23
+#>      [,1]
+#> [1,] 0.11
+#> [2,] 0.33
 B
-#>       [,1]  [,2]
-#> [1,] -0.43 -0.88
-#> [2,]  0.33  0.48
-#> [3,]  0.04 -0.16
-#> [4,]  0.47 -0.06
-#> [5,] -0.37 -0.14
+#>      [,1]
+#> [1,] 0.26
+#> [2,] 0.30
+#> [3,] 0.48
+#> [4,] 0.80
+#> [5,] 0.83
 Psi
-#>      [,1]  [,2] [,3]  [,4]
-#> [1,] 5.52  1.09 0.24  0.28
-#> [2,] 1.09  3.52 0.56 -0.37
-#> [3,] 0.24  0.56 1.85  0.50
-#> [4,] 0.28 -0.37 0.50  1.96
+#>       [,1]  [,2]  [,3]  [,4]
+#> [1,]  1.02  0.18 -1.27 -0.39
+#> [2,]  0.18  1.33  0.47 -0.74
+#> [3,] -1.27  0.47  3.63  0.20
+#> [4,] -0.39 -0.74  0.20  1.56
 sig
-#>      [,1] [,2]
-#> [1,] 0.02 0.00
-#> [2,] 0.00 0.14
+#>      [,1]
+#> [1,] 0.02
 ```
 
 Fit Cox model with only the observed markers (likely biased)
@@ -421,33 +418,31 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 10816, number of events= 3676 
+#>   n= 10250, number of events= 4258 
 #> 
 #>       coef exp(coef) se(coef)      z Pr(>|z|)    
-#> Z1  0.0145    1.0146   0.0331   0.44     0.66    
-#> Z2 -0.2413    0.7856   0.0331  -7.29  3.1e-13 ***
-#> Y1 -0.3755    0.6870   0.0132 -28.47  < 2e-16 ***
-#> Y2  0.2272    1.2551   0.0188  12.08  < 2e-16 ***
+#> Z1 -0.1904    0.8267   0.0308  -6.19  6.1e-10 ***
+#> Z2 -0.3764    0.6863   0.0308 -12.22  < 2e-16 ***
+#> Y1 -0.5768    0.5617   0.0205 -28.12  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     1.015      0.986     0.951     1.083
-#> Z2     0.786      1.273     0.736     0.838
-#> Y1     0.687      1.456     0.669     0.705
-#> Y2     1.255      0.797     1.210     1.302
+#> Z1     0.827       1.21     0.778     0.878
+#> Z2     0.686       1.46     0.646     0.729
+#> Y1     0.562       1.78     0.540     0.585
 #> 
-#> Concordance= 0.644  (se = 0.005 )
-#> Likelihood ratio test= 953  on 4 df,   p=<2e-16
-#> Wald test            = 950  on 4 df,   p=<2e-16
-#> Score (logrank) test = 951  on 4 df,   p=<2e-16
+#> Concordance= 0.639  (se = 0.004 )
+#> Likelihood ratio test= 962  on 3 df,   p=<2e-16
+#> Wald test            = 939  on 3 df,   p=<2e-16
+#> Score (logrank) test = 928  on 3 df,   p=<2e-16
 ```
 
 Compare with the true value
 
 ``` r
 delta
-#> [1] -0.09 -0.22
+#> [1] -0.1 -0.3
 alpha
-#> [1] -0.4  0.5
+#> [1] -0.62
 ```

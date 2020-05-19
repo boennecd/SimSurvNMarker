@@ -1,9 +1,9 @@
 #####
 # input
-d_m <- 2L
+d_m <- 4L
 d_g <- 5L
 d_b <- 5L
-n_y <- 2L
+n_y <- 1L
 d_z <- 2L
 d_x <- 2L
 K <- n_y * d_m
@@ -33,9 +33,9 @@ omega <- omega + local({
 dput(omega <- round(omega, 2))
 dput(B <- matrix(round(runif(n_y * d_g, -1, 1), 2), nrow = d_g))
 dput(Psi <- round(drop(rWishart(1L, 2 * K, diag(K) / K)), 2))
-dput(sig <- diag(round(runif(n_y, .1, .4)^2, 2)))
+dput(sig <- diag(round(runif(n_y, .1, .4)^2, 2), n_y))
 dput(delta <- round(runif(d_z, -1, 1) / d_z, 2))
 dput(alpha <- round(runif(n_y, -1, 1) / n_y, 2))
 dput(gamma <- matrix(round(runif(d_x * n_y, -1, 1) / n_y / d_x, 2),
-                     nr = n_y))
+                     nc = n_y))
 n_obs <- 2000L
