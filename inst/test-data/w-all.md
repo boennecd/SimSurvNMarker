@@ -139,8 +139,8 @@ show_mark_mean <- function(B, Psi, sigma, m_func, g_func){
     matplot(tis, y_rng    , type = "l", lty = 1, add = TRUE)
     matplot(y_obs$obs_time, y_obs$y_obs, type = "p", add = TRUE, pch = 3:4)
 
-    for(i in 1:NCOL(tis)){
-      rg <- col2rgb(i)
+    for(i in 1:NCOL(y_non_rng)){
+      rg <- col2rgb(i) / 255
       polygon(c(tis, rev(tis)), c(lbs[, i], rev(ubs[, i])), border = NA,
               col = rgb(rg[1], rg[2], rg[3], .1))
     }
@@ -208,7 +208,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   5.945   0.003   5.949
+#>   5.946   0.046   5.992
 ```
 
 Show stats
