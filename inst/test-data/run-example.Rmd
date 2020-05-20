@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   fig.width = 7, 
   fig.path = file.path("fig", paste0(file_name, "-")),
   error = FALSE, 
-  dpi = 300)
+  dpi = 100)
 options(digits = 3)
 ```
 

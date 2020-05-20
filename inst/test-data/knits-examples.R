@@ -1,3 +1,4 @@
+library(SimSurvNMarker)
 knit_example <- function(file_name){
   old_wd <- getwd()
   on.exit(setwd(old_wd))

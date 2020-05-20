@@ -59,18 +59,14 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
     out
   })
 
-.surv_func_inner <- function(x, omega, b_func)
-  exp(drop(b_func(x) %*% omega))
-
-.eval_surv_base_fun_outer <- function(ti, omega, b_func, gl_dat){
+.surv_func_inner <- function(ti, omega, b_func, gl_dat){
   lb <- .time_eps
   ub <- ti
   if(ti < lb)
     stop("too small ti")
 
   nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
-  f <- vapply(nodes, .surv_func_inner, FUN.VALUE = numeric(1L),
-              omega = omega, b_func)
+  f <- exp(drop(b_func(nodes) %*% omega))
   -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
 }
 
@@ -103,7 +99,7 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 eval_surv_base_fun <- function(
   ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = 0){
   cum_haz_fac <- vapply(
-    ti, .eval_surv_base_fun_outer, FUN.VALUE = numeric(1L),
+    ti, .surv_func_inner, FUN.VALUE = numeric(1L),
     omega = omega, b_func = b_func, gl_dat = gl_dat)
 
   if(length(delta) > 0)
@@ -135,10 +131,10 @@ eval_surv_base_fun <- function(
 #' offset <- runif(n_y)
 #' B <- matrix(runif(5L * n_y), nr = 5L)
 #' g_func <- function(x)
-#'   matrix(c(1, x, x^2, x^3, x^4), nr = 1L)
+#'   cbind(1, x, x^2, x^3, x^4)
 #' U <- matrix(runif(3L * n_y), nr = 3L)
 #' m_func <- function(x)
-#'   matrix(c(1, x, x^2), nr = 1L)
+#'   cbind(1, x, x^2)
 #'
 #' r_version <- function(ti, B, g_func, U, m_func, offset){
 #'   n_y <- NCOL(B)
@@ -165,31 +161,15 @@ eval_surv_base_fun <- function(
 #'
 #' @export
 eval_marker <- function(ti, B, g_func, U, m_func, offset){
-  if(length(ti) == 1L){
-    out <- 0.
-    if(length(B) > 0)
-      out <- out + .eval_marker_inner(ti = ti, B = B, m_func = g_func)
-    if(length(U) > 0)
-      out <- out + .eval_marker_inner(ti = ti, B = U, m_func = m_func)
-    if(length(offset) > 0)
-      out <- out + offset
-
-    return(out)
-  }
-
   out <- 0.
   if(length(B) > 0)
-    out <- out + vapply(
-      ti, .eval_marker_inner, FUN.VALUE = numeric(NCOL(B)), B = B,
-      m_func = g_func)
+    out <- out + eval_marker_cpp(B = B, m = g_func(ti))
   if(length(U) > 0)
-    out <- out + vapply(
-      ti, .eval_marker_inner, FUN.VALUE = numeric(NCOL(U)), B = U,
-      m_func = m_func)
+    out <- out + eval_marker_cpp(B = U, m = m_func(ti))
   if(length(offset) > 0)
     out <- out + offset
 
-  out
+  drop(out)
 }
 
 #' Samples from a Multivariate Normal Distribution
@@ -249,13 +229,7 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   list(obs_time = obs_time, y_obs = y_obs)
 }
 
-.surv_func_joint_inner <- function(x, B, U, omega, alpha, b_func, m_func,
-                                   g_func)
-  exp(drop(b_func(x) %*% omega +
-             alpha %*% eval_marker(ti = x, B = B, U = U, m_func = m_func,
-                                   g_func = g_func, offset = NULL)))
-
-.surv_func_joint_outer <- function(ti, B, U, omega, alpha, b_func, m_func,
+.surv_func_joint_inner <- function(ti, B, U, omega, alpha, b_func, m_func,
                                    g_func, gl_dat){
   lb <- .time_eps
   ub <- ti
@@ -263,9 +237,11 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
     stop("too small ti")
 
   nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
-  f <- vapply(nodes, .surv_func_joint_inner, FUN.VALUE = numeric(1L),
-              B = B, U = U, omega = omega, alpha = alpha, m_func = m_func,
-              b_func = b_func, g_func = g_func)
+  f <- exp(
+    drop(b_func(nodes) %*% omega +
+           drop(alpha %*% eval_marker(
+             ti = nodes, B = B, U = U, m_func = m_func, g_func = g_func,
+             offset = NULL))))
   -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
 }
 
@@ -279,7 +255,7 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
 surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
                             gl_dat = get_gl_rule(30L), g_func, offset){
   cum_haz_fac <- vapply(
-    ti, .surv_func_joint_outer, FUN.VALUE = numeric(1L),
+    ti, .surv_func_joint_inner, FUN.VALUE = numeric(1L),
     B = B, U = U, omega = omega, alpha = alpha, b_func = b_func,
     m_func = m_func, g_func = g_func, gl_dat = gl_dat)
 
@@ -289,6 +265,14 @@ surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
     cum_haz_fac <- cum_haz_fac * exp(drop(offset %*% alpha))
   exp(cum_haz_fac)
 }
+
+list_of_lists_to_data_frame <- function(dat)
+  as.data.frame(do.call(mapply, c(list(FUN = function(...){
+    if(is.matrix(...elt(1L)))
+      do.call(rbind, list(...))
+    else
+      do.call(c, list(...))
+  }, SIMPLIFY = FALSE), dat)))
 
 #' Simulate Individuals from a Joint Survival and Marker Model
 #'
@@ -369,7 +353,7 @@ sim_joint_data_set <- function(
         NULL
       } else {
         x <- r_x()
-        eval_marker_cpp(B = gamma, m = x)
+        drop(eval_marker_cpp(B = gamma, m = x))
       }
 
       while(!has_sample){
@@ -428,8 +412,7 @@ sim_joint_data_set <- function(
 
   # form data frames for estimation
   ids <- seq_along(out)
-  survival_dat <- do.call(
-    rbind, lapply(ids, function(i){
+  survival_dat <- lapply(ids, function(i){
       dat_i <- out[[i]][c("z", "left_trunc", "y", "event")]
       if(d_z > 0){
         dat_i$z <- matrix(
@@ -439,11 +422,11 @@ sim_joint_data_set <- function(
       } else
         dat_i$z <- NULL
       dat_i$id <- i
-      do.call(data.frame, dat_i)
-    }))
+      dat_i
+    })
+  survival_dat <- list_of_lists_to_data_frame(survival_dat)
 
-  marker_dat <- do.call(
-    rbind, lapply(ids, function(i){
+  marker_dat <- lapply(ids, function(i){
       markers <- out[[i]][["markers"]]
       n_y <- NROW(markers)
       if(d_x > 0){
@@ -453,10 +436,11 @@ sim_joint_data_set <- function(
         markers <- cbind(markers, x)
       }
 
-      out <- as.data.frame(markers)
-      out$id <- i
+      out <- list(markers)
+      out$id <- rep(i, NROW(markers))
       out
-    }))
+    })
+  marker_dat <- list_of_lists_to_data_frame(marker_dat)
 
   list(survival_data = survival_dat,
        marker_data   = marker_dat,

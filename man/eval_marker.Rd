@@ -33,10 +33,10 @@ ti <- seq(0, 1, length.out = n)
 offset <- runif(n_y)
 B <- matrix(runif(5L * n_y), nr = 5L)
 g_func <- function(x)
-  matrix(c(1, x, x^2, x^3, x^4), nr = 1L)
+  cbind(1, x, x^2, x^3, x^4)
 U <- matrix(runif(3L * n_y), nr = 3L)
 m_func <- function(x)
-  matrix(c(1, x, x^2), nr = 1L)
+  cbind(1, x, x^2)
 
 r_version <- function(ti, B, g_func, U, m_func, offset){
   n_y <- NCOL(B)

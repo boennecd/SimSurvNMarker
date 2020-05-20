@@ -23,8 +23,8 @@ get_gl_rule <- function(n) {
     .Call(`_SimSurvNMarker_get_gl_rule`, n)
 }
 
-glq <- function(lb, ub, nodes, weights, f) {
-    .Call(`_SimSurvNMarker_glq`, lb, ub, nodes, weights, f)
+glq <- function(lb, ub, nodes, weights, f, rho) {
+    .Call(`_SimSurvNMarker_glq`, lb, ub, nodes, weights, f, rho)
 }
 
 get_ns_ptr <- function(knots, boundary_knots, intercept) {

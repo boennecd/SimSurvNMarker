@@ -8,7 +8,7 @@
 using namespace Rcpp;
 
 // eval_marker
-Rcpp::NumericVector eval_marker(SEXP B, SEXP m);
+Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m);
 RcppExport SEXP _SimSurvNMarker_eval_marker(SEXP BSEXP, SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -40,16 +40,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // glq
-Rcpp::NumericVector glq(Rcpp::NumericVector const lb, Rcpp::NumericVector const ub, Rcpp::NumericVector const nodes, Rcpp::NumericVector const weights, Rcpp::Function f);
-RcppExport SEXP _SimSurvNMarker_glq(SEXP lbSEXP, SEXP ubSEXP, SEXP nodesSEXP, SEXP weightsSEXP, SEXP fSEXP) {
+Rcpp::NumericVector glq(SEXP lb, SEXP ub, SEXP nodes, SEXP weights, SEXP f, SEXP rho);
+RcppExport SEXP _SimSurvNMarker_glq(SEXP lbSEXP, SEXP ubSEXP, SEXP nodesSEXP, SEXP weightsSEXP, SEXP fSEXP, SEXP rhoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const >::type lb(lbSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const >::type ub(ubSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const >::type nodes(nodesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const >::type weights(weightsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type f(fSEXP);
-    rcpp_result_gen = Rcpp::wrap(glq(lb, ub, nodes, weights, f));
+    Rcpp::traits::input_parameter< SEXP >::type lb(lbSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type ub(ubSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type nodes(nodesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type f(fSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
+    rcpp_result_gen = Rcpp::wrap(glq(lb, ub, nodes, weights, f, rho));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -81,7 +82,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SimSurvNMarker_eval_marker", (DL_FUNC) &_SimSurvNMarker_eval_marker, 2},
     {"_SimSurvNMarker_get_commutation", (DL_FUNC) &_SimSurvNMarker_get_commutation, 2},
     {"_SimSurvNMarker_get_gl_rule", (DL_FUNC) &_SimSurvNMarker_get_gl_rule, 1},
-    {"_SimSurvNMarker_glq", (DL_FUNC) &_SimSurvNMarker_glq, 5},
+    {"_SimSurvNMarker_glq", (DL_FUNC) &_SimSurvNMarker_glq, 6},
     {"_SimSurvNMarker_get_ns_ptr", (DL_FUNC) &_SimSurvNMarker_get_ns_ptr, 3},
     {"_SimSurvNMarker_ns_cpp", (DL_FUNC) &_SimSurvNMarker_ns_cpp, 2},
     {NULL, NULL, 0}
