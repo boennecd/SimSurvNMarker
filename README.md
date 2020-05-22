@@ -1,6 +1,9 @@
 
 # SimSurvNMarker
 
+[![Build Status on
+Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
+
 The `SimSurvNMarker` package reasonably fast simulates from a joint
 survival and marker model. Specifically, the package can simulate from
 the

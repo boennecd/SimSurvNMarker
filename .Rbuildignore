@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^cache
+^inst/test-data/.*\.md
+^inst/test-data/fig
+^\.travis\.yml

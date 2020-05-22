@@ -1,0 +1,4 @@
+language: r
+cache: packages
+
+after_failure: "cat /home/travis/build/boennecd/SimSurvNMarker/SimSurvNMarker.Rcheck/00install.out"
