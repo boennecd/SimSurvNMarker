@@ -446,7 +446,7 @@ sim_joint_data_set <- function(
        marker_data   = marker_dat,
        complete_data = out,
        params        = list(
-         B = B, Psi = Psi, omega = omega, delta = delta, alpha = alpha,
-         sigma = sigma, b_attr = attributes(b_func),
-         m_attr = attributes(m_func)))
+         gamma = gamma, B = B, Psi = Psi, omega = omega, delta = delta,
+         alpha = alpha, sigma = sigma, b_attr = attributes(b_func),
+         m_attr = attributes(m_func), g_attr = attributes(g_func)))
 }
