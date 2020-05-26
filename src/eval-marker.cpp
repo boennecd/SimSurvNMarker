@@ -2,7 +2,7 @@
 
 // [[Rcpp::export(name = "eval_marker_cpp", rng = false)]]
 Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m){
-  if (!Rf_isMatrix(B))
+  if(__builtin_expect(!Rf_isMatrix(B), 0))
     throw std::invalid_argument("eval_marker: B must be a matrix");
 
   if(Rf_isMatrix(m)){
@@ -10,7 +10,7 @@ Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m){
                  nc = Rf_ncols(B),
           n_col_out = Rf_nrows(m),
                  nm = Rf_ncols(m);
-    if(nr != nm)
+    if(__builtin_expect(nr != nm, 0))
       throw std::invalid_argument("eval_marker: dims do not match");
 
     Rcpp::NumericMatrix out(nc, n_col_out);
@@ -37,7 +37,7 @@ Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m){
     size_t const nr = Rf_nrows(B),
                  nc = Rf_ncols(B),
                  nm = XLENGTH(m);
-    if(nr != nm)
+    if(__builtin_expect(nr != nm, 0))
       throw std::invalid_argument("eval_marker: dims do not match");
 
     Rcpp::NumericMatrix out(nc, 1L);

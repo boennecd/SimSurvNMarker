@@ -17,17 +17,17 @@ for(f_name in c("no-B", "no-delta", "no-gamma", "one-marker", "w-all")){
     args_env$n_obs <- 20L
 
     dat <- with(args_env, {
-      r_n_marker <- function()
+      r_n_marker <- function(id)
         rpois(1, 10) + 1L
-      r_obs_time <- function(n_markes)
+      r_obs_time <- function(id, n_markes)
         sort(runif(n_markes, 0, 10))
-      r_z <- function()
+      r_z <- function(id)
         as.numeric(runif(d_z) > .5)
-      r_x <- function()
+      r_x <- function(id)
         as.numeric(runif(d_x) > .5)
-      r_left_trunc <- function()
+      r_left_trunc <- function(id)
         rbeta(1, 1, 2) * 3
-      r_right_cens <- function()
+      r_right_cens <- function(id)
         rbeta(1, 2, 1) * 6 + 4
 
       b_func <- get_ns_spline(b_ks, do_log = TRUE)

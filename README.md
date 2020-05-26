@@ -153,17 +153,17 @@ m_ks <- seq(0, 10, length.out = 3)
 g_ks <- m_ks
 
 # simulation functions
-r_n_marker <- function()
+r_n_marker <- function(id)
   rpois(1, 10) + 1L
-r_obs_time <- function(n_markes)
+r_obs_time <- function(id, n_markes)
   sort(runif(n_markes, 0, 10))
-r_z <- function()
+r_z <- function(id)
   as.numeric(runif(1L) > .5)
-r_x <- function()
+r_x <- function(id)
   numeric()
-r_left_trunc <- function()
+r_left_trunc <- function(id)
    rbeta(1, 1, 2) * 3
-r_right_cens <- function()
+r_right_cens <- function(id)
   rbeta(1, 2, 1) * 6 + 4
 
 # model parameters
@@ -333,7 +333,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>    0.61    0.00    0.61
+#>   0.535   0.001   0.536
 ```
 
 Finally, we show a few of the first rows along with some summary

@@ -28,17 +28,17 @@ dput(n_obs)
 Define sampling functions
 
 ``` r
-r_n_marker <- function()
+r_n_marker <- function(id)
   rpois(1, 10) + 1L
-r_obs_time <- function(n_markes)
+r_obs_time <- function(id, n_markes)
   sort(runif(n_markes, 0, 10))
-r_z <- function()
+r_z <- function(id)
   as.numeric(runif(d_z) > .5)
-r_x <- function()
+r_x <- function(id)
   as.numeric(runif(d_x) > .5)
-r_left_trunc <- function()
+r_left_trunc <- function(id)
    rbeta(1, 1, 2) * 3
-r_right_cens <- function()
+r_right_cens <- function(id)
   rbeta(1, 2, 1) * 6 + 4
 ```
 
@@ -218,7 +218,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   0.886   0.025   0.909
+#>   0.837   0.034   0.870
 ```
 
 Show stats
@@ -266,8 +266,8 @@ NROW(dat$marker_data) / NROW(dat$survival_data)
 #> [1] 5.16
 ```
 
-Fixed mixed linear mixed model and see that we get estimates which are
-close to the true values
+Fit linear mixed model and see that we get estimates which are close to
+the true values
 
 ``` r
 library(lme4)
@@ -449,12 +449,12 @@ local({
 #> 
 #>        coef exp(coef) se(coef)     z Pr(>|z|)    
 #> Z1 -0.20236   0.81680  0.02931 -6.90  5.1e-12 ***
-#> Z2  0.12134   1.12901  0.02930  4.14  3.4e-05 ***
-#> Z3 -0.00593   0.99409  0.02927 -0.20   0.8395    
-#> Z4 -0.25721   0.77320  0.02938 -8.75  < 2e-16 ***
+#> Z2  0.12135   1.12902  0.02930  4.14  3.4e-05 ***
+#> Z3 -0.00592   0.99410  0.02927 -0.20   0.8398    
+#> Z4 -0.25721   0.77321  0.02938 -8.75  < 2e-16 ***
 #> Y1  0.09817   1.10315  0.01673  5.87  4.4e-09 ***
 #> Y2 -0.11792   0.88877  0.01985 -5.94  2.8e-09 ***
-#> Y3  0.08118   1.08457  0.02523  3.22   0.0013 ** 
+#> Y3  0.08119   1.08457  0.02523  3.22   0.0013 ** 
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 

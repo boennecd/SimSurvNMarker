@@ -1,11 +1,11 @@
 #####
 # input
-d_m <- 3L
-d_g <- 4L
+d_m <- 2L
+d_g <- 3L
 d_b <- 2L
 n_y <- 2L
-d_z <- 0L
-d_x <- 4L
+d_z <- 4L
+d_x <- 3L
 K <- n_y * d_m
 
 #####
@@ -15,7 +15,7 @@ m_ks <- seq(0     , 10     , length.out = d_m)
 g_ks <- seq(0     , 10     , length.out = d_g)
 
 if(d_b > 0){
-  omega <- runif(d_b, -.5, .5)
+  omega <- runif(d_b, -1, 1)
   omega <- omega + local({
     library(splines)
     Boundary_knots <- b_ks[c(1, d_b)]

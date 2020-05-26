@@ -51,19 +51,24 @@ sim_joint_data_set(
 
 \item{gl_dat}{Gauss–Legendre quadrature data.}
 
-\item{r_z}{generator for the covariates in the log hazard.}
+\item{r_z}{generator for the covariates in the log hazard. Takes an integer id.}
 
-\item{r_left_trunc}{generator for the left-truncation time.}
+\item{r_left_trunc}{generator for the left-truncation time.
+Takes an integer for the individual's id.}
 
-\item{r_right_cens}{generator for the right-censoring time.}
+\item{r_right_cens}{generator for the right-censoring time. Takes an
+integer for the individual's id.}
 
-\item{r_n_marker}{function to generate the number of observed markers.}
+\item{r_n_marker}{function to generate the number of observed markers.
+Takes an integer for the individual's id.}
 
-\item{r_x}{generator for the covariates in for the markers.}
+\item{r_x}{generator for the covariates in for the markers. Takes an
+integer for the individual's id.}
 
 \item{r_obs_time}{function to generate the observations times given the
-number of observed markers. It should take a single
-integer.}
+number of observed markers. Takes an
+integer for the number of markers and an integer
+for the individual's id.}
 
 \item{y_max}{maximum survival time before administrative censoring.}
 }

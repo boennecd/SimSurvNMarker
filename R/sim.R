@@ -204,17 +204,21 @@ draw_U <- function(Psi_chol, n_y){
 #'
 #' @param sigma_chol Cholesky decomposition of the noise's covariance matrix.
 #' @param r_n_marker function to generate the number of observed markers.
+#'                   Takes an integer for the individual's id.
 #' @param r_obs_time function to generate the observations times given the
-#'                   number of observed markers. It should take a single
-#'                   integer.
+#'                   number of observed markers. Takes an
+#'                   integer for the number of markers and an integer
+#'                   for the individual's id.
+#' @param id integer with id passed to \code{r_n_marker} and
+#'           \code{r_obs_time}.
 #' @inheritParams eval_marker
 #'
 #' @importFrom stats rnorm
 #' @export
 sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
-                       g_func, offset){
-  n_markes <- r_n_marker()
-  obs_time <- r_obs_time(n_markes)
+                       g_func, offset, id = 1L){
+  n_markes <- r_n_marker(id)
+  obs_time <- r_obs_time(id, n_markes)
   n_y <- NCOL(sigma_chol)
 
   noise <- matrix(rnorm(n_markes * n_y), ncol = n_y)  %*% sigma_chol
@@ -280,10 +284,13 @@ list_of_lists_to_data_frame <- function(dat)
 #' @param Psi the random effect covariance matrix.
 #' @param sigma the noise's covariance matrix.
 #' @param gamma coefficient matrix for the non-time-varying fixed effects. Use \code{NULL} if there is no effect.
-#' @param r_z generator for the covariates in the log hazard.
+#' @param r_z generator for the covariates in the log hazard. Takes an integer id.
 #' @param r_left_trunc generator for the left-truncation time.
-#' @param r_right_cens generator for the right-censoring time.
-#' @param r_x generator for the covariates in for the markers.
+#'                     Takes an integer for the individual's id.
+#' @param r_right_cens generator for the right-censoring time. Takes an
+#'                     integer for the individual's id.
+#' @param r_x generator for the covariates in for the markers. Takes an
+#'            integer for the individual's id.
 #' @param y_max maximum survival time before administrative censoring.
 #' @inheritParams surv_func_joint
 #' @inheritParams sim_marker
@@ -322,15 +329,15 @@ sim_joint_data_set <- function(
       is.numeric(g_func(1)),
       is.numeric(gl_dat$node), is.numeric(gl_dat$weight),
       length(gl_dat$node) == length(gl_dat$weight),
-      is.numeric(r_z()), length(r_z()) == d_z,
-      is.numeric(r_x()), length(r_x()) == d_x,
+      is.numeric(r_z(1L)), length(r_z(1L)) == d_z,
+      is.numeric(r_x(1L)), length(r_x(1L)) == d_x,
       length(gamma) == 0L || is.matrix(gamma),
       length(gamma) == 0L || is.numeric(gamma),
       length(gamma) == 0L || NCOL(gamma) == n_y,
-      is.numeric(r_left_trunc()),
-      is.numeric(r_right_cens()),
-      is.integer(r_n_marker()),
-      is.numeric(r_obs_time(1L)))
+      is.numeric(r_left_trunc(1L)),
+      is.numeric(r_right_cens(1L)),
+      is.integer(r_n_marker(1L)),
+      is.numeric(r_obs_time(1L, 1L)))
   })
 
   out <- rep(list(list()), n_obs)
@@ -344,7 +351,7 @@ sim_joint_data_set <- function(
         NULL
       }
       else {
-        z <- r_z()
+        z <- r_z(i)
         drop(z %*% delta)
       }
 
@@ -352,7 +359,7 @@ sim_joint_data_set <- function(
         x <- numeric()
         NULL
       } else {
-        x <- r_x()
+        x <- r_x(i)
         drop(eval_marker_cpp(B = gamma, m = x))
       }
 
@@ -368,23 +375,27 @@ sim_joint_data_set <- function(
           surv - unif
         }
 
+        # simulate left truncation time and right censoring time
+        left_trunc <- r_left_trunc(i)
 
-        f_lower <- fun(y_min)
-        f_upper <- fun(y_max)
-        y <- if(f_lower < 0) y_min else
-          if(f_upper > 0)
-            y_max else {
-              root <- uniroot(fun, interval = c(y_min, y_max),
-                              f.lower = f_lower, f.upper = f_upper)
-              root$root
-            }
-
-        left_trunc <- r_left_trunc()
-        if(y < left_trunc)
+        if(fun(left_trunc) < 0)
+          # the survival time is before the left-censoring time
           next
 
-        # simulate right truncation time
-        right_cens <- r_right_cens()
+        right_cens <- r_right_cens(i)
+
+        y_min_use <- max(y_min, left_trunc)
+        y_max_use <- min(y_max, right_cens * 1.00001)
+
+        f_lower <- fun(y_min_use)
+        f_upper <- fun(y_max_use)
+
+        y <- if(f_upper < 0){
+          root <- uniroot(fun, interval = c(y_min_use, y_max_use),
+                          f.lower = f_lower, f.upper = f_upper)
+          root$root
+        } else
+          y_max_use
 
         # simulate the marker
         keep <- logical()
@@ -392,7 +403,7 @@ sim_joint_data_set <- function(
           markers <- sim_marker(
             B = B, U = U, sigma_chol = sigma_chol, r_n_marker = r_n_marker,
             r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
-            offset = mu_offest)
+            offset = mu_offest, id = i)
           keep <- markers$obs_time < min(y, right_cens) &
             markers$obs_time > left_trunc
 

@@ -4,6 +4,7 @@ output:
 ---  
 
 ```{r, include = FALSE}
+file_name <- "w-ids"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -16,34 +17,43 @@ knitr::opts_chunk$set(
 options(digits = 3)
 ```
 
-Show configurations
+Assign parameters
 
 ```{r show_par}
-dput(alpha)
-dput(omega)
-dput(delta)
-dput(gamma)
-dput(B)
-dput(sig) # Sigma
-dput(Psi)
-dput(n_obs)
+alpha <- c(-0.42, 0.23)
+omega <- c(-2.28, -1.69)
+delta <- c(0.03, 0.23, 0.11, 0.23)
+gamma <- structure(c(0.06, 0.2, -0.18, -0.27, 0.23, 0.16), .Dim = 3:2)
+B <- structure(c(-0.68, 0.99, 0.06, 0.03, -0.97, 0.39), .Dim = 3:2)
+sig <- structure(c(0.01, 0, 0, 0.04), .Dim = c(2L, 2L))
+Psi <- structure(c(1.97, -0.24, -0.63, 0.29, -0.24, 0.35, -0.04, 0.16, 
+                   -0.63, -0.04, 3.22, -1.39, 0.29, 0.16, -1.39, 3.1),
+                 .Dim = c(4L, 4L))
+n_obs <- 2000L
+
+n_y <- length(alpha)
+d_m <- NROW(Psi) / n_y
+d_g <- NROW(B)
+d_b <- length(omega)
+d_z <- length(delta)
+d_x <- NROW(gamma)
 ```
 
 Define sampling functions
 
 ```{r def_sample}
 r_n_marker <- function(id)
-  rpois(1, 10) + 1L
+  as.integer((id %% 4) * 2L + 1L)
 r_obs_time <- function(id, n_markes)
   sort(runif(n_markes, 0, 10))
 r_z <- function(id)
-  as.numeric(runif(d_z) > .5)
+  as.numeric((id %% 5) == 1:4)
 r_x <- function(id)
-  as.numeric(runif(d_x) > .5)
+  as.numeric((id %% 4) == 1:3)
 r_left_trunc <- function(id)
-   rbeta(1, 1, 2) * 3
+   id / 1000
 r_right_cens <- function(id)
-  rbeta(1, 2, 1) * 6 + 4
+  10 - id / 1000
 ```
 
 Get splines
@@ -216,10 +226,12 @@ Show stats
 
 ```{r show_stats}
 # survival data
-head(dat$survival_data)
+head(dat$survival_data, 10)
+tail(dat$survival_data, 10)
 
 # marker data
 head(dat$marker_data, 10)
+tail(dat$marker_data, 10)
 
 # rate of observed events
 mean(dat$survival_data$event) 
@@ -233,6 +245,10 @@ quantile(subset(dat$survival_data, event)$y)
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
 ```
+
+We get a special structure for the covariates, left-truncation,  
+right-censoring time, etc. because we use the `id` argument in the 
+simulation function as we see above.
 
 Fit linear mixed model and see that we get estimates which are close
 to the true values

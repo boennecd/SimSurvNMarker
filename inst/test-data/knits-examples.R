@@ -23,3 +23,16 @@ knit_example("one-marker.R")
 knit_example("no-gamma.R")
 knit_example("no-B.R")
 knit_example("no-delta.R")
+
+local({
+  old_wd <- getwd()
+  on.exit(setwd(old_wd))
+  if(dir.exists("inst/test-data"))
+    setwd("inst/test-data")
+  if(dir.exists("test-data"))
+    setwd("test-data")
+
+  rmarkdown::render("w-ids.Rmd")
+  file.remove("w-ids.html")
+  invisible()
+})

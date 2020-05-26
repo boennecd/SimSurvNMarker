@@ -4,7 +4,17 @@
 \alias{sim_marker}
 \title{Simulate a Number of Observed Marker for an Individual}
 \usage{
-sim_marker(B, U, sigma_chol, r_n_marker, r_obs_time, m_func, g_func, offset)
+sim_marker(
+  B,
+  U,
+  sigma_chol,
+  r_n_marker,
+  r_obs_time,
+  m_func,
+  g_func,
+  offset,
+  id = 1L
+)
 }
 \arguments{
 \item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
@@ -13,17 +23,22 @@ sim_marker(B, U, sigma_chol, r_n_marker, r_obs_time, m_func, g_func, offset)
 
 \item{sigma_chol}{Cholesky decomposition of the noise's covariance matrix.}
 
-\item{r_n_marker}{function to generate the number of observed markers.}
+\item{r_n_marker}{function to generate the number of observed markers.
+Takes an integer for the individual's id.}
 
 \item{r_obs_time}{function to generate the observations times given the
-number of observed markers. It should take a single
-integer.}
+number of observed markers. Takes an
+integer for the number of markers and an integer
+for the individual's id.}
 
 \item{m_func}{basis function for \code{U} like \code{\link{poly}}.}
 
 \item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
 
 \item{offset}{vector with non-time-varying fixed effects.}
+
+\item{id}{integer with id passed to \code{r_n_marker} and
+\code{r_obs_time}.}
 }
 \description{
 Simulate a Number of Observed Marker for an Individual
