@@ -5,3 +5,6 @@
 ^inst/test-data/.*\.md
 ^inst/test-data/fig
 ^\.travis\.yml
+^create-vignette\.R
+^vignettes/SimSurvNMarker\.Rmd
+^vignettes/cache

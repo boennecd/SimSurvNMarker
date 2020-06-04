@@ -1,8 +1,4 @@
 ---
-vignette: >
-  %\VignetteIndexEntry{SimSurvNMarker}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -17,7 +13,7 @@ knitr::opts_chunk$set(
 options(digits = 3)
 ```
 
-# SimSurvNMarker
+# SimSurvNMarker (Simulate Survival process and Markers)
 [![Build Status on Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
 
 The `SimSurvNMarker` package reasonably fast simulates from a joint survival 

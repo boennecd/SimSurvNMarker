@@ -16,8 +16,9 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat (>= 2.1.0), 
-    splines
+    testthat (>= 2.1.0),
+    splines,
+    R.rsp
 RoxygenNote: 7.0.1
 LinkingTo: 
     Rcpp,
@@ -25,3 +26,4 @@ LinkingTo:
 Imports: 
     Rcpp
 SystemRequirements: C++14
+VignetteBuilder: R.rsp

@@ -1,5 +1,5 @@
 
-# SimSurvNMarker
+# SimSurvNMarker (Simulate Survival process and Markers)
 
 [![Build Status on
 Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
@@ -130,9 +130,17 @@ x\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20x_i "\\vec x_i") and
 ![\\vec z\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20z_i
 "\\vec z_i") are individual specific known covariates.
 
-The package is not too well documented at this point. Instead we provide
-an example of how to use the package here and the
+We provide an example of how to use the package here and the
 [inst/test-data](inst/test-data) directory.
+
+## Installation
+
+The package is not on CRAN but can be installed through
+
+``` r
+stopifnot(require(remotes)) # need the remotes package
+install_github("boennecd/SimSurvNMarker")
+```
 
 ## Example
 
@@ -333,7 +341,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.527   0.000   0.526
+#>   0.633   0.153   0.785
 ```
 
 Finally, we show a few of the first rows along with some summary
