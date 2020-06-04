@@ -12,7 +12,8 @@ draw_U(Psi_chol, n_y)
 \item{n_y}{number of markers.}
 }
 \description{
-Samples from a Multivariate Normal Distribution
+Simulates from a multivariate normal distribution and returns a
+matrix with appropriate dimensions.
 }
 \examples{
 library(SimSurvNMarker)

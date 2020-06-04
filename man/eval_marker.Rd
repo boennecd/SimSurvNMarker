@@ -7,20 +7,24 @@
 eval_marker(ti, B, g_func, U, m_func, offset)
 }
 \arguments{
-\item{ti}{time points.}
+\item{ti}{numeric vector with time points.}
 
-\item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
+\item{B}{coefficient matrix for time-varying fixed effects.
+Use \code{NULL} if there is no effect.}
 
 \item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
 
-\item{U}{random effect matrix for time-varying random effects. Use \code{NULL} if there is no effect.}
+\item{U}{random effects matrix for time-varying random effects.
+Use \code{NULL} if there is no effects.}
 
 \item{m_func}{basis function for \code{U} like \code{\link{poly}}.}
 
-\item{offset}{vector with non-time-varying fixed effects.}
+\item{offset}{numeric vector with non-time-varying fixed effects.}
 }
 \description{
-Fast Evaluation of Time-varying Marker Mean Term
+Evalutes the marker mean given by
+
+\deqn{\vec\mu(s, \vec u) = \vec o + B^\top\vec g(s) + U^\top\vec m(s).}
 }
 \examples{
 # compare R version with this function

@@ -23,25 +23,29 @@ sim_joint_data_set(
   r_n_marker,
   r_x,
   r_obs_time,
-  y_max
+  y_max,
+  tol = .Machine$double.eps^(1/4)
 )
 }
 \arguments{
 \item{n_obs}{integer with the number of individuals to draw.}
 
-\item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
+\item{B}{coefficient matrix for time-varying fixed effects.
+Use \code{NULL} if there is no effect.}
 
-\item{Psi}{the random effect covariance matrix.}
+\item{Psi}{the random effects' covariance matrix.}
 
-\item{omega}{coefficient for baseline hazard.}
+\item{omega}{numeric vector with coefficient for baseline hazard.}
 
-\item{delta}{offset on the log hazard scale. Use \code{NULL} if there is no effect.}
+\item{delta}{offset on the log hazard scale. Use \code{NULL} if
+there is no effect.}
 
 \item{alpha}{numeric vector with association parameters.}
 
 \item{sigma}{the noise's covariance matrix.}
 
-\item{gamma}{coefficient matrix for the non-time-varying fixed effects. Use \code{NULL} if there is no effect.}
+\item{gamma}{coefficient matrix for the non-time-varying fixed effects.
+Use \code{NULL} if there is no effect.}
 
 \item{b_func}{basis function for baseline hazard like \code{\link{poly}}.}
 
@@ -51,7 +55,8 @@ sim_joint_data_set(
 
 \item{gl_dat}{Gauss–Legendre quadrature data.}
 
-\item{r_z}{generator for the covariates in the log hazard. Takes an integer id.}
+\item{r_z}{generator for the covariates in the log hazard. Takes an
+integer for the individual's id.}
 
 \item{r_left_trunc}{generator for the left-truncation time.
 Takes an integer for the individual's id.}
@@ -71,7 +76,29 @@ integer for the number of markers and an integer
 for the individual's id.}
 
 \item{y_max}{maximum survival time before administrative censoring.}
+
+\item{tol}{convergence tolerance passed to \code{\link{uniroot}}.}
 }
 \description{
-Simulate Individuals from a Joint Survival and Marker Model
+Simulates individuals from the following model
+
+\deqn{\vec U_i \sim N^{(K)}(\vec 0, \Psi)}
+\deqn{\vec Y_{ij} \mid \vec U_i = \vec u_i \sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)}
+\deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
+  \vec 1^\top(diag(\vec \alpha) \otimes \vec x_i^\top)vec(\Gamma) +
+  \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
+  \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
+
+with
+
+\deqn{\vec\mu_i(s, \vec u) = (I \otimes \vec x_i^\top)vec(\Gamma) + \left(I \otimes \vec g(s)^\top\right)vec(B) + \left(I \otimes \vec m(s)^\top\right) \vec u}
+
+where \eqn{h(t \mid \vec u)} is the conditional hazard function.
+}
+\seealso{
+See the examples on Github at
+\url{https://github.com/boennecd/SimSurvNMarker} and
+\url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}.
+
+\code{\link{sim_marker}}, \code{\link{surv_func_joint}}
 }

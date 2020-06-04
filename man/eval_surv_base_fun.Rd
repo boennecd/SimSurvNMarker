@@ -4,21 +4,25 @@
 \alias{eval_surv_base_fun}
 \title{Evaluates the Survival Function without a Marker}
 \usage{
-eval_surv_base_fun(ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = 0)
+eval_surv_base_fun(ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = NULL)
 }
 \arguments{
-\item{ti}{time points.}
+\item{ti}{numeric vector with time points.}
 
-\item{omega}{coefficient for baseline hazard.}
+\item{omega}{numeric vector with coefficient for baseline hazard.}
 
 \item{b_func}{basis function for baseline hazard like \code{\link{poly}}.}
 
 \item{gl_dat}{Gauss–Legendre quadrature data.}
 
-\item{delta}{offset on the log hazard scale. Use \code{NULL} if there is no effect.}
+\item{delta}{offset on the log hazard scale. Use \code{NULL} if
+there is no effect.}
 }
 \description{
-Evaluates the Survival Function without a Marker
+Evaluates the survival function at given points where the hazard is
+given by
+
+\deqn{h(t) = \exp(\vec\omega^\top\vec b(t) + \delta).}
 }
 \examples{
 # Example of a hazard function

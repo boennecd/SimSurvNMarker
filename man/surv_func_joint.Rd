@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim.R
 \name{surv_func_joint}
 \alias{surv_func_joint}
-\title{Evaluate the Conditional Survival Function Given the Random Effect}
+\title{Evaluate the Conditional Survival Function Given the Random Effects}
 \usage{
 surv_func_joint(
   ti,
@@ -19,15 +19,18 @@ surv_func_joint(
 )
 }
 \arguments{
-\item{ti}{time points.}
+\item{ti}{numeric vector with time points.}
 
-\item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
+\item{B}{coefficient matrix for time-varying fixed effects.
+Use \code{NULL} if there is no effect.}
 
-\item{U}{random effect matrix for time-varying random effects. Use \code{NULL} if there is no effect.}
+\item{U}{random effects matrix for time-varying random effects.
+Use \code{NULL} if there is no effects.}
 
-\item{omega}{coefficient for baseline hazard.}
+\item{omega}{numeric vector with coefficient for baseline hazard.}
 
-\item{delta}{offset on the log hazard scale. Use \code{NULL} if there is no effect.}
+\item{delta}{offset on the log hazard scale. Use \code{NULL} if
+there is no effect.}
 
 \item{alpha}{numeric vector with association parameters.}
 
@@ -39,8 +42,18 @@ surv_func_joint(
 
 \item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
 
-\item{offset}{vector with non-time-varying fixed effects.}
+\item{offset}{numeric vector with non-time-varying fixed effects.}
 }
 \description{
-Evaluate the Conditional Survival Function Given the Random Effect
+Evaluate the conditional survival function given the random effects,
+\eqn{\vec U}. The conditional hazard function is
+
+\deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
+  \vec\alpha^\top\vec o +
+  \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
+  \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
+}
+\seealso{
+\code{\link{sim_marker}}, \code{\link{draw_U}},
+\code{\link{eval_surv_base_fun}}
 }

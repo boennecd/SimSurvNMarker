@@ -17,9 +17,11 @@ sim_marker(
 )
 }
 \arguments{
-\item{B}{coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.}
+\item{B}{coefficient matrix for time-varying fixed effects.
+Use \code{NULL} if there is no effect.}
 
-\item{U}{random effect matrix for time-varying random effects. Use \code{NULL} if there is no effect.}
+\item{U}{random effects matrix for time-varying random effects.
+Use \code{NULL} if there is no effects.}
 
 \item{sigma_chol}{Cholesky decomposition of the noise's covariance matrix.}
 
@@ -35,11 +37,24 @@ for the individual's id.}
 
 \item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
 
-\item{offset}{vector with non-time-varying fixed effects.}
+\item{offset}{numeric vector with non-time-varying fixed effects.}
 
 \item{id}{integer with id passed to \code{r_n_marker} and
 \code{r_obs_time}.}
 }
 \description{
-Simulate a Number of Observed Marker for an Individual
+Simulates from
+
+\deqn{\vec U_i \sim N^{(K)}(\vec 0, \Psi)}
+\deqn{\vec Y_{ij} \mid \vec U_i = \vec u_i \sim N^{(r)}(\vec \mu(s_{ij}, \vec u_i), \Sigma)}
+
+with
+
+\deqn{\vec\mu(s, \vec u) = \vec o + \left(I \otimes \vec g(s)^\top\right)vec(B) + \left(I \otimes \vec m(s)^\top\right) \vec u.}
+
+The number of observations and the observations times, \eqn{s_{ij}}s, are
+determined from the passed generating functions.
+}
+\seealso{
+\code{\link{draw_U}}, \code{\link{eval_marker}}
 }

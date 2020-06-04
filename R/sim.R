@@ -61,9 +61,10 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 
 .surv_func_inner <- function(ti, omega, b_func, gl_dat){
   lb <- .time_eps
-  ub <- ti
   if(ti < lb)
-    stop("too small ti")
+    return(0)
+  ub <- ti
+
 
   nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
   f <- exp(drop(b_func(nodes) %*% omega))
@@ -72,11 +73,18 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 
 #' Evaluates the Survival Function without a Marker
 #'
-#' @param ti time points.
-#' @param omega coefficient for baseline hazard.
+#' @description
+#' Evaluates the survival function at given points where the hazard is
+#' given by
+#'
+#' \deqn{h(t) = \exp(\vec\omega^\top\vec b(t) + \delta).}
+#'
+#' @param ti numeric vector with time points.
+#' @param omega numeric vector with coefficient for baseline hazard.
 #' @param b_func basis function for baseline hazard like \code{\link{poly}}.
 #' @param gl_dat Gauss–Legendre quadrature data.
-#' @param delta offset on the log hazard scale. Use \code{NULL} if there is no effect.
+#' @param delta offset on the log hazard scale. Use \code{NULL} if
+#'              there is no effect.
 #'
 #' @examples
 #' # Example of a hazard function
@@ -97,7 +105,7 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 #'      ylab = "Survival", yaxs = "i")
 #' @export
 eval_surv_base_fun <- function(
-  ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = 0){
+  ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = NULL){
   cum_haz_fac <- vapply(
     ti, .surv_func_inner, FUN.VALUE = numeric(1L),
     omega = omega, b_func = b_func, gl_dat = gl_dat)
@@ -113,12 +121,19 @@ eval_surv_base_fun <- function(
 
 #' Fast Evaluation of Time-varying Marker Mean Term
 #'
-#' @param ti time points.
-#' @param B coefficient matrix for time-varying fixed effects. Use \code{NULL} if there is no effect.
+#' @description
+#' Evalutes the marker mean given by
+#'
+#' \deqn{\vec\mu(s, \vec u) = \vec o + B^\top\vec g(s) + U^\top\vec m(s).}
+#'
+#' @param ti numeric vector with time points.
+#' @param B coefficient matrix for time-varying fixed effects.
+#'          Use \code{NULL} if there is no effect.
 #' @param g_func basis function for \code{B} like \code{\link{poly}}.
-#' @param U random effect matrix for time-varying random effects. Use \code{NULL} if there is no effect.
+#' @param U random effects matrix for time-varying random effects.
+#'          Use \code{NULL} if there is no effects.
 #' @param m_func basis function for \code{U} like \code{\link{poly}}.
-#' @param offset vector with non-time-varying fixed effects.
+#' @param offset numeric vector with non-time-varying fixed effects.
 #'
 #' @examples
 #' # compare R version with this function
@@ -174,6 +189,10 @@ eval_marker <- function(ti, B, g_func, U, m_func, offset){
 
 #' Samples from a Multivariate Normal Distribution
 #'
+#' @description
+#' Simulates from a multivariate normal distribution and returns a
+#' matrix with appropriate dimensions.
+#'
 #' @param Psi_chol Cholesky decomposition of the covariance matrix.
 #' @param n_y number of markers.
 #'
@@ -202,6 +221,19 @@ draw_U <- function(Psi_chol, n_y){
 
 #' Simulate a Number of Observed Marker for an Individual
 #'
+#' @description
+#' Simulates from
+#'
+#' \deqn{\vec U_i \sim N^{(K)}(\vec 0, \Psi)}
+#' \deqn{\vec Y_{ij} \mid \vec U_i = \vec u_i \sim N^{(r)}(\vec \mu(s_{ij}, \vec u_i), \Sigma)}
+#'
+#' with
+#'
+#' \deqn{\vec\mu(s, \vec u) = \vec o + \left(I \otimes \vec g(s)^\top\right)vec(B) + \left(I \otimes \vec m(s)^\top\right) \vec u.}
+#'
+#' The number of observations and the observations times, \eqn{s_{ij}}s, are
+#' determined from the passed generating functions.
+#'
 #' @param sigma_chol Cholesky decomposition of the noise's covariance matrix.
 #' @param r_n_marker function to generate the number of observed markers.
 #'                   Takes an integer for the individual's id.
@@ -212,6 +244,9 @@ draw_U <- function(Psi_chol, n_y){
 #' @param id integer with id passed to \code{r_n_marker} and
 #'           \code{r_obs_time}.
 #' @inheritParams eval_marker
+#'
+#' @seealso
+#' \code{\link{draw_U}}, \code{\link{eval_marker}}
 #'
 #' @importFrom stats rnorm
 #' @export
@@ -236,9 +271,9 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
 .surv_func_joint_inner <- function(ti, B, U, omega, alpha, b_func, m_func,
                                    g_func, gl_dat){
   lb <- .time_eps
-  ub <- ti
   if(ti < lb)
-    stop("too small ti")
+    return(0)
+  ub <- ti
 
   nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
   f <- exp(
@@ -249,11 +284,24 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
 }
 
-#' Evaluate the Conditional Survival Function Given the Random Effect
+#' Evaluate the Conditional Survival Function Given the Random Effects
+#'
+#' @description
+#' Evaluate the conditional survival function given the random effects,
+#' \eqn{\vec U}. The conditional hazard function is
+#'
+#' \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
+#'   \vec\alpha^\top\vec o +
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
 #'
 #' @inheritParams eval_surv_base_fun
 #' @inheritParams eval_marker
 #' @param alpha numeric vector with association parameters.
+#'
+#' @seealso
+#' \code{\link{sim_marker}}, \code{\link{draw_U}},
+#' \code{\link{eval_surv_base_fun}}
 #'
 #' @export
 surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
@@ -280,8 +328,24 @@ list_of_lists_to_data_frame <- function(dat)
 
 #' Simulate Individuals from a Joint Survival and Marker Model
 #'
+#' @description
+#' Simulates individuals from the following model
+#'
+#' \deqn{\vec U_i \sim N^{(K)}(\vec 0, \Psi)}
+#' \deqn{\vec Y_{ij} \mid \vec U_i = \vec u_i \sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)}
+#' \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec x_i^\top)vec(\Gamma) +
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
+#'
+#' with
+#'
+#' \deqn{\vec\mu_i(s, \vec u) = (I \otimes \vec x_i^\top)vec(\Gamma) + \left(I \otimes \vec g(s)^\top\right)vec(B) + \left(I \otimes \vec m(s)^\top\right) \vec u}
+#'
+#' where \eqn{h(t \mid \vec u)} is the conditional hazard function.
+#'
 #' @param n_obs integer with the number of individuals to draw.
-#' @param Psi the random effect covariance matrix.
+#' @param Psi the random effects' covariance matrix.
 #' @param sigma the noise's covariance matrix.
 #' @param gamma coefficient matrix for the non-time-varying fixed effects.
 #'              Use \code{NULL} if there is no effect.
@@ -294,15 +358,23 @@ list_of_lists_to_data_frame <- function(dat)
 #' @param r_x generator for the covariates in for the markers. Takes an
 #'            integer for the individual's id.
 #' @param y_max maximum survival time before administrative censoring.
+#' @param tol convergence tolerance passed to \code{\link{uniroot}}.
 #' @inheritParams surv_func_joint
 #' @inheritParams sim_marker
+#'
+#' @seealso
+#' See the examples on Github at
+#' \url{https://github.com/boennecd/SimSurvNMarker} and
+#' \url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}.
+#'
+#' \code{\link{sim_marker}}, \code{\link{surv_func_joint}}
 #'
 #' @importFrom stats uniroot runif
 #' @export
 sim_joint_data_set <- function(
   n_obs, B, Psi, omega, delta, alpha, sigma, gamma, b_func, m_func, g_func,
   gl_dat = get_gl_rule(30L), r_z, r_left_trunc, r_right_cens,
-  r_n_marker, r_x, r_obs_time, y_max){
+  r_n_marker, r_x, r_obs_time, y_max, tol = .Machine$double.eps^(1/4)){
   Psi_chol <- chol(Psi)
   y_min <- .time_eps
   sigma_chol <- chol(sigma)
@@ -394,7 +466,8 @@ sim_joint_data_set <- function(
 
         y <- if(f_upper < 0){
           root <- uniroot(fun, interval = c(y_min_use, y_max_use),
-                          f.lower = f_lower, f.upper = f_upper)
+                          f.lower = f_lower, f.upper = f_upper,
+                          tol = tol)
           root$root
         } else
           y_max_use
