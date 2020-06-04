@@ -59,6 +59,10 @@ r_right_cens <- function(id)
 Get splines
 
 ```{r get_splines}
+b_ks <- seq(log(1e-1), log(10), length.out = d_b)
+m_ks <- seq(       0 ,     10 , length.out = d_m)
+g_ks <- seq(       0 ,     10 , length.out = d_g)
+
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)

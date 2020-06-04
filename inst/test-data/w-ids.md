@@ -41,6 +41,10 @@ r_right_cens <- function(id)
 Get splines
 
 ``` r
+b_ks <- seq(log(1e-1), log(10), length.out = d_b)
+m_ks <- seq(       0 ,     10 , length.out = d_m)
+g_ks <- seq(       0 ,     10 , length.out = d_g)
+
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
@@ -214,7 +218,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   1.536   0.043   1.578
+#>   1.537   0.033   1.569
 ```
 
 Show stats

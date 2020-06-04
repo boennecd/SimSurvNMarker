@@ -9,8 +9,8 @@ local(envir = args_env, {
   K <- n_y * d_m
 
   b_ks <- seq(log(1e-2), log(10), length.out = d_b)
-  m_ks <- seq(0     , 10     , length.out = d_m)
-  g_ks <- seq(0     , 10     , length.out = d_g)
+  m_ks <- seq(0        , 10     , length.out = d_m)
+  g_ks <- seq(0        , 10     , length.out = d_g)
 
   omega <- c(-1.68, -1.93, -0.62, -5.11, -0.26)
   B <- structure(c(-0.43, 0.33, 0.04, 0.47, -0.37, -0.88, 0.48, -0.16,

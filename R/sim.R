@@ -1,4 +1,4 @@
-.time_eps <- sqrt(.Machine$double.eps)
+.time_eps <- 1e-16
 
 #' Faster Pointwise function than ns
 #'
@@ -283,8 +283,10 @@ list_of_lists_to_data_frame <- function(dat)
 #' @param n_obs integer with the number of individuals to draw.
 #' @param Psi the random effect covariance matrix.
 #' @param sigma the noise's covariance matrix.
-#' @param gamma coefficient matrix for the non-time-varying fixed effects. Use \code{NULL} if there is no effect.
-#' @param r_z generator for the covariates in the log hazard. Takes an integer id.
+#' @param gamma coefficient matrix for the non-time-varying fixed effects.
+#'              Use \code{NULL} if there is no effect.
+#' @param r_z generator for the covariates in the log hazard. Takes an
+#'            integer for the individual's id.
 #' @param r_left_trunc generator for the left-truncation time.
 #'                     Takes an integer for the individual's id.
 #' @param r_right_cens generator for the right-censoring time. Takes an
