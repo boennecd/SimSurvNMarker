@@ -70,64 +70,71 @@ model
 <!-- \end{align*}$$ -->
 
   
-![\\begin{align\*} \\vec Y\_{ij} \\mid \\vec U\_i = \\vec u\_i &\\sim
-N^{(r)}(\\vec \\mu\_i(s\_{ij}, \\vec u\_i), \\Sigma) \\\\
-\\vec\\mu\_i(s, \\vec u) &= \\Gamma^\\top \\vec x\_i + B^\\top\\vec g(s)
-+ U^\\top\\vec m(s) \\\\ &= \\left(I \\otimes \\vec
-x\_i^\\top\\right)\\text{vec}\\Gamma + \\left(I \\otimes \\vec
-g(s)^\\top\\right)\\text{vec} B + \\left(I \\otimes \\vec
-m(s)^\\top\\right) \\vec u \\\\ \\vec U\_i &\\sim N^{(K)}(\\vec 0,
-\\Psi) \\\\ h(t\\mid \\vec u) &= \\exp\\left( \\vec\\omega^\\top\\vec
-b(t) + \\vec z\_i^\\top\\vec\\delta + \\vec\\alpha^\\top\\vec\\mu\_i(t,
-\\vec u) \\right) \\\\ &= \\exp\\Bigg( \\vec\\omega^\\top\\vec b(t) +
-\\vec z\_i^\\top\\vec\\delta + \\vec 1^\\top\\left( \\text{diag}(\\vec
-\\alpha) \\otimes \\vec x\_i^\\top\\right)\\text{vec}\\Gamma +
-\\vec 1^\\top\\left( \\text{diag}(\\vec \\alpha) \\otimes \\vec
-g(t)^\\top\\right)\\text{vec} B \\\\ &\\hspace{50pt}+
-\\vec 1^\\top\\left( \\text{diag}(\\vec \\alpha) \\otimes \\vec
-m(t)^\\top\\right)\\vec u \\Bigg)
-\\end{align\*}](https://latex.codecogs.com/svg.latex?%5Cbegin%7Balign%2A%7D%20%20%5Cvec%20Y_%7Bij%7D%20%5Cmid%20%5Cvec%20U_i%20%3D%20%5Cvec%20u_i%20%20%20%20%26%5Csim%20N%5E%7B%28r%29%7D%28%5Cvec%20%5Cmu_i%28s_%7Bij%7D%2C%20%5Cvec%20u_i%29%2C%20%5CSigma%29%20%20%20%20%5C%5C%20%20%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20u%29%20%26%3D%20%20%20%20%5CGamma%5E%5Ctop%20%5Cvec%20x_i%20%2B%20B%5E%5Ctop%5Cvec%20g%28s%29%20%2B%20U%5E%5Ctop%5Cvec%20m%28s%29%20%20%20%20%5C%5C%20%20%26%3D%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%20%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20g%28s%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%20%20%20%20%20%20%2B%20%5Cleft%28I%20%5Cotimes%20%5Cvec%20m%28s%29%5E%5Ctop%5Cright%29%20%5Cvec%20u%20%20%20%20%5C%5C%20%20%5Cvec%20U_i%20%26%5Csim%20N%5E%7B%28K%29%7D%28%5Cvec%200%2C%20%5CPsi%29%20%20%20%20%5C%5C%20%20h%28t%5Cmid%20%5Cvec%20u%29%20%26%3D%20%5Cexp%5Cleft%28%20%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%2B%20%20%20%20%5Cvec%5Calpha%5E%5Ctop%5Cvec%5Cmu_i%28t%2C%20%5Cvec%20u%29%20%20%20%20%5Cright%29%20%20%20%20%5C%5C%20%20%26%3D%20%5Cexp%5CBigg%28%20%20%20%20%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%20%2B%20%20%20%20%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%20%20%20%20%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%20%20%20%20%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20g%28t%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%20%5C%5C%20%20%26%5Chspace%7B50pt%7D%2B%20%5Cvec%201%5E%5Ctop%5Cleft%28%20%20%20%20%5Ctext%7Bdiag%7D%28%5Cvec%20%5Calpha%29%20%5Cotimes%20%5Cvec%20m%28t%29%5E%5Ctop%5Cright%29%5Cvec%20u%20%20%20%20%5CBigg%29%20%20%5Cend%7Balign%2A%7D
-"\\begin{align*}  \\vec Y_{ij} \\mid \\vec U_i = \\vec u_i    &\\sim N^{(r)}(\\vec \\mu_i(s_{ij}, \\vec u_i), \\Sigma)    \\\\  \\vec\\mu_i(s, \\vec u) &=    \\Gamma^\\top \\vec x_i + B^\\top\\vec g(s) + U^\\top\\vec m(s)    \\\\  &= \\left(I \\otimes \\vec x_i^\\top\\right)\\text{vec}\\Gamma       + \\left(I \\otimes \\vec g(s)^\\top\\right)\\text{vec} B       + \\left(I \\otimes \\vec m(s)^\\top\\right) \\vec u    \\\\  \\vec U_i &\\sim N^{(K)}(\\vec 0, \\Psi)    \\\\  h(t\\mid \\vec u) &= \\exp\\left(    \\vec\\omega^\\top\\vec b(t) +    \\vec z_i^\\top\\vec\\delta +    \\vec\\alpha^\\top\\vec\\mu_i(t, \\vec u)    \\right)    \\\\  &= \\exp\\Bigg(    \\vec\\omega^\\top\\vec b(t) +    \\vec z_i^\\top\\vec\\delta    + \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec x_i^\\top\\right)\\text{vec}\\Gamma    + \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec g(t)^\\top\\right)\\text{vec} B \\\\  &\\hspace{50pt}+ \\vec 1^\\top\\left(    \\text{diag}(\\vec \\alpha) \\otimes \\vec m(t)^\\top\\right)\\vec u    \\Bigg)  \\end{align*}")  
+![\\begin{align\*}\\vec Y\_{ij}\\mid\\vec U\_i =\\vec u\_i &\\sim
+N^{(r)}(\\vec \\mu\_i(s\_{ij}, \\vec u\_i), \\Sigma)\\\\\\vec\\mu\_i(s,
+\\vec u)&=\\Gamma^\\top\\vec x\_i+B^\\top\\vec g(s)+U^\\top\\vec
+m(s)\\\\&=\\left(I\\otimes\\vec
+x\_i^\\top\\right)\\text{vec}\\Gamma+\\left(I\\otimes\\vec
+g(s)^\\top\\right)\\text{vec}B+\\left(I\\otimes\\vec
+m(s)^\\top\\right)\\vec u\\\\\\vec U\_i &\\sim
+N^{(K)}(\\vec 0,\\Psi)\\end{align\*}](https://render.githubusercontent.com/render/math?math=%5Cbegin%7Balign%2A%7D%5Cvec%20Y_%7Bij%7D%5Cmid%5Cvec%20U_i%20%3D%5Cvec%20u_i%20%26%5Csim%20N%5E%7B%28r%29%7D%28%5Cvec%20%5Cmu_i%28s_%7Bij%7D%2C%20%5Cvec%20u_i%29%2C%20%5CSigma%29%5C%5C%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20u%29%26%3D%5CGamma%5E%5Ctop%5Cvec%20x_i%2BB%5E%5Ctop%5Cvec%20g%28s%29%2BU%5E%5Ctop%5Cvec%20m%28s%29%5C%5C%26%3D%5Cleft%28I%5Cotimes%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%2B%5Cleft%28I%5Cotimes%5Cvec%20g%28s%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7DB%2B%5Cleft%28I%5Cotimes%5Cvec%20m%28s%29%5E%5Ctop%5Cright%29%5Cvec%20u%5C%5C%5Cvec%20U_i%20%26%5Csim%20N%5E%7B%28K%29%7D%28%5Cvec%200%2C%5CPsi%29%5Cend%7Balign%2A%7D
+"\\begin{align*}\\vec Y_{ij}\\mid\\vec U_i =\\vec u_i &\\sim N^{(r)}(\\vec \\mu_i(s_{ij}, \\vec u_i), \\Sigma)\\\\\\vec\\mu_i(s, \\vec u)&=\\Gamma^\\top\\vec x_i+B^\\top\\vec g(s)+U^\\top\\vec m(s)\\\\&=\\left(I\\otimes\\vec x_i^\\top\\right)\\text{vec}\\Gamma+\\left(I\\otimes\\vec g(s)^\\top\\right)\\text{vec}B+\\left(I\\otimes\\vec m(s)^\\top\\right)\\vec u\\\\\\vec U_i &\\sim N^{(K)}(\\vec 0,\\Psi)\\end{align*}")  
+
+  
+![\\begin{align\*}h(t\\mid\\vec u)&=\\exp\\left(\\vec\\omega^\\top\\vec
+b(t)+\\vec z\_i^\\top\\vec\\delta+\\vec\\alpha^\\top\\vec\\mu\_i(t,
+\\vec u)\\right)\\\\&=\\exp\\Bigg(\\vec\\omega^\\top\\vec b(t)+\\vec
+z\_i^\\top\\vec\\delta+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec
+x\_i^\\top\\right)\\text{vec}\\Gamma+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec
+g(t)^\\top\\right)\\text{vec}
+B\\\\&\\hspace{50pt}+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec
+m(t)^\\top\\right)\\vec
+u\\Bigg)\\end{align\*}](https://render.githubusercontent.com/render/math?math=%5Cbegin%7Balign%2A%7Dh%28t%5Cmid%5Cvec%20u%29%26%3D%5Cexp%5Cleft%28%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%2B%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%2B%5Cvec%5Calpha%5E%5Ctop%5Cvec%5Cmu_i%28t%2C%20%5Cvec%20u%29%5Cright%29%5C%5C%26%3D%5Cexp%5CBigg%28%5Cvec%5Comega%5E%5Ctop%5Cvec%20b%28t%29%2B%5Cvec%20z_i%5E%5Ctop%5Cvec%5Cdelta%2B%5Cvec%201%5E%5Ctop%5Cleft%28%5Ctext%7Bdiag%7D%28%5Cvec%5Calpha%29%5Cotimes%5Cvec%20x_i%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%5CGamma%2B%5Cvec%201%5E%5Ctop%5Cleft%28%5Ctext%7Bdiag%7D%28%5Cvec%5Calpha%29%5Cotimes%5Cvec%20g%28t%29%5E%5Ctop%5Cright%29%5Ctext%7Bvec%7D%20B%5C%5C%26%5Chspace%7B50pt%7D%2B%5Cvec%201%5E%5Ctop%5Cleft%28%5Ctext%7Bdiag%7D%28%5Cvec%5Calpha%29%5Cotimes%5Cvec%20m%28t%29%5E%5Ctop%5Cright%29%5Cvec%20u%5CBigg%29%5Cend%7Balign%2A%7D
+"\\begin{align*}h(t\\mid\\vec u)&=\\exp\\left(\\vec\\omega^\\top\\vec b(t)+\\vec z_i^\\top\\vec\\delta+\\vec\\alpha^\\top\\vec\\mu_i(t, \\vec u)\\right)\\\\&=\\exp\\Bigg(\\vec\\omega^\\top\\vec b(t)+\\vec z_i^\\top\\vec\\delta+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec x_i^\\top\\right)\\text{vec}\\Gamma+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec g(t)^\\top\\right)\\text{vec} B\\\\&\\hspace{50pt}+\\vec 1^\\top\\left(\\text{diag}(\\vec\\alpha)\\otimes\\vec m(t)^\\top\\right)\\vec u\\Bigg)\\end{align*}")  
 
 where ![\\vec Y\_{ij}\\in\\mathbb
-R^{n\_y}](https://latex.codecogs.com/svg.latex?%5Cvec%20Y_%7Bij%7D%5Cin%5Cmathbb%20R%5E%7Bn_y%7D
+R^{n\_y}](https://render.githubusercontent.com/render/math?math=%5Cvec%20Y_%7Bij%7D%5Cin%5Cmathbb%20R%5E%7Bn_y%7D
 "\\vec Y_{ij}\\in\\mathbb R^{n_y}") is individual
-![i](https://latex.codecogs.com/svg.latex?i "i")’s
-![j](https://latex.codecogs.com/svg.latex?j "j")th observed marker at
-time ![s\_{ij}](https://latex.codecogs.com/svg.latex?s_%7Bij%7D
+![i](https://render.githubusercontent.com/render/math?math=i "i")’s
+![j](https://render.githubusercontent.com/render/math?math=j "j")th
+observed marker at time
+![s\_{ij}](https://render.githubusercontent.com/render/math?math=s_%7Bij%7D
 "s_{ij}"), ![U\_i\\in\\mathbb
-R^K](https://latex.codecogs.com/svg.latex?U_i%5Cin%5Cmathbb%20R%5EK
+R^K](https://render.githubusercontent.com/render/math?math=U_i%5Cin%5Cmathbb%20R%5EK
 "U_i\\in\\mathbb R^K") is individual
-![i](https://latex.codecogs.com/svg.latex?i "i")’s random effect, and
-![h](https://latex.codecogs.com/svg.latex?h "h") is the instantaneous
-hazard rate for the time-to-event outcome.
-![\\vec\\alpha](https://latex.codecogs.com/svg.latex?%5Cvec%5Calpha
+![i](https://render.githubusercontent.com/render/math?math=i "i")’s
+random effect, and
+![h](https://render.githubusercontent.com/render/math?math=h "h") is the
+instantaneous hazard rate for the time-to-event outcome.
+![\\vec\\alpha](https://render.githubusercontent.com/render/math?math=%5Cvec%5Calpha
 "\\vec\\alpha") is the so-called association parameter. It shows the
 strength of the relation between the latent mean function,
 ![\\vec\\mu\_i(t,\\vec
-u)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu_i%28t%2C%5Cvec%20u%29
+u)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28t%2C%5Cvec%20u%29
 "\\vec\\mu_i(t,\\vec u)"), and the log of the instantaneous rate,
 ![h(t\\mid \\vec
-u)](https://latex.codecogs.com/svg.latex?h%28t%5Cmid%20%5Cvec%20u%29
+u)](https://render.githubusercontent.com/render/math?math=h%28t%5Cmid%20%5Cvec%20u%29
 "h(t\\mid \\vec u)"). ![\\vec
-m(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20m%28t%29
+m(t)](https://render.githubusercontent.com/render/math?math=%5Cvec%20m%28t%29
 "\\vec m(t)"), ![\\vec
-g(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20g%28t%29
+g(t)](https://render.githubusercontent.com/render/math?math=%5Cvec%20g%28t%29
 "\\vec g(t)") and ![\\vec
-b(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20b%28t%29
+b(t)](https://render.githubusercontent.com/render/math?math=%5Cvec%20b%28t%29
 "\\vec b(t)") are basis expansions of time. As an example, these can be
 a polynomial, a B-spline, or a natural cubic spline. The expansion for
 the baseline hazard, ![\\vec
-b(t)](https://latex.codecogs.com/svg.latex?%5Cvec%20b%28t%29
+b(t)](https://render.githubusercontent.com/render/math?math=%5Cvec%20b%28t%29
 "\\vec b(t)"), is typically made on ![\\log
-t](https://latex.codecogs.com/svg.latex?%5Clog%20t "\\log t") instead of
-![t](https://latex.codecogs.com/svg.latex?t "t"). One reason is that the
-model reduces to a Weibull distribution when a first polynomial is used
-and ![\\vec\\alpha =
-\\vec 0](https://latex.codecogs.com/svg.latex?%5Cvec%5Calpha%20%3D%20%5Cvec%200
+t](https://render.githubusercontent.com/render/math?math=%5Clog%20t
+"\\log t") instead of
+![t](https://render.githubusercontent.com/render/math?math=t "t"). One
+reason is that the model reduces to a Weibull distribution when a first
+polynomial is used and ![\\vec\\alpha =
+\\vec 0](https://render.githubusercontent.com/render/math?math=%5Cvec%5Calpha%20%3D%20%5Cvec%200
 "\\vec\\alpha = \\vec 0"). ![\\vec
-x\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20x_i "\\vec x_i") and
-![\\vec z\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20z_i
+x\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20x_i
+"\\vec x_i") and ![\\vec
+z\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20z_i
 "\\vec z_i") are individual specific known covariates.
 
 We provide an example of how to use the package here and the
@@ -168,10 +175,12 @@ m_func <- function(x){
 ```
 
 We use a third order polynomial for the two fixed terms, ![\\vec
-b](https://latex.codecogs.com/svg.latex?%5Cvec%20b "\\vec b") and
-![\\vec g](https://latex.codecogs.com/svg.latex?%5Cvec%20g "\\vec g"),
-and a second order random polynomial for the random term, ![U \\vec
-m(s)](https://latex.codecogs.com/svg.latex?U%20%5Cvec%20m%28s%29
+b](https://render.githubusercontent.com/render/math?math=%5Cvec%20b
+"\\vec b") and ![\\vec
+g](https://render.githubusercontent.com/render/math?math=%5Cvec%20g
+"\\vec g"), and a second order random polynomial for the random term,
+![U \\vec
+m(s)](https://render.githubusercontent.com/render/math?math=U%20%5Cvec%20m%28s%29
 "U \\vec m(s)"), in the latent mean function. We choose the following
 parameters for the baseline hazard.
 
@@ -205,18 +214,18 @@ abline(h = .25, lty = 3)
 <img src="man/figures/README-poly_base_haz-1.png" width="100%" />
 
 Then we set the following parameters for the random effect, ![\\vec
-U\_i](https://latex.codecogs.com/svg.latex?%5Cvec%20U_i "\\vec U_i"),
-and the parameters for the marker process. We also simulate a number of
-latent marker mean curves and observed values and plot the result. The
-dashed curve is the mean, ![\\vec\\mu\_i(s,
-\\vec 0)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu_i%28s%2C%20%5Cvec%200%29
+U\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20U_i
+"\\vec U_i"), and the parameters for the marker process. We also
+simulate a number of latent marker mean curves and observed values and
+plot the result. The dashed curve is the mean, ![\\vec\\mu\_i(s,
+\\vec 0)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%200%29
 "\\vec\\mu_i(s, \\vec 0)"), the fully drawn curve is the individual
 specific curve, ![\\vec\\mu\_i(s, \\vec
-U\_i)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20U_i%29
+U\_i)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20U_i%29
 "\\vec\\mu_i(s, \\vec U_i)"), the shaded areas are pointwise 95%
 interval for each mean curve, and the points are observed markers,
 ![\\vec
-y\_{ij}](https://latex.codecogs.com/svg.latex?%5Cvec%20y_%7Bij%7D
+y\_{ij}](https://render.githubusercontent.com/render/math?math=%5Cvec%20y_%7Bij%7D
 "\\vec y_{ij}").
 
 ``` r
@@ -292,7 +301,7 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
 As an example, we simulate the random effects and plot the conditional
 hazards and survival functions. We start by assigning the association
 parameter,
-![\\vec\\alpha](https://latex.codecogs.com/svg.latex?%5Cvec%5Calpha
+![\\vec\\alpha](https://render.githubusercontent.com/render/math?math=%5Cvec%5Calpha
 "\\vec\\alpha").
 
 ``` r
@@ -638,7 +647,7 @@ alpha
 
 It is possible to use derivatives of the latent mean, ![\\vec\\mu\_i(s,
 \\vec
-u)](https://latex.codecogs.com/svg.latex?%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20u%29
+u)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20u%29
 "\\vec\\mu_i(s, \\vec u)"), with respect to time in the hazard. As an
 example, we consider the first-order derivative below and plots
 conditional hazards and survival functions simulated from the new model.

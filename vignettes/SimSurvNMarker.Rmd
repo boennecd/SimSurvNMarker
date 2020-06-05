@@ -50,7 +50,9 @@ and marker model. Specifically, the package can simulate from the model
 <!--   \Bigg) -->
 <!-- \end{align*}$$ -->
 
-$$\begin{align*}  \vec Y_{ij} \mid \vec U_i = \vec u_i    &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)    \\  \vec\mu_i(s, \vec u) &=    \Gamma^\top \vec x_i + B^\top\vec g(s) + U^\top\vec m(s)    \\  &= \left(I \otimes \vec x_i^\top\right)\text{vec}\Gamma       + \left(I \otimes \vec g(s)^\top\right)\text{vec} B       + \left(I \otimes \vec m(s)^\top\right) \vec u    \\  \vec U_i &\sim N^{(K)}(\vec 0, \Psi)    \\  h(t\mid \vec u) &= \exp\left(    \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta +    \vec\alpha^\top\vec\mu_i(t, \vec u)    \right)    \\  &= \exp\Bigg(    \vec\omega^\top\vec b(t) +    \vec z_i^\top\vec\delta    + \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec x_i^\top\right)\text{vec}\Gamma    + \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\  &\hspace{50pt}+ \vec 1^\top\left(    \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u    \Bigg)  \end{align*}$$
+$$\begin{align*}\vec Y_{ij}\mid\vec U_i =\vec u_i &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)\\\vec\mu_i(s, \vec u)&=\Gamma^\top\vec x_i+B^\top\vec g(s)+U^\top\vec m(s)\\&=\left(I\otimes\vec x_i^\top\right)\text{vec}\Gamma+\left(I\otimes\vec g(s)^\top\right)\text{vec}B+\left(I\otimes\vec m(s)^\top\right)\vec u\\\vec U_i &\sim N^{(K)}(\vec 0,\Psi)\end{align*}$$
+
+$$\begin{align*}h(t\mid\vec u)&=\exp\left(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec\alpha^\top\vec\mu_i(t, \vec u)\right)\\&=\exp\Bigg(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec x_i^\top\right)\text{vec}\Gamma+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec g(t)^\top\right)\text{vec} B\\&\hspace{50pt}+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec m(t)^\top\right)\vec u\Bigg)\end{align*}$$
 
 where $\vec Y_{ij}\in\mathbb R^{n_y}$ is individual $i$'s 
 $j$th observed marker at time $s_{ij}$, 
