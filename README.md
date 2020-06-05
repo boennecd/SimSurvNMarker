@@ -1,5 +1,5 @@
 
-# SimSurvNMarker (Simulate Survival process and Markers)
+# SimSurvNMarker (Simulate Survival time and Markers)
 
 [![Build Status on
 Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)

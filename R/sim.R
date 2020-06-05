@@ -538,7 +538,7 @@ sim_joint_data_set <- function(
   gl_dat = get_gl_rule(30L),
   tol = .Machine$double.eps^(1/4)){
   Psi_chol <- chol(Psi)
-  y_min <- .time_eps
+  y_min <- 0
   sigma_chol <- chol(sigma)
 
   # checks
@@ -650,8 +650,8 @@ sim_joint_data_set <- function(
             B = B, U = U, sigma_chol = sigma_chol, r_n_marker = r_n_marker,
             r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
             offset = mu_offest, id = i)
-          keep <- markers$obs_time < min(y, right_cens) &
-            markers$obs_time > left_trunc
+          keep <- markers$obs_time <= min(y, right_cens) &
+            markers$obs_time >= left_trunc
 
           if(sum(keep) < 1L)
             next

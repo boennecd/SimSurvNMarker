@@ -1,6 +1,6 @@
 Package: SimSurvNMarker
 Type: Package
-Title: SimSurvNMarker: Simulate Survival process and Markers
+Title: SimSurvNMarker: Simulate Survival Time and Markers
 Version: 0.1.0
 Authors@R: c(person("Benjamin", "Christoffersen", 
                     email = "boennecd@gmail.com", 
