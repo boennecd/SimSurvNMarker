@@ -1,6 +1,5 @@
 library(rmarkdown)
-local({
-  eval(bquote(on.exit(setwd(.(getwd())))), envir = environment())
+(function(){
   setwd("vignettes")
 
   render("SimSurvNMarker.Rmd", output_format = "html_document")
@@ -15,4 +14,4 @@ local({
     file.copy(file.path("man", "figures", f),
               file.path("..", "man", "figures", f), overwrite = TRUE)
   unlink("man", recursive = TRUE)
-})
+})()

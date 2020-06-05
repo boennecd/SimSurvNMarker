@@ -300,7 +300,7 @@ void ns::operator()(vec &out, double const x, const int ders) const {
     return;
   }
 
-  out = trans(bspline(x));
+  out = trans(bspline(x, ders));
 }
 
 vec ns::trans(const vec &x) const {
@@ -338,9 +338,10 @@ void iSpline::operator()(vec &out, double const x, const int der) const {
         b[j] = 0.0;
       else if(j!=b.size()-1)
         b[j] += b[j+1];
-    for(uword j = b.size() - 1; j-- > 0;)
-      if ((int)j < js - (order+1))
-        b[j] = 1.0;
+    if (der==0)
+      for(uword j = b.size() - 1; j-- > 0;)
+        if ((int)j < js - (order+1))
+          b[j] = 1.0;
 
     if(intercept)
       out = b;

@@ -8,3 +8,4 @@
 ^create-vignette\.R
 ^vignettes/SimSurvNMarker\.Rmd
 ^vignettes/cache
+^ref\.bib

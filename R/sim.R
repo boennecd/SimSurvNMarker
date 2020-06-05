@@ -1,6 +1,6 @@
 .time_eps <- 1e-16
 
-#' Faster Pointwise function than ns
+#' Faster Pointwise Function than ns
 #'
 #' @param knots numeric vector with boundary and interior knots.
 #' @param intercept logical for whether to include an intercept.
@@ -425,6 +425,7 @@ list_of_lists_to_data_frame <- function(dat)
 #'
 #' where \eqn{h(t \mid \vec u)} is the conditional hazard function.
 #'
+#' @param delta coefficients for fixed effects in the log hazard.
 #' @param n_obs integer with the number of individuals to draw.
 #' @param Psi the random effects' covariance matrix.
 #' @param sigma the noise's covariance matrix.

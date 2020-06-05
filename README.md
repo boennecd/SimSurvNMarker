@@ -5,8 +5,10 @@
 Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
 
 The `SimSurvNMarker` package reasonably fast simulates from a joint
-survival and marker model. Specifically, the package can simulate from
-the
+survival and marker model. The package uses a combination of
+Gauss–Legendre quadrature and one dimensional root finding to simulate
+the event times as described by Crowther and Lambert (2013).
+Specifically, the package can simulate from the
 model
 
 <!-- $$\begin{align*} -->
@@ -138,8 +140,15 @@ z\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20z_i
 "\\vec z_i") are individual specific known covariates.
 
 We provide an example of how to use the package here and the
-[inst/test-data](inst/test-data) directory. The purpose of the R package
-is to
+[inst/test-data](inst/test-data) directory. The examples includes
+
+  - using [polynomials](#example-polynomial) as the basis functions.
+  - using [polynomials with derivatives in the log
+    hazard](#using-derivatives) as the basis functions.
+  - using [natural cubic splines](#example-natural-cubic-splines) as the
+    basis functions.
+
+The purpose of this package is to
 
   - allow the user to specify all components in R including the basis
     functions.
@@ -147,7 +156,8 @@ is to
 
 ## Installation
 
-The package is not on CRAN but can be installed through
+The package is not on CRAN but can be installed from Github using the
+`remotes` package.
 
 ``` r
 stopifnot(require(remotes)) # need the remotes package
@@ -361,7 +371,7 @@ function.
 
 ``` r
 r_z <- function(id)
-  # return a design matrix for a dummy setup
+  # returns a design matrix for a dummy setup
   cbind(1, (id %% 3) == 1, (id %% 3) == 2)
 r_z(1:6) # covariates for the first six individuals
 #>      [,1] [,2] [,3]
@@ -372,7 +382,8 @@ r_z(1:6) # covariates for the first six individuals
 #> [5,]    1    0    1
 #> [6,]    1    0    0
 
-r_x <- r_z # same covariates for the fixed effects
+# same covariates for the fixed time-invariant effects for the marker
+r_x <- r_z
 
 r_left_trunc <- function(id)
   # no left-truncation
@@ -383,11 +394,12 @@ r_right_cens <- function(id)
 
 # fixed effect coefficients in the hazard
 delta_vec <- c(delta, -.5, .5)
-# fixed effect coefficients in the marker process 
+# fixed time-invariant effect coefficients in the marker process 
 gamma <- matrix(c(.25, .5, 0, -.4, 0, .3), 3, 2)
 ```
 
-A full data set can now be simulated as follows.
+A full data set can now be simulated as follows. We consider the time it
+takes in seconds by using the `system.time` function.
 
 ``` r
 set.seed(70483614)
@@ -398,10 +410,10 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.476   0.037   0.513
+#>   0.542   0.031   0.577
 ```
 
-The first entries of the survival data and the observed marker looks as
+The first entries of the survival data and the observed markers looks as
 follows.
 
 ``` r
@@ -649,7 +661,7 @@ It is possible to use derivatives of the latent mean, ![\\vec\\mu\_i(s,
 \\vec
 u)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20u%29
 "\\vec\\mu_i(s, \\vec u)"), with respect to time in the hazard. As an
-example, we consider the first-order derivative below and plots
+example, we consider the first-order derivative below and plot
 conditional hazards and survival functions simulated from the new model.
 
 ``` r
@@ -684,7 +696,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.532   0.028   0.559
+#>   0.627   0.035   0.662
 ```
 
 The first entries of the new data looks as follows.
@@ -715,9 +727,9 @@ head(dat$marker_data, 10)
 #> 10   0.3010  0.764 -1.408  1  0  0  3
 ```
 
-## Example: Natural Cubic Spline
+## Example: Natural Cubic Splines
 
-In this section, we will use natural cubic spline for the time-varying
+In this section, we will use natural cubic splines for the time-varying
 basis functions. We start by assigning all the variables that we will
 pass to the functions in the package.
 
@@ -808,8 +820,7 @@ sim_surv_curves(sig = sig, Psi = Psi, delta = delta, omega = omega,
 
 <img src="man/figures/README-show_draw_surv_curves-1.png" width="100%" />
 
-We end by drawing a data set. We consider the time it takes in seconds
-by using the `system.time` function.
+We end by drawing a data set.
 
 ``` r
 set.seed(70483614)
@@ -821,7 +832,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.549   0.036   0.585
+#>   0.595   0.035   0.630
 ```
 
 Finally, we show a few of the first rows along with some summary
@@ -875,3 +886,17 @@ quantile(subset(dat$survival_data, event)$y)
 NROW(dat$marker_data) / NROW(dat$survival_data)
 #> [1] 4.17
 ```
+
+## References
+
+<div id="refs" class="references">
+
+<div id="ref-Crowther13">
+
+Crowther, Michael J., and Paul C. Lambert. 2013. “Simulating
+Biologically Plausible Complex Survival Data.” *Statistics in Medicine*
+32 (23): 4118–34. <https://doi.org/10.1002/sim.5823>.
+
+</div>
+
+</div>

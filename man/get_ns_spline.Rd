@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim.R
 \name{get_ns_spline}
 \alias{get_ns_spline}
-\title{Faster Pointwise function than ns}
+\title{Faster Pointwise Function than ns}
 \usage{
 get_ns_spline(knots, intercept = TRUE, do_log = TRUE)
 }
@@ -15,7 +15,7 @@ get_ns_spline(knots, intercept = TRUE, do_log = TRUE)
 or \code{x}.}
 }
 \description{
-Faster Pointwise function than ns
+Faster Pointwise Function than ns
 }
 \examples{
 # compare with splines

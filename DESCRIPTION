@@ -1,6 +1,6 @@
 Package: SimSurvNMarker
 Type: Package
-Title: What the Package Does (Title Case)
+Title: SimSurvNMarker: Simulate Survival process and Markers
 Version: 0.1.0
 Authors@R: c(person("Benjamin", "Christoffersen", 
                     email = "boennecd@gmail.com", 
@@ -10,8 +10,10 @@ Authors@R: c(person("Benjamin", "Christoffersen",
              person("Ignace", "Bogaert", 
                     role = "cph"))
 Maintainer: Benjamin Christoffersen <boennecd@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Provides functions to simulate from joint survival and marker 
+    models. The user can specific all basis functions of time, random or 
+    deterministic covariates, random or deterministic left-truncation and 
+    right-censoring times, and model parameters.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

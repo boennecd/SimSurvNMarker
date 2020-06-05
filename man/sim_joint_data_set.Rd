@@ -40,8 +40,7 @@ Use \code{NULL} if there is no effect.}
 
 \item{omega}{numeric vector with coefficient for baseline hazard.}
 
-\item{delta}{offset on the log hazard scale. Use \code{NULL} if
-there is no effect.}
+\item{delta}{coefficients for fixed effects in the log hazard.}
 
 \item{alpha}{numeric vector with association parameters.}
 
