@@ -216,7 +216,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   0.941   0.055   0.995
+#>   0.968   0.014   0.981
 ```
 
 Show stats
@@ -269,6 +269,7 @@ the true values
 
 ``` r
 library(lme4)
+#> Loading required package: Matrix
 library(reshape2)
 library(splines)
 .GlobalEnv$ns_func <- function(x, knots){
@@ -424,7 +425,7 @@ local({
   }
   tdat <- na.omit(tdat)
   
-  sformula <- Surv(left_trunc, y, event) ~ 1
+  sformula <- Surv(left_trunc, y, ev) ~ 1
   for(i in seq_along(delta)){
     new_call <- substitute(update(sformula, . ~ . + XVAR), 
                            list(XVAR = as.name(paste0("Z", i))))
@@ -443,26 +444,26 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 10816, number of events= 3676 
+#>   n= 10816, number of events= 1062 
 #> 
 #>       coef exp(coef) se(coef)      z Pr(>|z|)    
-#> Z1  0.0145    1.0146   0.0331   0.44     0.66    
-#> Z2 -0.2413    0.7856   0.0331  -7.29  3.1e-13 ***
-#> Y1 -0.3755    0.6870   0.0132 -28.47  < 2e-16 ***
-#> Y2  0.2272    1.2551   0.0188  12.08  < 2e-16 ***
+#> Z1 -0.0650    0.9371   0.0616  -1.06     0.29    
+#> Z2 -0.2786    0.7569   0.0617  -4.52  6.3e-06 ***
+#> Y1 -0.4629    0.6295   0.0246 -18.82  < 2e-16 ***
+#> Y2  0.3792    1.4611   0.0350  10.84  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     1.015      0.986     0.951     1.083
-#> Z2     0.786      1.273     0.736     0.838
-#> Y1     0.687      1.456     0.669     0.705
-#> Y2     1.255      0.797     1.210     1.302
+#> Z1     0.937      1.067     0.831     1.057
+#> Z2     0.757      1.321     0.671     0.854
+#> Y1     0.629      1.589     0.600     0.661
+#> Y2     1.461      0.684     1.364     1.565
 #> 
-#> Concordance= 0.644  (se = 0.005 )
-#> Likelihood ratio test= 953  on 4 df,   p=<2e-16
-#> Wald test            = 950  on 4 df,   p=<2e-16
-#> Score (logrank) test = 951  on 4 df,   p=<2e-16
+#> Concordance= 0.673  (se = 0.008 )
+#> Likelihood ratio test= 464  on 4 df,   p=<2e-16
+#> Wald test            = 463  on 4 df,   p=<2e-16
+#> Score (logrank) test = 463  on 4 df,   p=<2e-16
 ```
 
 Compare with the true value

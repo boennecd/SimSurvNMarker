@@ -83,6 +83,7 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 #' @param omega numeric vector with coefficient for baseline hazard.
 #' @param b_func basis function for baseline hazard like \code{\link{poly}}.
 #' @param gl_dat Gauss–Legendre quadrature data.
+#'               See \code{\link{get_gl_rule}}.
 #' @param delta offset on the log hazard scale. Use \code{NULL} if
 #'              there is no effect.
 #'
@@ -122,7 +123,7 @@ eval_surv_base_fun <- function(
 #' Fast Evaluation of Time-varying Marker Mean Term
 #'
 #' @description
-#' Evalutes the marker mean given by
+#' Evaluates the marker mean given by
 #'
 #' \deqn{\vec\mu(s, \vec u) = \vec o + B^\top\vec g(s) + U^\top\vec m(s).}
 #'
@@ -248,6 +249,47 @@ draw_U <- function(Psi_chol, n_y){
 #' @seealso
 #' \code{\link{draw_U}}, \code{\link{eval_marker}}
 #'
+#' @examples
+#' #####
+#' # example with polynomial basis functions
+#' g_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^3, x^2, x)
+#' }
+#' m_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^2, x, 1)
+#' }
+#'
+#' # parameters
+#' gamma <- matrix(c(.25, .5, 0, -.4, 0, .3), 3, 2)
+#' Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25,
+#'                    -0.06, -0.03, 0.29, -0.05, -0.25, 0.24, 0.04, 0.04,
+#'                    -0.12, 0.1, -0.06, 0.04, 0.34, 0, -0.04, -0.02, -0.03,
+#'                    0.04, 0, 0.1, -0.08, 0.06, 0.29, -0.12, -0.04, -0.08,
+#'                    0.51), .Dim = c(6L, 6L))
+#' B <- structure(c(-0.57, 0.17, -0.48, 0.58, 1, 0.86), .Dim = 3:2)
+#' sig <- diag(c(.6, .3)^2)
+#'
+#' # generator functions
+#' r_n_marker <- function(id){
+#'   cat(sprintf("r_n_marker: passed id is %d\n", id))
+#'   # the number of markers is Poisson distributed
+#'   rpois(1, 10) + 1L
+#' }
+#' r_obs_time <- function(id, n_markes){
+#'   cat(sprintf("r_obs_time: passed id is %d\n", id))
+#'   # the observations times are uniform distributed
+#'   sort(runif(n_markes, 0, 2))
+#' }
+#'
+#' # simulate marker
+#' set.seed(1)
+#' U <- draw_U(chol(Psi), NCOL(B))
+#' sim_marker(B = B, U = U, sigma_chol = chol(sig), r_n_marker = r_n_marker,
+#'            r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
+#'            offset = NULL, id = 1L)
+#'
 #' @importFrom stats rnorm
 #' @export
 sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
@@ -284,10 +326,10 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
 }
 
-#' Evaluate the Conditional Survival Function Given the Random Effects
+#' Evaluates the Conditional Survival Function Given the Random Effects
 #'
 #' @description
-#' Evaluate the conditional survival function given the random effects,
+#' Evaluates the conditional survival function given the random effects,
 #' \eqn{\vec U}. The conditional hazard function is
 #'
 #' \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
@@ -302,6 +344,45 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
 #' @seealso
 #' \code{\link{sim_marker}}, \code{\link{draw_U}},
 #' \code{\link{eval_surv_base_fun}}
+#'
+#' @examples
+#' #####
+#' # example with polynomial basis functions
+#' b_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^3, x^2, x)
+#' }
+#' g_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^3, x^2, x)
+#' }
+#' m_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^2, x, 1)
+#' }
+#'
+#' # parameters
+#' omega <- c(1.4, -1.2, -2.1)
+#' Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25,
+#'                    -0.06, -0.03, 0.29, -0.05, -0.25, 0.24, 0.04, 0.04,
+#'                    -0.12, 0.1, -0.06, 0.04, 0.34, 0, -0.04, -0.02, -0.03,
+#'                    0.04, 0, 0.1, -0.08, 0.06, 0.29, -0.12, -0.04, -0.08,
+#'                    0.51), .Dim = c(6L, 6L))
+#' B <- structure(c(-0.57, 0.17, -0.48, 0.58, 1, 0.86), .Dim = 3:2)
+#' alpha <- c(.5, .9)
+#'
+#' # simulate and draw survival curve
+#' gl_dat <- get_gl_rule(30L)
+#' set.seed(1)
+#' U <- draw_U(chol(Psi), NCOL(B))
+#' tis <- seq(0, 2, length.out = 100)
+#' Survs <- surv_func_joint(ti = tis, B = B, U = U, omega = omega,
+#'                          delta = NULL, alpha = alpha, b_func = b_func,
+#'                          m_func = m_func, gl_dat = gl_dat, g_func = g_func,
+#'                          offset = NULL)
+#' par(mar = c(5, 5, 1, 1))
+#' plot(tis, Survs, xlab = "Time", ylab = "Survival", type = "l",
+#'      ylim = c(0, 1), bty = "l", xaxs = "i", yaxs = "i")
 #'
 #' @export
 surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
@@ -333,10 +414,10 @@ list_of_lists_to_data_frame <- function(dat)
 #'
 #' \deqn{\vec U_i \sim N^{(K)}(\vec 0, \Psi)}
 #' \deqn{\vec Y_{ij} \mid \vec U_i = \vec u_i \sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)}
-#' \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
+#' \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \vec\delta^\top\vec z_i +
 #'   \vec 1^\top(diag(\vec \alpha) \otimes \vec x_i^\top)vec(\Gamma) +
 #'   \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
-#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
+#'   \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u)}
 #'
 #' with
 #'
@@ -359,6 +440,18 @@ list_of_lists_to_data_frame <- function(dat)
 #'            integer for the individual's id.
 #' @param y_max maximum survival time before administrative censoring.
 #' @param tol convergence tolerance passed to \code{\link{uniroot}}.
+#' @param use_fixed_latent logical for whether to include the
+#'                         \eqn{\vec 1^\top(diag(\vec \alpha) \otimes \vec x_i^\top)vec(\Gamma)}
+#'                         term in the log hazard. Useful if derivatives of
+#'                         the latent mean should be used.
+#' @param m_func_surv basis function for \code{U} like \code{\link{poly}}
+#'                    in the log hazard. Can be different from
+#'                    \code{m_func}. Useful if derivatives of the latent
+#'                    mean should be used.
+#' @param g_func_surv basis function for \code{B} like \code{\link{poly}}
+#'                    in the log hazard. Can be different from
+#'                    \code{g_func}. Useful if derivatives of the latent
+#'                    mean should be used.
 #' @inheritParams surv_func_joint
 #' @inheritParams sim_marker
 #'
@@ -369,12 +462,80 @@ list_of_lists_to_data_frame <- function(dat)
 #'
 #' \code{\link{sim_marker}}, \code{\link{surv_func_joint}}
 #'
+#' @examples
+#' #####
+#' # example with polynomial basis functions
+#' b_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^3, x^2, x)
+#' }
+#' g_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^3, x^2, x)
+#' }
+#' m_func <- function(x){
+#'   x <- x - 1
+#'   cbind(x^2, x, 1)
+#' }
+#'
+#' # parameters
+#' delta <- c(-.5, -.5, .5)
+#' gamma <- matrix(c(.25, .5, 0, -.4, 0, .3), 3, 2)
+#' omega <- c(1.4, -1.2, -2.1)
+#' Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25,
+#'                    -0.06, -0.03, 0.29, -0.05, -0.25, 0.24, 0.04, 0.04,
+#'                    -0.12, 0.1, -0.06, 0.04, 0.34, 0, -0.04, -0.02, -0.03,
+#'                    0.04, 0, 0.1, -0.08, 0.06, 0.29, -0.12, -0.04, -0.08,
+#'                    0.51), .Dim = c(6L, 6L))
+#' B <- structure(c(-0.57, 0.17, -0.48, 0.58, 1, 0.86), .Dim = 3:2)
+#' sig <- diag(c(.6, .3)^2)
+#' alpha <- c(.5, .9)
+#'
+#' # generator functions
+#' r_n_marker <- function(id)
+#'   # the number of markers is Poisson distributed
+#'   rpois(1, 10) + 1L
+#' r_obs_time <- function(id, n_markes)
+#'   # the observations times are uniform distributed
+#'   sort(runif(n_markes, 0, 2))
+#' r_z <- function(id)
+#'   # return a design matrix for a dummy setup
+#'   cbind(1, (id %% 3) == 1, (id %% 3) == 2)
+#' r_x <- r_z # same covariates for the fixed effects
+#' r_left_trunc <- function(id)
+#'   # no left-truncation
+#'   0
+#' r_right_cens <- function(id)
+#'   # right-censoring time is exponentially distributed
+#'   rexp(1, rate = .5)
+#'
+#' # simulate
+#' gl_dat <- get_gl_rule(30L)
+#' y_max <- 2
+#' n_obs <- 100L
+#' set.seed(1)
+#' dat <- sim_joint_data_set(
+#'   n_obs = n_obs, B = B, Psi = Psi, omega = omega, delta = delta,
+#'   alpha = alpha, sigma = sig, gamma = gamma, b_func = b_func,
+#'   m_func = m_func, g_func = g_func, r_z = r_z, r_left_trunc = r_left_trunc,
+#'   r_right_cens = r_right_cens, r_n_marker = r_n_marker, r_x = r_x,
+#'   r_obs_time = r_obs_time, y_max = y_max)
+#'
+#' # checks
+#' stopifnot(
+#'   NROW(dat$survival_data) == n_obs,
+#'   NROW(dat$marker_data) >= n_obs,
+#'   all(dat$survival_data$y <= y_max))
+#'
 #' @importFrom stats uniroot runif
 #' @export
 sim_joint_data_set <- function(
   n_obs, B, Psi, omega, delta, alpha, sigma, gamma, b_func, m_func, g_func,
-  gl_dat = get_gl_rule(30L), r_z, r_left_trunc, r_right_cens,
-  r_n_marker, r_x, r_obs_time, y_max, tol = .Machine$double.eps^(1/4)){
+  r_z, r_left_trunc, r_right_cens,
+  r_n_marker, r_x, r_obs_time, y_max, use_fixed_latent = TRUE,
+  m_func_surv = m_func, g_func_surv = g_func,
+  gl_dat = get_gl_rule(30L),
+  tol = .Machine$double.eps^(1/4)){
   Psi_chol <- chol(Psi)
   y_min <- .time_eps
   sigma_chol <- chol(sigma)
@@ -400,7 +561,11 @@ sim_joint_data_set <- function(
       is.numeric(alpha), length(alpha) == n_y,
       is.numeric(b_func(1)), length(b_func(1)) == d_b,
       is.numeric(m_func(1)),
+      is.numeric(m_func_surv(1)),
+      length(m_func_surv(1)) == length(m_func(1)),
       is.numeric(g_func(1)),
+      is.numeric(g_func_surv(1)),
+      length(g_func_surv(1)) == length(g_func(1)),
       is.numeric(gl_dat$node), is.numeric(gl_dat$weight),
       length(gl_dat$node) == length(gl_dat$weight),
       is.numeric(r_z(1L)), length(r_z(1L)) == d_z,
@@ -411,7 +576,8 @@ sim_joint_data_set <- function(
       is.numeric(r_left_trunc(1L)),
       is.numeric(r_right_cens(1L)),
       is.integer(r_n_marker(1L)),
-      is.numeric(r_obs_time(1L, 1L)))
+      is.numeric(r_obs_time(1L, 1L)),
+      is.logical(use_fixed_latent), length(use_fixed_latent) == 1L)
   })
 
   out <- rep(list(list()), n_obs)
@@ -437,14 +603,18 @@ sim_joint_data_set <- function(
         drop(eval_marker_cpp(B = gamma, m = x))
       }
 
+      mu_offest_surv <- if(use_fixed_latent)
+        mu_offest else NULL
+
       while(!has_sample){
         U <- draw_U(Psi_chol, n_y = n_y)
         unif <- runif(1)
         fun <- function(x){
           surv <- surv_func_joint(
             ti = x, B = B, U = U, omega = omega,
-            delta = z_delta, alpha = alpha, b_func = b_func, m_func = m_func,
-            gl_dat = gl_dat, g_func = g_func, offset = mu_offest)
+            delta = z_delta, alpha = alpha, b_func = b_func,
+            m_func = m_func_surv,
+            gl_dat = gl_dat, g_func = g_func_surv, offset = mu_offest_surv)
 
           surv - unif
         }
@@ -534,5 +704,7 @@ sim_joint_data_set <- function(
        params        = list(
          gamma = gamma, B = B, Psi = Psi, omega = omega, delta = delta,
          alpha = alpha, sigma = sigma, b_attr = attributes(b_func),
-         m_attr = attributes(m_func), g_attr = attributes(g_func)))
+         m_attr = attributes(m_func), g_attr = attributes(g_func),
+         m_surv_attr = attributes(m_func_surv),
+         g_surv_attr = attributes(g_func_surv)))
 }

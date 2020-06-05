@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim.R
 \name{surv_func_joint}
 \alias{surv_func_joint}
-\title{Evaluate the Conditional Survival Function Given the Random Effects}
+\title{Evaluates the Conditional Survival Function Given the Random Effects}
 \usage{
 surv_func_joint(
   ti,
@@ -38,20 +38,61 @@ there is no effect.}
 
 \item{m_func}{basis function for \code{U} like \code{\link{poly}}.}
 
-\item{gl_dat}{Gauss–Legendre quadrature data.}
+\item{gl_dat}{Gauss–Legendre quadrature data.
+See \code{\link{get_gl_rule}}.}
 
 \item{g_func}{basis function for \code{B} like \code{\link{poly}}.}
 
 \item{offset}{numeric vector with non-time-varying fixed effects.}
 }
 \description{
-Evaluate the conditional survival function given the random effects,
+Evaluates the conditional survival function given the random effects,
 \eqn{\vec U}. The conditional hazard function is
 
 \deqn{h(t \mid \vec u) = \exp(\vec\omega^\top\vec b(t) + \delta +
   \vec\alpha^\top\vec o +
   \vec 1^\top(diag(\vec \alpha) \otimes \vec g(t)^\top)vec(B) +
   \vec 1^\top(diag(\vec \alpha) \otimes \vec m(t)^\top)\vec u).}
+}
+\examples{
+#####
+# example with polynomial basis functions
+b_func <- function(x){
+  x <- x - 1
+  cbind(x^3, x^2, x)
+}
+g_func <- function(x){
+  x <- x - 1
+  cbind(x^3, x^2, x)
+}
+m_func <- function(x){
+  x <- x - 1
+  cbind(x^2, x, 1)
+}
+
+# parameters
+omega <- c(1.4, -1.2, -2.1)
+Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25,
+                   -0.06, -0.03, 0.29, -0.05, -0.25, 0.24, 0.04, 0.04,
+                   -0.12, 0.1, -0.06, 0.04, 0.34, 0, -0.04, -0.02, -0.03,
+                   0.04, 0, 0.1, -0.08, 0.06, 0.29, -0.12, -0.04, -0.08,
+                   0.51), .Dim = c(6L, 6L))
+B <- structure(c(-0.57, 0.17, -0.48, 0.58, 1, 0.86), .Dim = 3:2)
+alpha <- c(.5, .9)
+
+# simulate and draw survival curve
+gl_dat <- get_gl_rule(30L)
+set.seed(1)
+U <- draw_U(chol(Psi), NCOL(B))
+tis <- seq(0, 2, length.out = 100)
+Survs <- surv_func_joint(ti = tis, B = B, U = U, omega = omega,
+                         delta = NULL, alpha = alpha, b_func = b_func,
+                         m_func = m_func, gl_dat = gl_dat, g_func = g_func,
+                         offset = NULL)
+par(mar = c(5, 5, 1, 1))
+plot(tis, Survs, xlab = "Time", ylab = "Survival", type = "l",
+     ylim = c(0, 1), bty = "l", xaxs = "i", yaxs = "i")
+
 }
 \seealso{
 \code{\link{sim_marker}}, \code{\link{draw_U}},

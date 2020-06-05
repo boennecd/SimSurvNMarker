@@ -220,7 +220,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   0.805   0.049   0.853
+#>   0.815   0.041   0.855
 ```
 
 Show stats
@@ -430,7 +430,7 @@ local({
   }
   tdat <- na.omit(tdat)
   
-  sformula <- Surv(left_trunc, y, event) ~ 1
+  sformula <- Surv(left_trunc, y, ev) ~ 1
   for(i in seq_along(delta)){
     new_call <- substitute(update(sformula, . ~ . + XVAR), 
                            list(XVAR = as.name(paste0("Z", i))))
@@ -449,32 +449,32 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 12017, number of events= 3590 
+#>   n= 12017, number of events= 858 
 #> 
-#>       coef exp(coef) se(coef)     z Pr(>|z|)    
-#> Z1 -0.0529    0.9485   0.0335 -1.58   0.1140    
-#> Z2 -0.0963    0.9082   0.0335 -2.87   0.0041 ** 
-#> Z3 -0.0356    0.9650   0.0334 -1.07   0.2866    
-#> Z4 -0.1457    0.8644   0.0335 -4.35  1.4e-05 ***
-#> Y1  0.1021    1.1075   0.0187  5.46  4.7e-08 ***
-#> Y2  0.0131    1.0132   0.0132  0.99   0.3230    
-#> Y3 -0.1479    0.8625   0.0176 -8.42  < 2e-16 ***
+#>        coef exp(coef) se(coef)     z Pr(>|z|)    
+#> Z1 -0.04954   0.95166  0.06845 -0.72   0.4692    
+#> Z2 -0.18062   0.83475  0.06867 -2.63   0.0085 ** 
+#> Z3 -0.02130   0.97893  0.06839 -0.31   0.7555    
+#> Z4 -0.21792   0.80419  0.06864 -3.17   0.0015 ** 
+#> Y1  0.20052   1.22204  0.03735  5.37  7.9e-08 ***
+#> Y2  0.00336   1.00336  0.02792  0.12   0.9043    
+#> Y3 -0.26223   0.76933  0.03404 -7.70  1.3e-14 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     0.948      1.054     0.888     1.013
-#> Z2     0.908      1.101     0.850     0.970
-#> Z3     0.965      1.036     0.904     1.030
-#> Z4     0.864      1.157     0.809     0.923
-#> Y1     1.108      0.903     1.068     1.149
-#> Y2     1.013      0.987     0.987     1.040
-#> Y3     0.862      1.159     0.833     0.893
+#> Z1     0.952      1.051     0.832     1.088
+#> Z2     0.835      1.198     0.730     0.955
+#> Z3     0.979      1.022     0.856     1.119
+#> Z4     0.804      1.243     0.703     0.920
+#> Y1     1.222      0.818     1.136     1.315
+#> Y2     1.003      0.997     0.950     1.060
+#> Y3     0.769      1.300     0.720     0.822
 #> 
-#> Concordance= 0.557  (se = 0.005 )
-#> Likelihood ratio test= 139  on 7 df,   p=<2e-16
-#> Wald test            = 139  on 7 df,   p=<2e-16
-#> Score (logrank) test = 139  on 7 df,   p=<2e-16
+#> Concordance= 0.583  (se = 0.01 )
+#> Likelihood ratio test= 111  on 7 df,   p=<2e-16
+#> Wald test            = 113  on 7 df,   p=<2e-16
+#> Score (logrank) test = 113  on 7 df,   p=<2e-16
 ```
 
 Compare with the true value

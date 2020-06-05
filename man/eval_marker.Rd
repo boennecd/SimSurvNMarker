@@ -22,7 +22,7 @@ Use \code{NULL} if there is no effects.}
 \item{offset}{numeric vector with non-time-varying fixed effects.}
 }
 \description{
-Evalutes the marker mean given by
+Evaluates the marker mean given by
 
 \deqn{\vec\mu(s, \vec u) = \vec o + B^\top\vec g(s) + U^\top\vec m(s).}
 }

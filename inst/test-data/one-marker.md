@@ -215,7 +215,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   0.959   0.056   1.014
+#>   0.982   0.049   1.031
 ```
 
 Show stats
@@ -421,7 +421,7 @@ local({
   }
   tdat <- na.omit(tdat)
   
-  sformula <- Surv(left_trunc, y, event) ~ 1
+  sformula <- Surv(left_trunc, y, ev) ~ 1
   for(i in seq_along(delta)){
     new_call <- substitute(update(sformula, . ~ . + XVAR), 
                            list(XVAR = as.name(paste0("Z", i))))
@@ -440,24 +440,24 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 10250, number of events= 4258 
+#>   n= 10250, number of events= 1190 
 #> 
 #>       coef exp(coef) se(coef)      z Pr(>|z|)    
-#> Z1 -0.1904    0.8266   0.0308  -6.19  6.1e-10 ***
-#> Z2 -0.3764    0.6863   0.0308 -12.22  < 2e-16 ***
-#> Y1 -0.5768    0.5617   0.0205 -28.12  < 2e-16 ***
+#> Z1 -0.1466    0.8636   0.0581  -2.52    0.012 *  
+#> Z2 -0.4283    0.6516   0.0584  -7.34  2.2e-13 ***
+#> Y1 -0.7255    0.4841   0.0383 -18.92  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     0.827       1.21     0.778     0.878
-#> Z2     0.686       1.46     0.646     0.729
-#> Y1     0.562       1.78     0.540     0.585
+#> Z1     0.864       1.16     0.771     0.968
+#> Z2     0.652       1.53     0.581     0.731
+#> Y1     0.484       2.07     0.449     0.522
 #> 
-#> Concordance= 0.639  (se = 0.004 )
-#> Likelihood ratio test= 962  on 3 df,   p=<2e-16
-#> Wald test            = 939  on 3 df,   p=<2e-16
-#> Score (logrank) test = 928  on 3 df,   p=<2e-16
+#> Concordance= 0.659  (se = 0.008 )
+#> Likelihood ratio test= 410  on 3 df,   p=<2e-16
+#> Wald test            = 406  on 3 df,   p=<2e-16
+#> Score (logrank) test = 395  on 3 df,   p=<2e-16
 ```
 
 Compare with the true value

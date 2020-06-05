@@ -55,6 +55,48 @@ with
 The number of observations and the observations times, \eqn{s_{ij}}s, are
 determined from the passed generating functions.
 }
+\examples{
+#####
+# example with polynomial basis functions
+g_func <- function(x){
+  x <- x - 1
+  cbind(x^3, x^2, x)
+}
+m_func <- function(x){
+  x <- x - 1
+  cbind(x^2, x, 1)
+}
+
+# parameters
+gamma <- matrix(c(.25, .5, 0, -.4, 0, .3), 3, 2)
+Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25,
+                   -0.06, -0.03, 0.29, -0.05, -0.25, 0.24, 0.04, 0.04,
+                   -0.12, 0.1, -0.06, 0.04, 0.34, 0, -0.04, -0.02, -0.03,
+                   0.04, 0, 0.1, -0.08, 0.06, 0.29, -0.12, -0.04, -0.08,
+                   0.51), .Dim = c(6L, 6L))
+B <- structure(c(-0.57, 0.17, -0.48, 0.58, 1, 0.86), .Dim = 3:2)
+sig <- diag(c(.6, .3)^2)
+
+# generator functions
+r_n_marker <- function(id){
+  cat(sprintf("r_n_marker: passed id is \%d\n", id))
+  # the number of markers is Poisson distributed
+  rpois(1, 10) + 1L
+}
+r_obs_time <- function(id, n_markes){
+  cat(sprintf("r_obs_time: passed id is \%d\n", id))
+  # the observations times are uniform distributed
+  sort(runif(n_markes, 0, 2))
+}
+
+# simulate marker
+set.seed(1)
+U <- draw_U(chol(Psi), NCOL(B))
+sim_marker(B = B, U = U, sigma_chol = chol(sig), r_n_marker = r_n_marker,
+           r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
+           offset = NULL, id = 1L)
+
+}
 \seealso{
 \code{\link{draw_U}}, \code{\link{eval_marker}}
 }

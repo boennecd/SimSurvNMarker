@@ -1,7 +1,6 @@
 library(rmarkdown)
 local({
-  old_wd <- getwd()
-  on.exit(setwd(old_wd))
+  eval(bquote(on.exit(setwd(.(getwd())))))
   setwd("vignettes")
 
   render("SimSurvNMarker.Rmd", output_format = "html_document")
