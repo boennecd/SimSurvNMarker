@@ -540,6 +540,7 @@ sim_joint_data_set <- function(
   Psi_chol <- chol(Psi)
   y_min <- 0
   sigma_chol <- chol(sigma)
+  max_it <- 1000000L
 
   # checks
   n_y <- NCOL(sigma)
@@ -581,91 +582,97 @@ sim_joint_data_set <- function(
       is.logical(use_fixed_latent), length(use_fixed_latent) == 1L)
   })
 
-  out <- rep(list(list()), n_obs)
-  for(i in seq_along(out))
-    out[[i]] <- {
-      # keep going till we get a none left-truncated event
-      has_sample <- FALSE
-
-      z_delta <- if(d_z == 0L){
-        z <- numeric()
-        NULL
-      }
-      else {
-        z <- r_z(i)
-        drop(z %*% delta)
-      }
-
-      mu_offest <- if(d_x == 0L){
-        x <- numeric()
-        NULL
-      } else {
-        x <- r_x(i)
-        drop(eval_marker_cpp(B = gamma, m = x))
-      }
-
-      mu_offest_surv <- if(use_fixed_latent)
-        mu_offest else NULL
-
-      while(!has_sample){
-        U <- draw_U(Psi_chol, n_y = n_y)
-        unif <- runif(1)
-        fun <- function(x){
-          surv <- surv_func_joint(
-            ti = x, B = B, U = U, omega = omega,
-            delta = z_delta, alpha = alpha, b_func = b_func,
-            m_func = m_func_surv,
-            gl_dat = gl_dat, g_func = g_func_surv, offset = mu_offest_surv)
-
-          surv - unif
-        }
-
-        # simulate left truncation time and right censoring time
-        left_trunc <- r_left_trunc(i)
-
-        if(fun(left_trunc) < 0)
-          # the survival time is before the left-censoring time
-          next
-
-        right_cens <- r_right_cens(i)
-
-        y_min_use <- max(y_min, left_trunc)
-        y_max_use <- min(y_max, right_cens * 1.00001)
-
-        f_lower <- fun(y_min_use)
-        f_upper <- fun(y_max_use)
-
-        y <- if(f_upper < 0){
-          root <- uniroot(fun, interval = c(y_min_use, y_max_use),
-                          f.lower = f_lower, f.upper = f_upper,
-                          tol = tol)
-          root$root
-        } else
-          y_max_use
-
-        # simulate the marker
-        keep <- logical()
-        while(sum(keep) < 1L){
-          markers <- sim_marker(
-            B = B, U = U, sigma_chol = sigma_chol, r_n_marker = r_n_marker,
-            r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
-            offset = mu_offest, id = i)
-          keep <- markers$obs_time <= min(y, right_cens) &
-            markers$obs_time >= left_trunc
-
-          if(sum(keep) < 1L)
-            next
-
-          has_sample <- TRUE
-          markers <- cbind(obs_time = markers$obs_time, markers$y_obs)
-          markers <- markers[keep, , drop = FALSE]
-          colnames(markers)[-1] <- paste0("Y", 1:(NCOL(markers) - 1L))
-        }
-      }
-
-      list(z = z, left_trunc = left_trunc, y = min(right_cens, y),
-           event = y < right_cens, U = U, markers = markers, x = x)
+  out <- lapply(1:n_obs, function(i){
+    z_delta <- if(d_z == 0L){
+      z <- numeric()
+      NULL
     }
+    else {
+      z <- r_z(i)
+      drop(z %*% delta)
+    }
+
+    mu_offest <- if(d_x == 0L){
+      x <- numeric()
+      NULL
+    } else {
+      x <- r_x(i)
+      drop(eval_marker_cpp(B = gamma, m = x))
+    }
+
+    mu_offest_surv <- if(use_fixed_latent)
+      mu_offest else NULL
+
+    #####
+    # start drawing
+    U <- draw_U(Psi_chol, n_y = n_y)
+    unif <- runif(1)
+    fun <- function(x){
+      surv <- surv_func_joint(
+        ti = x, B = B, U = U, omega = omega,
+        delta = z_delta, alpha = alpha, b_func = b_func,
+        m_func = m_func_surv,
+        gl_dat = gl_dat, g_func = g_func_surv, offset = mu_offest_surv)
+
+      surv - unif
+    }
+
+    # simulate left-truncation time and right-censoring time
+    left_trunc <- r_left_trunc(i)
+    for(it in 1:max_it){
+      if(it == max_it)
+        stop("failed to find right-censoring time")
+      right_cens <- r_right_cens(i)
+      if(right_cens > left_trunc)
+        break
+    }
+
+    y_min_use <- max(y_min, left_trunc)
+    for(it in 1:max_it){
+      f_lower <- fun(y_min_use)
+      if(f_lower > 0)
+        break
+      if(it == max_it)
+        stop("failed to find event time greater than left-truncation time")
+
+      # the survival time is before the left-censoring time
+      unif <- runif(1)
+    }
+
+    y_max_use <- min(y_max, right_cens * 1.00001)
+    f_upper <- fun(y_max_use)
+
+    y <- if(f_upper < 0){
+      root <- uniroot(fun, interval = c(y_min_use, y_max_use),
+                      f.lower = f_lower, f.upper = f_upper,
+                      tol = tol)
+      root$root
+    } else
+      y_max_use
+
+    # simulate the marker
+    for(it in 1:max_it){
+      if(it == max_it)
+        stop("failed to find markers between left-truncation time and the observed time")
+
+      markers <- sim_marker(
+        B = B, U = U, sigma_chol = sigma_chol, r_n_marker = r_n_marker,
+        r_obs_time = r_obs_time, m_func = m_func, g_func = g_func,
+        offset = mu_offest, id = i)
+      keep <- markers$obs_time <= min(y, right_cens) &
+        markers$obs_time >= left_trunc
+
+      if(sum(keep) > 0L)
+        break
+    }
+
+    markers <- cbind(obs_time = markers$obs_time, markers$y_obs)
+    markers <- markers[keep, , drop = FALSE]
+    colnames(markers)[-1] <- paste0("Y", 1:(NCOL(markers) - 1L))
+
+    list(z = z, left_trunc = left_trunc, y = min(right_cens, y),
+         event = y < right_cens, U = U, markers = markers, x = x)
+  })
 
   # form data frames for estimation
   ids <- seq_along(out)

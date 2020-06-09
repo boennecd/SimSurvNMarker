@@ -410,7 +410,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.542   0.031   0.577
+#>   0.482   0.039   0.521
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -696,7 +696,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.627   0.035   0.662
+#>   0.529   0.042   0.570
 ```
 
 The first entries of the new data looks as follows.
@@ -832,7 +832,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.595   0.035   0.630
+#>   0.543   0.036   0.579
 ```
 
 Finally, we show a few of the first rows along with some summary
@@ -842,49 +842,49 @@ statistics.
 # survival data
 head(dat$survival_data)
 #>   Z1 left_trunc    y event id
-#> 1  0      2.321 6.55  TRUE  1
-#> 2  0      1.709 4.20  TRUE  2
-#> 3  1      0.230 1.52  TRUE  3
-#> 4  1      0.144 6.93 FALSE  4
-#> 5  0      0.915 9.06 FALSE  5
-#> 6  0      0.709 6.45 FALSE  6
+#> 1  0     2.3208 6.55  TRUE  1
+#> 2  0     0.6880 1.15  TRUE  2
+#> 3  1     0.4099 4.18  TRUE  3
+#> 4  1     0.0193 1.12  TRUE  4
+#> 5  0     1.8492 6.04 FALSE  5
+#> 6  0     0.1587 8.60  TRUE  6
 
 # marker data
 head(dat$marker_data, 10)
 #>    obs_time      Y1     Y2 id
 #> 1     3.095 -0.5767 -1.362  1
-#> 2     2.049  0.6875 -0.169  2
-#> 3     2.774  0.9111 -0.274  2
-#> 4     0.295 -0.3623 -0.405  3
-#> 5     0.490  0.0454 -0.292  3
-#> 6     2.236  0.2978 -1.426  4
-#> 7     2.926  0.2177 -1.596  4
-#> 8     4.164  0.5980 -1.453  4
-#> 9     4.216  0.2078 -1.889  4
-#> 10    4.925  0.0629 -1.583  4
+#> 2     1.114  0.5738 -1.556  2
+#> 3     1.026 -0.3805 -1.019  3
+#> 4     1.079  0.1618 -1.238  3
+#> 5     1.505  0.0218 -1.287  3
+#> 6     1.550  0.0377 -1.183  3
+#> 7     1.889  0.2260 -1.214  3
+#> 8     2.105  0.5082 -1.278  3
+#> 9     0.737 -0.6690 -0.870  4
+#> 10    0.835 -0.5551 -0.986  4
 
 # rate of observed events
 mean(dat$survival_data$event) 
-#> [1] 0.779
+#> [1] 0.76
 
 # mean event time
 mean(subset(dat$survival_data, event           )$y)
-#> [1] 3.67
+#> [1] 3.54
 
 # mean event time for the two group
 mean(subset(dat$survival_data, event & Z1 == 1L)$y)
-#> [1] 3.07
+#> [1] 3.15
 mean(subset(dat$survival_data, event & Z1 == 0L)$y)
-#> [1] 4.43
+#> [1] 4.18
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 #>     0%    25%    50%    75%   100% 
-#> 0.0707 1.6364 2.9435 5.6122 9.6541
+#> 0.0707 1.6666 2.8574 5.3823 9.3193
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
-#> [1] 4.17
+#> [1] 4.03
 ```
 
 ## References

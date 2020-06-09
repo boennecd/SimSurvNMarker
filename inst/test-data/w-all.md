@@ -216,7 +216,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   0.968   0.014   0.981
+#>   0.989   0.045   1.033
 ```
 
 Show stats
@@ -225,43 +225,43 @@ Show stats
 # survival data
 head(dat$survival_data)
 #>   Z1 Z2 left_trunc    y event id
-#> 1  0  0      1.735 4.62  TRUE  1
-#> 2  0  0      0.338 3.74  TRUE  2
-#> 3  1  0      1.320 3.58  TRUE  3
-#> 4  0  1      2.150 2.31  TRUE  4
-#> 5  1  1      0.727 6.32 FALSE  5
-#> 6  1  0      0.627 2.27  TRUE  6
+#> 1  0  0      1.335 1.70  TRUE  1
+#> 2  0  1      0.166 9.26 FALSE  2
+#> 3  1  1      1.454 4.16  TRUE  3
+#> 4  0  0      2.258 3.03  TRUE  4
+#> 5  0  1      0.961 5.50 FALSE  5
+#> 6  0  0      1.641 1.74  TRUE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time     Y1     Y2 X1 X2 id
-#> 1      1.86 -1.611  0.989  1  1  1
-#> 2      4.11 -0.522  0.717  1  1  1
-#> 3      1.29  1.093 -0.390  1  0  2
-#> 4      2.13  0.698 -1.006  1  0  2
-#> 5      2.70  0.804 -0.209  1  0  2
-#> 6      3.53  0.644 -0.609  1  0  2
-#> 7      1.81  0.744 -0.619  0  0  3
-#> 8      2.19  0.658 -0.548  0  0  3
-#> 9      2.68  0.814 -0.114  0  0  3
-#> 10     2.69  0.744 -0.359  0  0  3
+#>    obs_time     Y1      Y2 X1 X2 id
+#> 1      1.43 -2.097  0.6122  1  1  1
+#> 2      3.35 -0.406  0.0946  1  1  2
+#> 3      3.38 -0.311  0.0178  1  1  2
+#> 4      3.80 -0.568 -0.4853  1  1  2
+#> 5      3.91 -0.429 -0.4032  1  1  2
+#> 6      6.30 -0.393 -0.1605  1  1  2
+#> 7      6.44 -0.190 -0.6339  1  1  2
+#> 8      7.24 -0.315 -0.1957  1  1  2
+#> 9      8.41 -0.490 -1.1169  1  1  2
+#> 10     8.56 -0.262 -0.0512  1  1  2
 
 # rate of observed events
 mean(dat$survival_data$event) 
-#> [1] 0.531
+#> [1] 0.543
 
 # mean event time
 mean(subset(dat$survival_data, event)$y)
-#> [1] 3.73
+#> [1] 3.67
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 #>     0%    25%    50%    75%   100% 
-#> 0.0711 1.9541 3.3230 5.3027 9.8106
+#> 0.0558 1.9433 3.3087 5.1438 9.8017
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
-#> [1] 5.41
+#> [1] 5.28
 ```
 
 Fit linear mixed model and see that we get estimates which are close to
@@ -269,7 +269,6 @@ the true values
 
 ``` r
 library(lme4)
-#> Loading required package: Matrix
 library(reshape2)
 library(splines)
 .GlobalEnv$ns_func <- function(x, knots){
@@ -357,29 +356,29 @@ local({
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
 #> $gamma
-#>        [,1]    [,2]
-#> [1,] -0.114  0.0524
-#> [2,]  0.178 -0.2113
+#>        [,1]     [,2]
+#> [1,] -0.131 -0.00507
+#> [2,]  0.115 -0.21420
 #> 
 #> $B
-#>         [,1]   [,2]
-#> [1,] -0.3220 -0.940
-#> [2,]  0.4245  0.436
-#> [3,]  0.0848 -0.241
-#> [4,]  0.6978 -0.218
-#> [5,] -0.3817 -0.194
+#>         [,1]    [,2]
+#> [1,] -0.3873 -0.8383
+#> [2,]  0.3521  0.4984
+#> [3,]  0.0621 -0.1849
+#> [4,]  0.4959 -0.0562
+#> [5,] -0.4036 -0.2914
 #> 
 #> $Psi
 #>       [,1]   [,2]  [,3]   [,4]
-#> [1,] 5.464  1.045 0.418  0.376
-#> [2,] 1.045  3.037 0.558 -0.310
-#> [3,] 0.418  0.558 1.789  0.463
-#> [4,] 0.376 -0.310 0.463  2.146
+#> [1,] 5.485  1.030 0.261  0.544
+#> [2,] 1.030  3.101 0.471 -0.277
+#> [3,] 0.261  0.471 1.854  0.535
+#> [4,] 0.544 -0.277 0.535  2.307
 #> 
 #> $Sigma
 #>        [,1]   [,2]
-#> [1,] 0.0792 0.0000
-#> [2,] 0.0000 0.0792
+#> [1,] 0.0807 0.0000
+#> [2,] 0.0000 0.0807
 ```
 
 Compare with the true values
@@ -444,26 +443,26 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 10816, number of events= 1062 
+#>   n= 10568, number of events= 1087 
 #> 
 #>       coef exp(coef) se(coef)      z Pr(>|z|)    
-#> Z1 -0.0650    0.9371   0.0616  -1.06     0.29    
-#> Z2 -0.2786    0.7569   0.0617  -4.52  6.3e-06 ***
-#> Y1 -0.4629    0.6295   0.0246 -18.82  < 2e-16 ***
-#> Y2  0.3792    1.4611   0.0350  10.84  < 2e-16 ***
+#> Z1  0.0179    1.0181   0.0608   0.29   0.7682    
+#> Z2 -0.1841    0.8318   0.0607  -3.03   0.0024 ** 
+#> Y1 -0.4143    0.6608   0.0239 -17.33   <2e-16 ***
+#> Y2  0.3907    1.4780   0.0341  11.46   <2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     0.937      1.067     0.831     1.057
-#> Z2     0.757      1.321     0.671     0.854
-#> Y1     0.629      1.589     0.600     0.661
-#> Y2     1.461      0.684     1.364     1.565
+#> Z1     1.018      0.982     0.904     1.147
+#> Z2     0.832      1.202     0.738     0.937
+#> Y1     0.661      1.513     0.631     0.692
+#> Y2     1.478      0.677     1.382     1.580
 #> 
-#> Concordance= 0.673  (se = 0.008 )
-#> Likelihood ratio test= 464  on 4 df,   p=<2e-16
-#> Wald test            = 463  on 4 df,   p=<2e-16
-#> Score (logrank) test = 463  on 4 df,   p=<2e-16
+#> Concordance= 0.661  (se = 0.009 )
+#> Likelihood ratio test= 416  on 4 df,   p=<2e-16
+#> Wald test            = 425  on 4 df,   p=<2e-16
+#> Score (logrank) test = 418  on 4 df,   p=<2e-16
 ```
 
 Compare with the true value
