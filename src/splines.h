@@ -1,3 +1,5 @@
+#ifndef SPLINES_H
+#define SPLINES_H
 #include <RcppArmadillo.h>
 #include <limits> // quiet_NaN
 #include <stdexcept> // invalid_argument
@@ -6,7 +8,6 @@
 #define DEFAULT_INTERCEPT false
 
 namespace splines {
-
 using namespace arma;
 
 class basisMixin {
@@ -178,3 +179,5 @@ public:
 #undef DEFAULT_ORDER
 #undef DEFAULT_DERS
 #undef DEFAULT_INTERCEPT
+
+#endif

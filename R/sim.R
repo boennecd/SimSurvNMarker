@@ -671,7 +671,8 @@ sim_joint_data_set <- function(
     colnames(markers)[-1] <- paste0("Y", 1:(NCOL(markers) - 1L))
 
     list(z = z, left_trunc = left_trunc, y = min(right_cens, y),
-         event = y < right_cens, U = U, markers = markers, x = x)
+         event = y < min(y_max, y_max_use), U = U, markers = markers,
+         x = x)
   })
 
   # form data frames for estimation
