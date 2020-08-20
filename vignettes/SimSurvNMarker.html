@@ -402,22 +402,24 @@ summary {
 <p><span class="math display">\[\begin{align*}\vec Y_{ij}\mid\vec U_i =\vec u_i &amp;\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)\\\vec\mu_i(s, \vec u)&amp;=\Gamma^\top\vec x_i+B^\top\vec g(s)+U^\top\vec m(s)\\&amp;=\left(I\otimes\vec x_i^\top\right)\text{vec}\Gamma+\left(I\otimes\vec g(s)^\top\right)\text{vec}B+\left(I\otimes\vec m(s)^\top\right)\vec u\\\vec U_i &amp;\sim N^{(K)}(\vec 0,\Psi)\end{align*}\]</span></p>
 <p><span class="math display">\[\begin{align*}h(t\mid\vec u)&amp;=\exp\left(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec\alpha^\top\vec\mu_i(t, \vec u)\right)\\&amp;=\exp\Bigg(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec x_i^\top\right)\text{vec}\Gamma+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec g(t)^\top\right)\text{vec} B\\&amp;\hspace{50pt}+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec m(t)^\top\right)\vec u\Bigg)\end{align*}\]</span></p>
 <p>where <span class="math inline">\(\vec Y_{ij}\in\mathbb R^{n_y}\)</span> is individual <span class="math inline">\(i\)</span>’s <span class="math inline">\(j\)</span>th observed marker at time <span class="math inline">\(s_{ij}\)</span>, <span class="math inline">\(U_i\in\mathbb R^K\)</span> is individual <span class="math inline">\(i\)</span>’s random effect, and <span class="math inline">\(h\)</span> is the instantaneous hazard rate for the time-to-event outcome. <span class="math inline">\(\vec\alpha\)</span> is the so-called association parameter. It shows the strength of the relation between the latent mean function, <span class="math inline">\(\vec\mu_i(t,\vec u)\)</span>, and the log of the instantaneous rate, <span class="math inline">\(h(t\mid \vec u)\)</span>. <span class="math inline">\(\vec m(t)\)</span>, <span class="math inline">\(\vec g(t)\)</span> and <span class="math inline">\(\vec b(t)\)</span> are basis expansions of time. As an example, these can be a polynomial, a B-spline, or a natural cubic spline. The expansion for the baseline hazard, <span class="math inline">\(\vec b(t)\)</span>, is typically made on <span class="math inline">\(\log t\)</span> instead of <span class="math inline">\(t\)</span>. One reason is that the model reduces to a Weibull distribution when a first polynomial is used and <span class="math inline">\(\vec\alpha = \vec 0\)</span>. <span class="math inline">\(\vec x_i\)</span> and <span class="math inline">\(\vec z_i\)</span> are individual specific known covariates.</p>
-<p>We provide an example of how to use the package here and the <a href="inst/test-data">inst/test-data</a> directory. The examples includes</p>
+<p>We provide an example of how to use the package here and in <a href="https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data">inst/test-data</a> directory on Github. The former examples includes</p>
 <ul>
 <li>using <a href="#example-polynomial">polynomials</a> as the basis functions.</li>
 <li>using <a href="#using-derivatives">polynomials with derivatives in the log hazard</a> as the basis functions.</li>
 <li>using <a href="#example-natural-cubic-splines">natural cubic splines</a> as the basis functions.</li>
 </ul>
-<p>The purpose of this package is to</p>
+<p>The purpose/goal of this package is to</p>
 <ul>
 <li>allow the user to specify all components in R including the basis functions.</li>
 <li>simulate reasonably fast from the model given this requirement.</li>
 </ul>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
-<p>The package is not on CRAN but can be installed from Github using the <code>remotes</code> package.</p>
-<pre class="r"><code>stopifnot(require(remotes)) # need the remotes package
+<p>The package can be installed from Github using the<code>remotes</code> package.</p>
+<pre class="r"><code>stopifnot(require(remotes)) # needs the remotes package
 install_github(&quot;boennecd/SimSurvNMarker&quot;)</code></pre>
+<p>It can also be installed from CRAN using <code>install.packages</code>.</p>
+<pre class="r"><code>install.packages(&quot;SimSurvNMarker&quot;)</code></pre>
 </div>
 <div id="example-polynomial" class="section level2">
 <h2>Example: Polynomial</h2>
@@ -434,7 +436,7 @@ m_func &lt;- function(x){
   x &lt;- x - 1
   cbind(x^2, x, 1)
 }</code></pre>
-<p>We use a third order polynomial for the two fixed terms, <span class="math inline">\(\vec b\)</span> and <span class="math inline">\(\vec g\)</span>, and a second order random polynomial for the random term, <span class="math inline">\(U \vec m(s)\)</span>, in the latent mean function. We choose the following parameters for the baseline hazard.</p>
+<p>We use a third order polynomial for the two fixed terms, <span class="math inline">\(\vec b\)</span> and <span class="math inline">\(\vec g\)</span>, and a second order random polynomial for the random term, <span class="math inline">\(U_i \vec m(s)\)</span>, in the latent mean function. We choose the following parameters for the baseline hazard.</p>
 <pre class="r"><code>library(SimSurvNMarker)</code></pre>
 <pre class="r"><code>omega &lt;- c(1.4, -1.2, -2.1)
 delta &lt;- -.5 # the intercept
@@ -608,14 +610,14 @@ system.time(dat &lt;- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #&gt;    user  system elapsed 
-#&gt;   0.482   0.039   0.521</code></pre>
+#&gt;   0.442   0.062   0.504</code></pre>
 <p>The first entries of the survival data and the observed markers looks as follows.</p>
 <pre class="r"><code># survival data
 head(dat$survival_data)
 #&gt;   Z1 Z2 Z3 left_trunc     y event id
 #&gt; 1  1  1  0          0 0.213  TRUE  1
 #&gt; 2  1  0  1          0 1.580 FALSE  2
-#&gt; 3  1  0  0          0 2.000  TRUE  3
+#&gt; 3  1  0  0          0 2.000 FALSE  3
 #&gt; 4  1  1  0          0 0.343 FALSE  4
 #&gt; 5  1  0  1          0 0.132  TRUE  5
 #&gt; 6  1  0  0          0 0.920 FALSE  6
@@ -721,23 +723,23 @@ local({
 #&gt; $gamma
 #&gt;         [,1]    [,2]
 #&gt; [1,]  0.1749 -0.3606
-#&gt; [2,]  0.5260 -0.0256
-#&gt; [3,] -0.0724  0.1897
+#&gt; [2,]  0.5259 -0.0255
+#&gt; [3,] -0.0725  0.1897
 #&gt; 
 #&gt; $B
 #&gt;        [,1]  [,2]
 #&gt; [1,] -0.564 0.455
-#&gt; [2,]  0.267 0.976
+#&gt; [2,]  0.268 0.976
 #&gt; [3,] -0.467 0.893
 #&gt; 
 #&gt; $Psi
-#&gt;         [,1]    [,2]    [,3]     [,4]     [,5]    [,6]
-#&gt; [1,]  0.5240  0.0658 -0.1494  0.12097 -0.04934  0.1091
-#&gt; [2,]  0.0658  0.3677 -0.2493 -0.02632 -0.05304  0.2639
-#&gt; [3,] -0.1494 -0.2493  0.2572 -0.00560  0.04887 -0.1412
-#&gt; [4,]  0.1210 -0.0263 -0.0056  0.15411 -0.00464  0.0533
-#&gt; [5,] -0.0493 -0.0530  0.0489 -0.00464  0.04562 -0.0915
-#&gt; [6,]  0.1091  0.2639 -0.1412  0.05327 -0.09150  0.4083
+#&gt;         [,1]    [,2]     [,3]     [,4]     [,5]    [,6]
+#&gt; [1,]  0.5266  0.0661 -0.15020  0.12119 -0.04917  0.1091
+#&gt; [2,]  0.0661  0.3677 -0.24946 -0.02710 -0.05298  0.2639
+#&gt; [3,] -0.1502 -0.2495  0.25764 -0.00515  0.04901 -0.1415
+#&gt; [4,]  0.1212 -0.0271 -0.00515  0.15408 -0.00454  0.0529
+#&gt; [5,] -0.0492 -0.0530  0.04901 -0.00454  0.04570 -0.0916
+#&gt; [6,]  0.1091  0.2639 -0.14149  0.05291 -0.09163  0.4086
 #&gt; 
 #&gt; $Sigma
 #&gt;       [,1]  [,2]
@@ -800,28 +802,28 @@ sig
 #&gt; Call:
 #&gt; coxph(formula = sformula, data = tdat)
 #&gt; 
-#&gt;   n= 4171, number of events= 649 
+#&gt;   n= 4171, number of events= 535 
 #&gt; 
 #&gt;       coef exp(coef) se(coef)     z Pr(&gt;|z|)    
 #&gt; Z1      NA        NA   0.0000    NA       NA    
-#&gt; Z2 -0.5459    0.5793   0.1010 -5.41  6.5e-08 ***
-#&gt; Z3  0.6118    1.8437   0.0950  6.44  1.2e-10 ***
-#&gt; Y1  0.4858    1.6254   0.0397 12.24  &lt; 2e-16 ***
-#&gt; Y2  0.6294    1.8765   0.0427 14.75  &lt; 2e-16 ***
+#&gt; Z2 -0.6961    0.4985   0.1155 -6.03  1.7e-09 ***
+#&gt; Z3  0.6337    1.8845   0.1013  6.26  3.9e-10 ***
+#&gt; Y1  0.5690    1.7666   0.0416 13.67  &lt; 2e-16 ***
+#&gt; Y2  0.4577    1.5805   0.0480  9.54  &lt; 2e-16 ***
 #&gt; ---
 #&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #&gt; 
 #&gt;    exp(coef) exp(-coef) lower .95 upper .95
 #&gt; Z1        NA         NA        NA        NA
-#&gt; Z2     0.579      1.726     0.475     0.706
-#&gt; Z3     1.844      0.542     1.531     2.221
-#&gt; Y1     1.625      0.615     1.504     1.757
-#&gt; Y2     1.876      0.533     1.726     2.040
+#&gt; Z2     0.499      2.006     0.398     0.625
+#&gt; Z3     1.885      0.531     1.545     2.298
+#&gt; Y1     1.767      0.566     1.628     1.917
+#&gt; Y2     1.580      0.633     1.439     1.736
 #&gt; 
-#&gt; Concordance= 0.692  (se = 0.011 )
-#&gt; Likelihood ratio test= 340  on 4 df,   p=&lt;2e-16
-#&gt; Wald test            = 342  on 4 df,   p=&lt;2e-16
-#&gt; Score (logrank) test = 350  on 4 df,   p=&lt;2e-16</code></pre>
+#&gt; Concordance= 0.702  (se = 0.012 )
+#&gt; Likelihood ratio test= 292  on 4 df,   p=&lt;2e-16
+#&gt; Wald test            = 300  on 4 df,   p=&lt;2e-16
+#&gt; Score (logrank) test = 307  on 4 df,   p=&lt;2e-16</code></pre>
 <p>This is close-ish to the true values.</p>
 <pre class="r"><code>delta_vec
 #&gt; [1] -0.5 -0.5  0.5
@@ -856,7 +858,7 @@ system.time(dat &lt;- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #&gt;    user  system elapsed 
-#&gt;   0.529   0.042   0.570</code></pre>
+#&gt;   0.550   0.024   0.574</code></pre>
 <p>The first entries of the new data looks as follows.</p>
 <pre class="r"><code># survival data
 head(dat$survival_data)
@@ -922,7 +924,7 @@ gamma &lt;- numeric()</code></pre>
 <pre class="r"><code>b_func &lt;- get_ns_spline(b_ks, do_log = TRUE)
 m_func &lt;- get_ns_spline(m_ks, do_log = FALSE)
 g_func &lt;- get_ns_spline(g_ks, do_log = FALSE)</code></pre>
-<p>We show the baseline hazard function and the survival function without the marker below.</p>
+<p>Notice that we use the <code>get_ns_spline</code> functions which reduces the computation time a lot. We show the baseline hazard function and the survival function without the marker below.</p>
 <pre class="r"><code># hazard function without marker
 par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
 plot(function(x) exp(drop(b_func(x) %*% omega)),
@@ -959,7 +961,7 @@ system.time(dat &lt;- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #&gt;    user  system elapsed 
-#&gt;   0.543   0.036   0.579</code></pre>
+#&gt;   0.554   0.031   0.586</code></pre>
 <p>Finally, we show a few of the first rows along with some summary statistics.</p>
 <pre class="r"><code># survival data
 head(dat$survival_data)

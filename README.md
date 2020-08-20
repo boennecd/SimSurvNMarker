@@ -139,8 +139,9 @@ x\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20x_i
 z\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20z_i
 "\\vec z_i") are individual specific known covariates.
 
-We provide an example of how to use the package here and the
-[inst/test-data](inst/test-data) directory. The examples includes
+We provide an example of how to use the package here and in
+[inst/test-data](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data)
+directory on Github. The former examples includes
 
   - using [polynomials](#example-polynomial) as the basis functions.
   - using [polynomials with derivatives in the log
@@ -148,7 +149,7 @@ We provide an example of how to use the package here and the
   - using [natural cubic splines](#example-natural-cubic-splines) as the
     basis functions.
 
-The purpose of this package is to
+The purpose/goal of this package is to
 
   - allow the user to specify all components in R including the basis
     functions.
@@ -156,12 +157,17 @@ The purpose of this package is to
 
 ## Installation
 
-The package is not on CRAN but can be installed from Github using the
-`remotes` package.
+The package can be installed from Github using the`remotes` package.
 
 ``` r
-stopifnot(require(remotes)) # need the remotes package
+stopifnot(require(remotes)) # needs the remotes package
 install_github("boennecd/SimSurvNMarker")
+```
+
+It can also be installed from CRAN using `install.packages`.
+
+``` r
+install.packages("SimSurvNMarker")
 ```
 
 ## Example: Polynomial
@@ -189,9 +195,9 @@ b](https://render.githubusercontent.com/render/math?math=%5Cvec%20b
 "\\vec b") and ![\\vec
 g](https://render.githubusercontent.com/render/math?math=%5Cvec%20g
 "\\vec g"), and a second order random polynomial for the random term,
-![U \\vec
-m(s)](https://render.githubusercontent.com/render/math?math=U%20%5Cvec%20m%28s%29
-"U \\vec m(s)"), in the latent mean function. We choose the following
+![U\_i \\vec
+m(s)](https://render.githubusercontent.com/render/math?math=U_i%20%5Cvec%20m%28s%29
+"U_i \\vec m(s)"), in the latent mean function. We choose the following
 parameters for the baseline hazard.
 
 ``` r
@@ -410,7 +416,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.482   0.039   0.521
+#>   0.442   0.062   0.504
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -422,7 +428,7 @@ head(dat$survival_data)
 #>   Z1 Z2 Z3 left_trunc     y event id
 #> 1  1  1  0          0 0.213  TRUE  1
 #> 2  1  0  1          0 1.580 FALSE  2
-#> 3  1  0  0          0 2.000  TRUE  3
+#> 3  1  0  0          0 2.000 FALSE  3
 #> 4  1  1  0          0 0.343 FALSE  4
 #> 5  1  0  1          0 0.132  TRUE  5
 #> 6  1  0  0          0 0.920 FALSE  6
@@ -533,23 +539,23 @@ local({
 #> $gamma
 #>         [,1]    [,2]
 #> [1,]  0.1749 -0.3606
-#> [2,]  0.5260 -0.0256
-#> [3,] -0.0724  0.1897
+#> [2,]  0.5259 -0.0255
+#> [3,] -0.0725  0.1897
 #> 
 #> $B
 #>        [,1]  [,2]
 #> [1,] -0.564 0.455
-#> [2,]  0.267 0.976
+#> [2,]  0.268 0.976
 #> [3,] -0.467 0.893
 #> 
 #> $Psi
-#>         [,1]    [,2]    [,3]     [,4]     [,5]    [,6]
-#> [1,]  0.5240  0.0658 -0.1494  0.12097 -0.04934  0.1091
-#> [2,]  0.0658  0.3677 -0.2493 -0.02632 -0.05304  0.2639
-#> [3,] -0.1494 -0.2493  0.2572 -0.00560  0.04887 -0.1412
-#> [4,]  0.1210 -0.0263 -0.0056  0.15411 -0.00464  0.0533
-#> [5,] -0.0493 -0.0530  0.0489 -0.00464  0.04562 -0.0915
-#> [6,]  0.1091  0.2639 -0.1412  0.05327 -0.09150  0.4083
+#>         [,1]    [,2]     [,3]     [,4]     [,5]    [,6]
+#> [1,]  0.5266  0.0661 -0.15020  0.12119 -0.04917  0.1091
+#> [2,]  0.0661  0.3677 -0.24946 -0.02710 -0.05298  0.2639
+#> [3,] -0.1502 -0.2495  0.25764 -0.00515  0.04901 -0.1415
+#> [4,]  0.1212 -0.0271 -0.00515  0.15408 -0.00454  0.0529
+#> [5,] -0.0492 -0.0530  0.04901 -0.00454  0.04570 -0.0916
+#> [6,]  0.1091  0.2639 -0.14149  0.05291 -0.09163  0.4086
 #> 
 #> $Sigma
 #>       [,1]  [,2]
@@ -622,28 +628,28 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 4171, number of events= 649 
+#>   n= 4171, number of events= 535 
 #> 
 #>       coef exp(coef) se(coef)     z Pr(>|z|)    
 #> Z1      NA        NA   0.0000    NA       NA    
-#> Z2 -0.5459    0.5793   0.1010 -5.41  6.5e-08 ***
-#> Z3  0.6118    1.8437   0.0950  6.44  1.2e-10 ***
-#> Y1  0.4858    1.6254   0.0397 12.24  < 2e-16 ***
-#> Y2  0.6294    1.8765   0.0427 14.75  < 2e-16 ***
+#> Z2 -0.6961    0.4985   0.1155 -6.03  1.7e-09 ***
+#> Z3  0.6337    1.8845   0.1013  6.26  3.9e-10 ***
+#> Y1  0.5690    1.7666   0.0416 13.67  < 2e-16 ***
+#> Y2  0.4577    1.5805   0.0480  9.54  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
 #> Z1        NA         NA        NA        NA
-#> Z2     0.579      1.726     0.475     0.706
-#> Z3     1.844      0.542     1.531     2.221
-#> Y1     1.625      0.615     1.504     1.757
-#> Y2     1.876      0.533     1.726     2.040
+#> Z2     0.499      2.006     0.398     0.625
+#> Z3     1.885      0.531     1.545     2.298
+#> Y1     1.767      0.566     1.628     1.917
+#> Y2     1.580      0.633     1.439     1.736
 #> 
-#> Concordance= 0.692  (se = 0.011 )
-#> Likelihood ratio test= 340  on 4 df,   p=<2e-16
-#> Wald test            = 342  on 4 df,   p=<2e-16
-#> Score (logrank) test = 350  on 4 df,   p=<2e-16
+#> Concordance= 0.702  (se = 0.012 )
+#> Likelihood ratio test= 292  on 4 df,   p=<2e-16
+#> Wald test            = 300  on 4 df,   p=<2e-16
+#> Score (logrank) test = 307  on 4 df,   p=<2e-16
 ```
 
 This is close-ish to the true values.
@@ -696,7 +702,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.529   0.042   0.570
+#>   0.550   0.024   0.574
 ```
 
 The first entries of the new data looks as follows.
@@ -775,8 +781,9 @@ m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
 ```
 
-We show the baseline hazard function and the survival function without
-the marker below.
+Notice that we use the `get_ns_spline` functions which reduces the
+computation time a lot. We show the baseline hazard function and the
+survival function without the marker below.
 
 ``` r
 # hazard function without marker
@@ -832,7 +839,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.543   0.036   0.579
+#>   0.554   0.031   0.586
 ```
 
 Finally, we show a few of the first rows along with some summary

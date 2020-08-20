@@ -1,4 +1,5 @@
 library(rmarkdown)
+library(reshape2)
 (function(){
   setwd("vignettes")
 

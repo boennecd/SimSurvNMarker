@@ -11,15 +11,13 @@ inline void check_splines
   (const arma::vec &boundary_knots, const arma::vec &interior_knots,
    const int order) {
 #ifdef DO_CHECKS
-  if(__builtin_expect(order<1, 0))
+  if(order<1, 0)
     throw std::invalid_argument("order<1");
-  if(__builtin_expect(boundary_knots.size() != 2L, 0))
+  if(boundary_knots.size() != 2L)
     throw std::invalid_argument("boundary_knots should have length 2");
-  if(__builtin_expect(
-      interior_knots.size()>0 && boundary_knots(0)>min(interior_knots), 0))
+  if(interior_knots.size()>0 && boundary_knots(0)>min(interior_knots))
     throw std::invalid_argument("boundary_knots(0)>min(interior_knots)");
-  if(__builtin_expect(
-      interior_knots.size()>0 && boundary_knots(1)<max(interior_knots), 0))
+  if(interior_knots.size()>0 && boundary_knots(1)<max(interior_knots))
     throw std::invalid_argument("boundary_knots(1)<max(interior_knots)");
   // TODO: check if interior_knots are in ascending order?
 #endif
@@ -46,7 +44,7 @@ vec basisMixin::operator()(double const x, int const ders) const {
 mat basisMixin::basis(const vec &x, const int ders,
                       const double centre) const {
 #ifdef DO_CHECKS
-  if (__builtin_expect(ders < 0, 0))
+  if (ders < 0)
     throw std::invalid_argument("ders<0");
 #endif
   uword const n_basis(get_n_basis()),
@@ -67,7 +65,7 @@ mat basisMixin::basis(const vec &x, const int ders,
 
 SplineBasis::SplineBasis(const int order): order(order), knots() {
 #ifdef DO_CHECKS
-  if (__builtin_expect(order<1, 0))
+  if (order<1)
     throw std::invalid_argument("order<1");
 #endif
 }
@@ -76,7 +74,7 @@ SplineBasis::SplineBasis(const int order): order(order), knots() {
 SplineBasis::SplineBasis(const vec knots, const int order):
   order(order), knots(knots) {
 #ifdef DO_CHECKS
-  if (__builtin_expect(order<1, 0))
+  if (order<1)
     throw std::invalid_argument("order<1");
 #endif
 }
@@ -85,7 +83,7 @@ void SplineBasis::operator()(
     vec &out, double const x, const int ders) const {
   out.zeros();
 #ifdef DO_CHECKS
-  if(__builtin_expect(out.n_elem != SplineBasis::get_n_basis(), 0))
+  if(out.n_elem != SplineBasis::get_n_basis())
     throw_invalid_out(
       "splineBasis", out.n_elem, SplineBasis::get_n_basis());
 #endif
@@ -210,10 +208,10 @@ bs::bs(const vec &bk, const vec &ik, const bool inter, const int ord):
 
 void bs::operator()(vec &out, double const x, const int ders) const {
 #ifdef DO_CHECKS
-  if(__builtin_expect(out.n_elem != bs::get_n_basis(), 0))
+  if(out.n_elem != bs::get_n_basis())
     throw_invalid_out("bs", out.n_elem, bs::get_n_basis());
 #endif
-  if (__builtin_expect(x < boundary_knots(0) || x > boundary_knots(1), 0)) {
+  if (x < boundary_knots(0) || x > boundary_knots(1)) {
     double const k_pivot =
         x < boundary_knots(0) ?
         0.75 * boundary_knots(0) + 0.25 * knots(order) :
@@ -270,10 +268,10 @@ ns::ns(const vec &boundary_knots, const vec &interior_knots,
 
 void ns::operator()(vec &out, double const x, const int ders) const {
 #ifdef DO_CHECKS
-  if(__builtin_expect(out.n_elem != ns::get_n_basis(), 0))
+  if(out.n_elem != ns::get_n_basis())
     throw_invalid_out("ns", out.n_elem, ns::get_n_basis());
 #endif
-  if(__builtin_expect(x < bspline.boundary_knots(0), 0)) {
+  if(x < bspline.boundary_knots(0)) {
     if (ders==0){
       out  = tl1;
       out *= x - bspline.boundary_knots(0);
@@ -286,7 +284,7 @@ void ns::operator()(vec &out, double const x, const int ders) const {
 
     return;
 
-  } else if (__builtin_expect(x > bspline.boundary_knots(1), 0)) {
+  } else if (x > bspline.boundary_knots(1)) {
     if (ders==0){
       out  = tr1;
       out *= x - bspline.boundary_knots(1);
@@ -316,15 +314,15 @@ iSpline::iSpline(const vec &boundary_knots, const vec &interior_knots,
 
 void iSpline::operator()(vec &out, double const x, const int der) const {
 #ifdef DO_CHECKS
-  if(__builtin_expect(out.n_elem != iSpline::get_n_basis(), 0))
+  if(out.n_elem != iSpline::get_n_basis())
     throw_invalid_out("iSpline", out.n_elem, iSpline::get_n_basis());
 #endif
-  if(__builtin_expect(x < 0, 0)){
+  if(x < 0){
     out.zeros();
     return;
 
   }
-  else if(__builtin_expect(x <= 1, 1)){
+  else if(x <= 1){
     vec &b = wrk;
     bspline(b, x, der);
     int const js = (bspline.interior_knots.size()>0) ?
@@ -364,7 +362,7 @@ mSpline::mSpline(const vec &boundary_knots, const vec &interior_knots,
 
 void mSpline::operator()(vec &out, double const x, const int der) const {
 #ifdef DO_CHECKS
-  if(__builtin_expect(out.n_elem != mSpline::get_n_basis(), 0))
+  if(out.n_elem != mSpline::get_n_basis())
     throw_invalid_out("mSpline", out.n_elem, mSpline::get_n_basis());
 #endif
   bspline(wrk, x, der);

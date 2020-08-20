@@ -80,8 +80,8 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 #' \deqn{h(t) = \exp(\vec\omega^\top\vec b(t) + \delta).}
 #'
 #' @param ti numeric vector with time points.
-#' @param omega numeric vector with coefficient for baseline hazard.
-#' @param b_func basis function for baseline hazard like \code{\link{poly}}.
+#' @param omega numeric vector with coefficients for the baseline hazard.
+#' @param b_func basis function for the baseline hazard like \code{\link{poly}}.
 #' @param gl_dat Gauss–Legendre quadrature data.
 #'               See \code{\link{get_gl_rule}}.
 #' @param delta offset on the log hazard scale. Use \code{NULL} if
@@ -104,6 +104,13 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 #'                                     b_func = b_func, gl_dat = gl_dat),
 #'      xlim = c(1e-4, 10), ylim = c(0, 1), bty = "l", xlab = "time",
 #'      ylab = "Survival", yaxs = "i")
+#'
+#' # using to few nodes gives a wrong result in this case!
+#' gl_dat <- get_gl_rule(15L)
+#' plot(function(x) eval_surv_base_fun(ti = x, omega = omega,
+#'                                     b_func = b_func, gl_dat = gl_dat),
+#'      xlim = c(1e-4, 10), ylim = c(0, 1), bty = "l", xlab = "time",
+#'      ylab = "Survival", yaxs = "i")
 #' @export
 eval_surv_base_fun <- function(
   ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = NULL){
@@ -116,9 +123,6 @@ eval_surv_base_fun <- function(
   else
     exp(cum_haz_fac)
 }
-
-.eval_marker_inner <- function(ti, B, m_func)
-  eval_marker_cpp(B = B, m = m_func(ti))
 
 #' Fast Evaluation of Time-varying Marker Mean Term
 #'
@@ -153,12 +157,8 @@ eval_surv_base_fun <- function(
 #'   cbind(1, x, x^2)
 #'
 #' r_version <- function(ti, B, g_func, U, m_func, offset){
-#'   n_y <- NCOL(B)
-#'   B <- c(B)
-#'   U <- c(U)
 #'   func <- function(ti)
-#'     drop((diag(n_y) %x% g_func(ti)) %*% B) +
-#'       drop((diag(n_y) %x% m_func(ti)) %*% U)
+#'     drop(crossprod(B, drop(g_func(ti))) + crossprod(U, drop(m_func(ti))))
 #'
 #'   vapply(ti, func, numeric(n_y)) + offset
 #' }
@@ -177,11 +177,11 @@ eval_surv_base_fun <- function(
 #'
 #' @export
 eval_marker <- function(ti, B, g_func, U, m_func, offset){
-  out <- 0.
+  out <- matrix(0., max(NCOL(B), NCOL(U), 1L), length(ti))
   if(length(B) > 0)
-    out <- out + eval_marker_cpp(B = B, m = g_func(ti))
+    eval_marker_cpp(B = B, m = g_func(ti), Sout = out)
   if(length(U) > 0)
-    out <- out + eval_marker_cpp(B = U, m = m_func(ti))
+    eval_marker_cpp(B = U, m = m_func(ti), Sout = out)
   if(length(offset) > 0)
     out <- out + offset
 
@@ -458,10 +458,11 @@ list_of_lists_to_data_frame <- function(dat)
 #'
 #' @seealso
 #' See the examples on Github at
-#' \url{https://github.com/boennecd/SimSurvNMarker} and
-#' \url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}.
+#' \url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}
+#' or this vignette
+#' \code{vignette("SimSurvNMarker", package = "SimSurvNMarker")}.
 #'
-#' \code{\link{sim_marker}}, \code{\link{surv_func_joint}}
+#' \code{\link{sim_marker}} and \code{\link{surv_func_joint}}
 #'
 #' @examples
 #' #####
@@ -592,12 +593,14 @@ sim_joint_data_set <- function(
       drop(z %*% delta)
     }
 
-    mu_offest <- if(d_x == 0L){
+    if(d_x == 0L){
       x <- numeric()
-      NULL
+      mu_offest <- NULL
     } else {
       x <- r_x(i)
-      drop(eval_marker_cpp(B = gamma, m = x))
+      mu_offest <- matrix(0., NCOL(gamma), 1L)
+      eval_marker_cpp(B = gamma, m = x, Sout = mu_offest)
+      mu_offest <- drop(mu_offest)
     }
 
     mu_offest_surv <- if(use_fixed_latent)

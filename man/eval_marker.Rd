@@ -43,12 +43,8 @@ m_func <- function(x)
   cbind(1, x, x^2)
 
 r_version <- function(ti, B, g_func, U, m_func, offset){
-  n_y <- NCOL(B)
-  B <- c(B)
-  U <- c(U)
   func <- function(ti)
-    drop((diag(n_y) \%x\% g_func(ti)) \%*\% B) +
-      drop((diag(n_y) \%x\% m_func(ti)) \%*\% U)
+    drop(crossprod(B, drop(g_func(ti))) + crossprod(U, drop(m_func(ti))))
 
   vapply(ti, func, numeric(n_y)) + offset
 }

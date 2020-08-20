@@ -10,11 +10,14 @@ get_gl_rule(n)
 \item{n}{number of nodes.}
 }
 \description{
-Get Gauss–Legendre Quadrature Nodes and Weights
+Computes Gauss–Legendre Quadrature nodes and weights.
 }
 \examples{
 library(SimSurvNMarker)
 get_gl_rule(4)
 get_gl_rule(25)
 
+# fast
+system.time(replicate(10000, get_gl_rule(10)))
+system.time(replicate(10000, get_gl_rule(100)))
 }

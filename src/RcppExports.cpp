@@ -8,14 +8,14 @@
 using namespace Rcpp;
 
 // eval_marker
-Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m);
-RcppExport SEXP _SimSurvNMarker_eval_marker(SEXP BSEXP, SEXP mSEXP) {
+void eval_marker(SEXP B, SEXP m, SEXP Sout);
+RcppExport SEXP _SimSurvNMarker_eval_marker(SEXP BSEXP, SEXP mSEXP, SEXP SoutSEXP) {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type B(BSEXP);
     Rcpp::traits::input_parameter< SEXP >::type m(mSEXP);
-    rcpp_result_gen = Rcpp::wrap(eval_marker(B, m));
-    return rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type Sout(SoutSEXP);
+    eval_marker(B, m, Sout);
+    return R_NilValue;
 END_RCPP
 }
 // get_commutation
@@ -79,7 +79,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_SimSurvNMarker_eval_marker", (DL_FUNC) &_SimSurvNMarker_eval_marker, 2},
+    {"_SimSurvNMarker_eval_marker", (DL_FUNC) &_SimSurvNMarker_eval_marker, 3},
     {"_SimSurvNMarker_get_commutation", (DL_FUNC) &_SimSurvNMarker_get_commutation, 2},
     {"_SimSurvNMarker_get_gl_rule", (DL_FUNC) &_SimSurvNMarker_get_gl_rule, 1},
     {"_SimSurvNMarker_glq", (DL_FUNC) &_SimSurvNMarker_glq, 6},

@@ -1,56 +1,70 @@
 #include <Rcpp.h>
 
+inline void eval_marker_inner
+  (double * __restrict__ o, double const * const __restrict__ m_start,
+   double const * __restrict__ b, size_t const lm,
+   size_t const lo) noexcept {
+  for(size_t i = 0; i < lo; ++i, ++o){
+    double const * mj = m_start;
+    for(size_t j = 0; j < lm; ++j, ++mj, ++b)
+      *o += *mj * *b;
+  }
+}
+
 // [[Rcpp::export(name = "eval_marker_cpp", rng = false)]]
-Rcpp::NumericMatrix eval_marker(SEXP B, SEXP m){
-  if(__builtin_expect(!Rf_isMatrix(B), 0))
-    throw std::invalid_argument("eval_marker: B must be a matrix");
+void eval_marker(SEXP B, SEXP m, SEXP Sout){
+  bool const out_is_mat = Rf_isMatrix(Sout);
+  if(Rf_isMatrix(B) and out_is_mat){
+    if(Rf_isMatrix(m)){
+      size_t const nr = Rf_nrows(B),
+                   nc = Rf_ncols(B),
+            n_col_out = Rf_nrows(m),
+                   nm = Rf_ncols(m);
 
-  if(Rf_isMatrix(m)){
-    size_t const nr = Rf_nrows(B),
-                 nc = Rf_ncols(B),
-          n_col_out = Rf_nrows(m),
-                 nm = Rf_ncols(m);
-    if(__builtin_expect(nr != nm, 0))
-      throw std::invalid_argument("eval_marker: dims do not match");
+      bool const B_m_ok = nr == nm,
+                 out_ok = static_cast<size_t>(Rf_ncols(Sout)) == n_col_out;
+      if(B_m_ok and out_ok){
+        double * o = REAL(Sout);
+        double const * const m_start = REAL(m),
+                     * const b_start = REAL(B);
 
-    Rcpp::NumericMatrix out(nc, n_col_out);
+        for(size_t i = 0; i < n_col_out; ++i){
+          double const * const o_end = o + nc,
+                       *           b = b_start;
+          for(; o != o_end; ++o){
+            double const *           mi = m_start + i,
+                         * const mi_end = mi + n_col_out * nm;
 
-    double * o = out.begin();
-    double const * const m_start = REAL(m),
-                 * const b_start = REAL(B);
+            for(; mi != mi_end; mi += n_col_out, ++b)
+              *o += *mi * *b;
+          }
+        }
 
-    for(size_t i = 0; i < n_col_out; ++i){
-      double const * const o_end = o + nc,
-                   *           b = b_start;
-      for(; o != o_end; ++o){
-        double const *           mi = m_start + i,
-                     * const mi_end = mi + n_col_out * nm;
+        return;
 
-        for(; mi != mi_end; mi += n_col_out, ++b)
-          *o += *mi * *b;
-      }
+      } else
+        throw std::invalid_argument("eval_marker: dims do not match");
+
+    } else if(Rf_isVector(m)){
+      size_t const nr = Rf_nrows(B),
+                   nc = Rf_ncols(B),
+                   nm = XLENGTH(m);
+
+      bool const B_m_ok = nr == nm,
+                 out_ok = Rf_ncols(Sout) == 1L;
+      if(B_m_ok and out_ok){
+        double const *b = REAL(B),
+               *m_start = REAL(m);
+
+        eval_marker_inner(REAL(Sout), m_start, b, nm, nc);
+
+        return;
+
+      } else
+        throw std::invalid_argument("eval_marker: dims do not match");
+
     }
-
-    return out;
-
-  } else if(Rf_isVector(m)){
-    size_t const nr = Rf_nrows(B),
-                 nc = Rf_ncols(B),
-                 nm = XLENGTH(m);
-    if(__builtin_expect(nr != nm, 0))
-      throw std::invalid_argument("eval_marker: dims do not match");
-
-    Rcpp::NumericMatrix out(nc, 1L);
-    double const *b = REAL(B),
-           *m_start = REAL(m),
-           *m_end   = m_start + nm;
-      for(double *o = out.begin(); o != out.end(); ++o)
-        for(auto mi = m_start; mi != m_end; ++mi)
-          *o += *mi * *b++;
-
-      return out;
   }
 
-  throw std::invalid_argument("eval_marker: m is not a vector or a matrix");
-  return Rcpp::NumericMatrix();
+  throw std::invalid_argument("eval_marker: B and Sout must be a matrix. m must be a vector or a Matrix");
 }

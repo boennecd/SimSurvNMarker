@@ -9,9 +9,9 @@ eval_surv_base_fun(ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = NULL)
 \arguments{
 \item{ti}{numeric vector with time points.}
 
-\item{omega}{numeric vector with coefficient for baseline hazard.}
+\item{omega}{numeric vector with coefficients for the baseline hazard.}
 
-\item{b_func}{basis function for baseline hazard like \code{\link{poly}}.}
+\item{b_func}{basis function for the baseline hazard like \code{\link{poly}}.}
 
 \item{gl_dat}{Gauss–Legendre quadrature data.
 See \code{\link{get_gl_rule}}.}
@@ -38,6 +38,13 @@ plot(haz_fun, xlim = c(0, 10))
 # plot the hazard
 library(SimSurvNMarker)
 gl_dat <- get_gl_rule(60L)
+plot(function(x) eval_surv_base_fun(ti = x, omega = omega,
+                                    b_func = b_func, gl_dat = gl_dat),
+     xlim = c(1e-4, 10), ylim = c(0, 1), bty = "l", xlab = "time",
+     ylab = "Survival", yaxs = "i")
+
+# using to few nodes gives a wrong result in this case!
+gl_dat <- get_gl_rule(15L)
 plot(function(x) eval_surv_base_fun(ti = x, omega = omega,
                                     b_func = b_func, gl_dat = gl_dat),
      xlim = c(1e-4, 10), ylim = c(0, 1), bty = "l", xlab = "time",

@@ -1,28 +1,24 @@
 #include <Rcpp.h>
 
-Rcpp::NumericMatrix get_commutation_unequal
-  (unsigned const n, unsigned const m){
+void get_commutation_unequal
+  (unsigned const n, unsigned const m, double * o) noexcept{
   unsigned const nm = n * m,
-    nnm_p1 = n * nm + 1L,
-    nm_pm = nm + m;
-  Rcpp::NumericMatrix out(nm, nm);
-  double * o = &out[0];
+             nnm_p1 = n * nm + 1L,
+              nm_pm = nm + m;
+
   for(unsigned i = 0; i < n; ++i, o += nm_pm){
     double *o1 = o;
     for(unsigned j = 0; j < m; ++j, o1 += nnm_p1)
       *o1 = 1.;
   }
-
-  return out;
 }
 
-Rcpp::NumericMatrix get_commutation_equal(unsigned const m){
+void get_commutation_equal(unsigned const m, double * const o) noexcept {
   unsigned const mm = m * m,
-    mmm = mm * m,
-    mmm_p1 = mmm + 1L,
-    mm_pm = mm + m;
-  Rcpp::NumericMatrix out(mm, mm);
-  double * const o = &out[0];
+                mmm = mm * m,
+             mmm_p1 = mmm + 1L,
+              mm_pm = mm + m;
+
   unsigned inc_i(0L);
   for(unsigned i = 0; i < m; ++i, inc_i += m){
     double *o1 = o + inc_i + i * mm,
@@ -33,15 +29,18 @@ Rcpp::NumericMatrix get_commutation_equal(unsigned const m){
     }
     *o1 += 1.;
   }
-  return out;
 }
 
 // [[Rcpp::export(rng = false)]]
 Rcpp::NumericMatrix get_commutation(unsigned const n, unsigned const m){
+  size_t const nm = n * m;
+  Rcpp::NumericMatrix out(nm, nm);
   if(n == m)
-    return get_commutation_equal(n);
+    get_commutation_equal(n, &out[0]);
+  else
+    get_commutation_unequal(n, m, &out[0]);
 
-  return get_commutation_unequal(n, m);
+  return out;
 }
 
 /*** R

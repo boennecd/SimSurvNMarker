@@ -75,14 +75,15 @@ One reason is that the model reduces to a Weibull distribution
 when a first polynomial is used and $\vec\alpha = \vec 0$. $\vec x_i$ and 
 $\vec z_i$ are individual specific known covariates.
 
-We provide an example of how to use the package here and the 
-[inst/test-data](inst/test-data) directory. The examples includes
+We provide an example of how to use the package here and in 
+[inst/test-data](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data) 
+directory on Github. The former examples includes
 
  - using [polynomials](#example-polynomial) as the basis functions.
  - using [polynomials with derivatives in the log hazard](#using-derivatives) as the basis functions.
  - using [natural cubic splines](#example-natural-cubic-splines) as the basis functions.
 
-The purpose of this package is to 
+The purpose/goal of this package is to 
 
  - allow the user to specify all components in R including the basis 
    functions. 
@@ -90,12 +91,17 @@ The purpose of this package is to
 
 ## Installation
 
-The package is not on CRAN but can be installed from Github using the 
-`remotes` package.
+The package can be installed from Github using the`remotes` package.
 
 ```{r how_to_install, eval = FALSE}
-stopifnot(require(remotes)) # need the remotes package
+stopifnot(require(remotes)) # needs the remotes package
 install_github("boennecd/SimSurvNMarker")
+```
+
+It can also be installed from CRAN using `install.packages`. 
+
+```{r CRAN_how_to_install, eval = FALSE}
+install.packages("SimSurvNMarker")
 ```
 
 ## Example: Polynomial
@@ -119,7 +125,7 @@ m_func <- function(x){
 
 We use a third order polynomial for the two fixed terms, $\vec b$ and 
 $\vec g$, and a second order random polynomial for the random term, 
-$U \vec m(s)$, in the latent mean function. We choose the 
+$U_i \vec m(s)$, in the latent mean function. We choose the 
 following parameters for the baseline hazard.
 
 ```{r attach_pkg}
@@ -570,8 +576,9 @@ m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
 ```
 
-We show the baseline hazard function and the survival function without 
-the marker below.
+Notice that we use the `get_ns_spline` functions which reduces the 
+computation time a lot. We show the baseline hazard function and the 
+survival function without the marker below.
 
 ```{r plot_wo_marker}
 # hazard function without marker

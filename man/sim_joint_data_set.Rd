@@ -38,7 +38,7 @@ Use \code{NULL} if there is no effect.}
 
 \item{Psi}{the random effects' covariance matrix.}
 
-\item{omega}{numeric vector with coefficient for baseline hazard.}
+\item{omega}{numeric vector with coefficients for the baseline hazard.}
 
 \item{delta}{coefficients for fixed effects in the log hazard.}
 
@@ -49,7 +49,7 @@ Use \code{NULL} if there is no effect.}
 \item{gamma}{coefficient matrix for the non-time-varying fixed effects.
 Use \code{NULL} if there is no effect.}
 
-\item{b_func}{basis function for baseline hazard like \code{\link{poly}}.}
+\item{b_func}{basis function for the baseline hazard like \code{\link{poly}}.}
 
 \item{m_func}{basis function for \code{U} like \code{\link{poly}}.}
 
@@ -181,8 +181,9 @@ stopifnot(
 }
 \seealso{
 See the examples on Github at
-\url{https://github.com/boennecd/SimSurvNMarker} and
-\url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}.
+\url{https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data}
+or this vignette
+\code{vignette("SimSurvNMarker", package = "SimSurvNMarker")}.
 
-\code{\link{sim_marker}}, \code{\link{surv_func_joint}}
+\code{\link{sim_marker}} and \code{\link{surv_func_joint}}
 }
