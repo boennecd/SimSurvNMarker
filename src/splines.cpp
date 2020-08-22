@@ -384,6 +384,9 @@ void mSpline::operator()(vec &out, double const x, const int der) const {
 Rcpp::XPtr<splines::ns>
   get_ns_ptr(const arma::vec &knots, arma::vec const &boundary_knots,
              bool const intercept){
+    if(boundary_knots.n_elem < 2)
+      throw std::invalid_argument("get_ns_ptr: invalid boundary_knots size");
+
     return Rcpp::XPtr<splines::ns>(
       new splines::ns(boundary_knots, knots, intercept), true);
   }

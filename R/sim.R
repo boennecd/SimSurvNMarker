@@ -44,19 +44,25 @@
 #' @export
 get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
   with(new.env(), {
-    ptr_obj <- get_ns_ptr(knots          = knots[-c(1L, length(knots))],
-                          boundary_knots = knots[ c(1L, length(knots))],
-                          intercept = intercept)
-    out <- if(do_log)
-      function(x)
-        ns_cpp(x = log(x), ns_ptr = ptr_obj)
-    else
-      function(x)
-        ns_cpp(x =     x , ns_ptr = ptr_obj)
+    if(length(knots) > 1L){
+      ptr_obj <- get_ns_ptr(knots          = knots[-c(1L, length(knots))],
+                            boundary_knots = knots[ c(1L, length(knots))],
+                            intercept = intercept)
+      out <- if(do_log)
+        function(x)
+          ns_cpp(x = log(x), ns_ptr = ptr_obj)
+      else
+        function(x)
+          ns_cpp(x =     x , ns_ptr = ptr_obj)
 
-    attributes(out) <- list(
-      knots = knots, intercept = intercept, do_log = do_log)
-    out
+      attributes(out) <- list(
+        knots = knots, intercept = intercept, do_log = do_log)
+      return(out)
+
+    }
+
+    function(x)
+      matrix(0, nrow = length(x), ncol = 0L)
   })
 
 .surv_func_inner <- function(ti, omega, b_func, gl_dat){

@@ -9,3 +9,4 @@
 ^vignettes/SimSurvNMarker\.Rmd
 ^vignettes/cache
 ^ref\.bib
+^cran-comments\.md$

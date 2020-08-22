@@ -3,14 +3,15 @@ context("Testing 'sim_joint_data_set'")
 
 for(f_name in c("no-B", "no-delta", "no-gamma", "one-marker", "w-all")){
   test_that(paste0("'", f_name, "' settings gives previous results"), {
-    r_f_name <- file.path("test-data", paste0(f_name, ".R"))
-    r_f_name_use <- file.path("..", "..", "SimSurvNMarker", r_f_name)
+    r_f_name_org <- file.path("test-data", paste0(f_name, ".R"))
 
-    if(file.exists(r_f_name_use))
-      r_f_name <- r_f_name_use
-    else
-      r_f_name <- file.path("..", "..", "inst", r_f_name)
+    r_f_name <- file.path("..", "..", "SimSurvNMarker", r_f_name_org)
+    if(!file.exists(r_f_name))
+      r_f_name <- file.path("..", "..", "inst", r_f_name_org)
+    if(!file.exists(r_f_name))
+      r_f_name <- system.file(r_f_name_org, package = "SimSurvNMarker")
 
+    expect_true(nchar(r_f_name) > 0)
     expect_true(file.exists(r_f_name))
 
     source(r_f_name, local = TRUE)
@@ -54,6 +55,3 @@ for(f_name in c("no-B", "no-delta", "no-gamma", "one-marker", "w-all")){
       file.path(test_res_dir, paste0("marker_data-", f_name, ".RDS")))
   })
 }
-
-
-
