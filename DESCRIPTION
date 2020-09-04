@@ -21,7 +21,7 @@ Suggests:
     testthat (>= 2.1.0),
     splines,
     R.rsp
-RoxygenNote: 7.0.1
+RoxygenNote: 7.1.1
 LinkingTo: 
     Rcpp,
     RcppArmadillo

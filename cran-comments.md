@@ -13,3 +13,9 @@
   
 ## R CMD check results
 There were no ERRORs, WARNINGs, or notes.
+
+## Resubmission
+This is a resubmission. In this version I have:
+
+* removed the re-setting of the seed which changed `.GlobalEnv`. 
+* reset `par()` in the examples.

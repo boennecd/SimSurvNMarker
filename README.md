@@ -416,7 +416,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.442   0.062   0.504
+#>   0.472   0.021   0.491
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -426,26 +426,26 @@ follows.
 # survival data
 head(dat$survival_data)
 #>   Z1 Z2 Z3 left_trunc     y event id
-#> 1  1  1  0          0 0.213  TRUE  1
-#> 2  1  0  1          0 1.580 FALSE  2
-#> 3  1  0  0          0 2.000 FALSE  3
-#> 4  1  1  0          0 0.343 FALSE  4
-#> 5  1  0  1          0 0.132  TRUE  5
-#> 6  1  0  0          0 0.920 FALSE  6
+#> 1  1  1  0          0 0.869  TRUE  1
+#> 2  1  0  1          0 0.320  TRUE  2
+#> 3  1  0  0          0 1.535  TRUE  3
+#> 4  1  1  0          0 0.129  TRUE  4
+#> 5  1  0  1          0 2.000 FALSE  5
+#> 6  1  0  0          0 0.369 FALSE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time     Y1     Y2 X1 X2 X3 id
-#> 1    0.0217  3.145 -1.354  1  1  0  1
-#> 2    0.0603  0.656 -1.469  1  0  1  2
-#> 3    0.2706 -0.873 -1.001  1  0  1  2
-#> 4    0.4378  0.655 -0.869  1  0  1  2
-#> 5    0.5547  0.477 -0.419  1  0  1  2
-#> 6    0.2052  0.552 -0.756  1  0  0  3
-#> 7    0.2158 -0.345 -0.896  1  0  0  3
-#> 8    0.3010  0.764 -1.408  1  0  0  3
-#> 9    0.4186  1.234 -1.000  1  0  0  3
-#> 10   0.4210  1.026 -0.715  1  0  0  3
+#>    obs_time    Y1      Y2 X1 X2 X3 id
+#> 1    0.4392 1.984  0.8920  1  1  0  1
+#> 2    0.6009 1.651  0.2385  1  1  0  1
+#> 3    0.7747 0.819  0.1867  1  1  0  1
+#> 4    0.0702 3.796 -0.5575  1  0  1  2
+#> 5    0.1186 3.122  0.2074  1  0  1  2
+#> 6    0.2737 2.977 -0.2365  1  0  1  2
+#> 7    0.2829 2.506 -0.2323  1  0  1  2
+#> 8    0.1121 2.211  0.1531  1  0  0  3
+#> 9    0.3337 1.595  0.0196  1  0  0  3
+#> 10   0.3430 0.294 -0.1353  1  0  0  3
 ```
 
 To illustrate that we simulate from the correct model, we can estimate a
@@ -453,6 +453,7 @@ linear mixed models for the markers as follows.
 
 ``` r
 library(lme4)
+#> Loading required package: Matrix
 
 # estimate the linear mixed model (skip this if you want and look at the 
 # estimates in the end)
@@ -537,30 +538,30 @@ local({
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
 #> $gamma
-#>         [,1]    [,2]
-#> [1,]  0.1749 -0.3606
-#> [2,]  0.5259 -0.0255
-#> [3,] -0.0725  0.1897
+#>         [,1]      [,2]
+#> [1,]  0.1684 -0.384080
+#> [2,]  0.5224  0.000604
+#> [3,] -0.0767  0.219849
 #> 
 #> $B
 #>        [,1]  [,2]
-#> [1,] -0.564 0.455
-#> [2,]  0.268 0.976
-#> [3,] -0.467 0.893
+#> [1,] -0.569 0.484
+#> [2,]  0.282 0.988
+#> [3,] -0.466 0.893
 #> 
 #> $Psi
-#>         [,1]    [,2]     [,3]     [,4]     [,5]    [,6]
-#> [1,]  0.5266  0.0661 -0.15020  0.12119 -0.04917  0.1091
-#> [2,]  0.0661  0.3677 -0.24946 -0.02710 -0.05298  0.2639
-#> [3,] -0.1502 -0.2495  0.25764 -0.00515  0.04901 -0.1415
-#> [4,]  0.1212 -0.0271 -0.00515  0.15408 -0.00454  0.0529
-#> [5,] -0.0492 -0.0530  0.04901 -0.00454  0.04570 -0.0916
-#> [6,]  0.1091  0.2639 -0.14149  0.05291 -0.09163  0.4086
+#>         [,1]    [,2]     [,3]     [,4]    [,5]    [,6]
+#> [1,]  0.5245  0.0688 -0.16087  0.12002 -0.0286  0.1126
+#> [2,]  0.0688  0.3572 -0.24086 -0.03221 -0.0451  0.2572
+#> [3,] -0.1609 -0.2409  0.25861 -0.00229  0.0464 -0.1342
+#> [4,]  0.1200 -0.0322 -0.00229  0.16050 -0.0057  0.0469
+#> [5,] -0.0286 -0.0451  0.04644 -0.00570  0.0533 -0.0833
+#> [6,]  0.1126  0.2572 -0.13422  0.04693 -0.0833  0.4166
 #> 
 #> $Sigma
 #>       [,1]  [,2]
-#> [1,] 0.229 0.000
-#> [2,] 0.000 0.229
+#> [1,] 0.225 0.000
+#> [2,] 0.000 0.225
 ```
 
 Although we assume equal noise variance, the estimates are close to the
@@ -628,28 +629,28 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 4171, number of events= 535 
+#>   n= 4042, number of events= 535 
 #> 
 #>       coef exp(coef) se(coef)     z Pr(>|z|)    
 #> Z1      NA        NA   0.0000    NA       NA    
-#> Z2 -0.6961    0.4985   0.1155 -6.03  1.7e-09 ***
-#> Z3  0.6337    1.8845   0.1013  6.26  3.9e-10 ***
-#> Y1  0.5690    1.7666   0.0416 13.67  < 2e-16 ***
-#> Y2  0.4577    1.5805   0.0480  9.54  < 2e-16 ***
+#> Z2 -0.8688    0.4194   0.1168 -7.44  1.0e-13 ***
+#> Z3  0.4566    1.5787   0.1007  4.53  5.8e-06 ***
+#> Y1  0.5474    1.7287   0.0419 13.06  < 2e-16 ***
+#> Y2  0.4519    1.5712   0.0489  9.23  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
 #> Z1        NA         NA        NA        NA
-#> Z2     0.499      2.006     0.398     0.625
-#> Z3     1.885      0.531     1.545     2.298
-#> Y1     1.767      0.566     1.628     1.917
-#> Y2     1.580      0.633     1.439     1.736
+#> Z2     0.419      2.384     0.334     0.527
+#> Z3     1.579      0.633     1.296     1.923
+#> Y1     1.729      0.578     1.592     1.877
+#> Y2     1.571      0.636     1.428     1.729
 #> 
-#> Concordance= 0.702  (se = 0.012 )
-#> Likelihood ratio test= 292  on 4 df,   p=<2e-16
-#> Wald test            = 300  on 4 df,   p=<2e-16
-#> Score (logrank) test = 307  on 4 df,   p=<2e-16
+#> Concordance= 0.693  (se = 0.012 )
+#> Likelihood ratio test= 270  on 4 df,   p=<2e-16
+#> Wald test            = 271  on 4 df,   p=<2e-16
+#> Score (logrank) test = 278  on 4 df,   p=<2e-16
 ```
 
 This is close-ish to the true values.
@@ -702,7 +703,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.550   0.024   0.574
+#>   0.600   0.028   0.627
 ```
 
 The first entries of the new data looks as follows.
@@ -710,27 +711,27 @@ The first entries of the new data looks as follows.
 ``` r
 # survival data
 head(dat$survival_data)
-#>   Z1 Z2 Z3 left_trunc      y event id
-#> 1  1  1  0          0 0.5779  TRUE  1
-#> 2  1  0  1          0 0.5093  TRUE  2
-#> 3  1  0  0          0 0.6698  TRUE  3
-#> 4  1  1  0          0 0.3428 FALSE  4
-#> 5  1  0  1          0 0.0496  TRUE  5
-#> 6  1  0  0          0 0.9196 FALSE  6
+#>   Z1 Z2 Z3 left_trunc     y event id
+#> 1  1  1  0          0 1.038 FALSE  1
+#> 2  1  0  1          0 1.704  TRUE  2
+#> 3  1  0  0          0 1.752  TRUE  3
+#> 4  1  1  0          0 1.170  TRUE  4
+#> 5  1  0  1          0 1.343  TRUE  5
+#> 6  1  0  0          0 0.369 FALSE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time     Y1     Y2 X1 X2 X3 id
-#> 1    0.0217  3.145 -1.354  1  1  0  1
-#> 2    0.4081  2.588 -0.948  1  1  0  1
-#> 3    0.4776  3.393 -0.850  1  1  0  1
-#> 4    0.5238  2.954 -1.303  1  1  0  1
-#> 5    0.0603  0.656 -1.469  1  0  1  2
-#> 6    0.2706 -0.873 -1.001  1  0  1  2
-#> 7    0.4378  0.655 -0.869  1  0  1  2
-#> 8    0.2052  0.552 -0.756  1  0  0  3
-#> 9    0.2158 -0.345 -0.896  1  0  0  3
-#> 10   0.3010  0.764 -1.408  1  0  0  3
+#>    obs_time    Y1     Y2 X1 X2 X3 id
+#> 1    0.4392 1.984  0.892  1  1  0  1
+#> 2    0.6009 1.651  0.239  1  1  0  1
+#> 3    0.7747 0.819  0.187  1  1  0  1
+#> 4    0.8931 0.853  0.521  1  1  0  1
+#> 5    0.9442 1.522 -0.216  1  1  0  1
+#> 6    0.0702 3.796 -0.558  1  0  1  2
+#> 7    0.1186 3.122  0.207  1  0  1  2
+#> 8    0.2737 2.977 -0.237  1  0  1  2
+#> 9    0.2829 2.506 -0.232  1  0  1  2
+#> 10   0.4253 2.098 -0.124  1  0  1  2
 ```
 
 ## Example: Natural Cubic Splines
@@ -839,7 +840,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.554   0.031   0.586
+#>   0.585   0.014   0.598
 ```
 
 Finally, we show a few of the first rows along with some summary
@@ -849,49 +850,49 @@ statistics.
 # survival data
 head(dat$survival_data)
 #>   Z1 left_trunc    y event id
-#> 1  0     2.3208 6.55  TRUE  1
-#> 2  0     0.6880 1.15  TRUE  2
-#> 3  1     0.4099 4.18  TRUE  3
-#> 4  1     0.0193 1.12  TRUE  4
-#> 5  0     1.8492 6.04 FALSE  5
-#> 6  0     0.1587 8.60  TRUE  6
+#> 1  0     0.3830 7.85 FALSE  1
+#> 2  1     1.0779 2.10  TRUE  2
+#> 3  0     0.8923 1.37  TRUE  3
+#> 4  0     0.9055 8.04 FALSE  4
+#> 5  1     0.8378 6.22  TRUE  5
+#> 6  1     0.0649 1.84  TRUE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time      Y1     Y2 id
-#> 1     3.095 -0.5767 -1.362  1
-#> 2     1.114  0.5738 -1.556  2
-#> 3     1.026 -0.3805 -1.019  3
-#> 4     1.079  0.1618 -1.238  3
-#> 5     1.505  0.0218 -1.287  3
-#> 6     1.550  0.0377 -1.183  3
-#> 7     1.889  0.2260 -1.214  3
-#> 8     2.105  0.5082 -1.278  3
-#> 9     0.737 -0.6690 -0.870  4
-#> 10    0.835 -0.5551 -0.986  4
+#>    obs_time    Y1     Y2 id
+#> 1      1.32 0.824 -2.165  1
+#> 2      1.85 0.163 -2.132  1
+#> 3      2.20 1.052 -1.914  1
+#> 4      3.00 0.831 -1.941  1
+#> 5      3.59 1.303 -1.840  1
+#> 6      4.91 1.061 -1.660  1
+#> 7      4.92 0.803 -1.770  1
+#> 8      5.74 0.595 -1.520  1
+#> 9      5.87 0.432 -1.364  1
+#> 10     1.77 1.285 -0.497  2
 
 # rate of observed events
 mean(dat$survival_data$event) 
-#> [1] 0.76
+#> [1] 0.742
 
 # mean event time
 mean(subset(dat$survival_data, event           )$y)
-#> [1] 3.54
+#> [1] 3.49
 
 # mean event time for the two group
 mean(subset(dat$survival_data, event & Z1 == 1L)$y)
-#> [1] 3.15
+#> [1] 3.08
 mean(subset(dat$survival_data, event & Z1 == 0L)$y)
-#> [1] 4.18
+#> [1] 4.16
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 #>     0%    25%    50%    75%   100% 
-#> 0.0707 1.6666 2.8574 5.3823 9.3193
+#> 0.0707 1.6318 2.7531 5.2749 9.5271
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
-#> [1] 4.03
+#> [1] 4.08
 ```
 
 ## References

@@ -10,3 +10,4 @@
 ^vignettes/cache
 ^ref\.bib
 ^cran-comments\.md$
+^CRAN-RELEASE$

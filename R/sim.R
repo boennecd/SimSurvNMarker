@@ -386,9 +386,10 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
 #'                          delta = NULL, alpha = alpha, b_func = b_func,
 #'                          m_func = m_func, gl_dat = gl_dat, g_func = g_func,
 #'                          offset = NULL)
-#' par(mar = c(5, 5, 1, 1))
+#' par_old <- par(mar = c(5, 5, 1, 1))
 #' plot(tis, Survs, xlab = "Time", ylab = "Survival", type = "l",
 #'      ylim = c(0, 1), bty = "l", xaxs = "i", yaxs = "i")
+#' par(par_old)
 #'
 #' @export
 surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
@@ -557,37 +558,32 @@ sim_joint_data_set <- function(
   d_x <- length(gamma) / n_y
   K <- length(m_func(1L)) * n_y
 
-  local({
-    old_seed <- .GlobalEnv$.Random.seed
-    on.exit(.GlobalEnv$.Random.seed <- old_seed)
-
-    stopifnot(
-      length(B) == 0L || is.matrix(B),
-      length(B) == 0L || is.numeric(B),
-      length(B) == 0L || NCOL(B) == n_y,
-      is.matrix(Psi), is.numeric(Psi), NCOL(Psi) == K,
-      is.matrix(sigma), is.numeric(sigma),
-      is.numeric(alpha), length(alpha) == n_y,
-      is.numeric(b_func(1)), length(b_func(1)) == d_b,
-      is.numeric(m_func(1)),
-      is.numeric(m_func_surv(1)),
-      length(m_func_surv(1)) == length(m_func(1)),
-      is.numeric(g_func(1)),
-      is.numeric(g_func_surv(1)),
-      length(g_func_surv(1)) == length(g_func(1)),
-      is.numeric(gl_dat$node), is.numeric(gl_dat$weight),
-      length(gl_dat$node) == length(gl_dat$weight),
-      is.numeric(r_z(1L)), length(r_z(1L)) == d_z,
-      is.numeric(r_x(1L)), length(r_x(1L)) == d_x,
-      length(gamma) == 0L || is.matrix(gamma),
-      length(gamma) == 0L || is.numeric(gamma),
-      length(gamma) == 0L || NCOL(gamma) == n_y,
-      is.numeric(r_left_trunc(1L)),
-      is.numeric(r_right_cens(1L)),
-      is.integer(r_n_marker(1L)),
-      is.numeric(r_obs_time(1L, 1L)),
-      is.logical(use_fixed_latent), length(use_fixed_latent) == 1L)
-  })
+  stopifnot(
+    length(B) == 0L || is.matrix(B),
+    length(B) == 0L || is.numeric(B),
+    length(B) == 0L || NCOL(B) == n_y,
+    is.matrix(Psi), is.numeric(Psi), NCOL(Psi) == K,
+    is.matrix(sigma), is.numeric(sigma),
+    is.numeric(alpha), length(alpha) == n_y,
+    is.numeric(b_func(1)), length(b_func(1)) == d_b,
+    is.numeric(m_func(1)),
+    is.numeric(m_func_surv(1)),
+    length(m_func_surv(1)) == length(m_func(1)),
+    is.numeric(g_func(1)),
+    is.numeric(g_func_surv(1)),
+    length(g_func_surv(1)) == length(g_func(1)),
+    is.numeric(gl_dat$node), is.numeric(gl_dat$weight),
+    length(gl_dat$node) == length(gl_dat$weight),
+    is.numeric(r_z(1L)), length(r_z(1L)) == d_z,
+    is.numeric(r_x(1L)), length(r_x(1L)) == d_x,
+    length(gamma) == 0L || is.matrix(gamma),
+    length(gamma) == 0L || is.numeric(gamma),
+    length(gamma) == 0L || NCOL(gamma) == n_y,
+    is.numeric(r_left_trunc(1L)),
+    is.numeric(r_right_cens(1L)),
+    is.integer(r_n_marker(1L)),
+    is.numeric(r_obs_time(1L, 1L)),
+    is.logical(use_fixed_latent), length(use_fixed_latent) == 1L)
 
   out <- lapply(1:n_obs, function(i){
     z_delta <- if(d_z == 0L){

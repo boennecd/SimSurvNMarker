@@ -89,9 +89,10 @@ Survs <- surv_func_joint(ti = tis, B = B, U = U, omega = omega,
                          delta = NULL, alpha = alpha, b_func = b_func,
                          m_func = m_func, gl_dat = gl_dat, g_func = g_func,
                          offset = NULL)
-par(mar = c(5, 5, 1, 1))
+par_old <- par(mar = c(5, 5, 1, 1))
 plot(tis, Survs, xlab = "Time", ylab = "Survival", type = "l",
      ylim = c(0, 1), bty = "l", xaxs = "i", yaxs = "i")
+par(par_old)
 
 }
 \seealso{

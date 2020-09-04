@@ -215,7 +215,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>   2.072   0.018   2.090
+#>    2.11    0.05    2.16
 ```
 
 Show stats
@@ -224,43 +224,43 @@ Show stats
 # survival data
 head(dat$survival_data)
 #>   Z1 Z2 left_trunc    y event id
-#> 1  0  0      1.335 4.63  TRUE  1
-#> 2  0  0      0.506 6.37 FALSE  2
-#> 3  0  0      0.810 3.80  TRUE  3
-#> 4  1  1      0.196 9.17 FALSE  4
-#> 5  0  0      0.104 1.43  TRUE  5
-#> 6  1  0      0.311 5.70  TRUE  6
+#> 1  0  1      0.209 5.38  TRUE  1
+#> 2  1  0      1.317 1.70  TRUE  2
+#> 3  1  1      0.111 8.31 FALSE  3
+#> 4  0  0      2.080 8.32 FALSE  4
+#> 5  1  1      1.109 9.19 FALSE  5
+#> 6  0  0      2.362 9.78 FALSE  6
 
 # marker data
 head(dat$marker_data, 10)
-#>    obs_time   Y1 X1 X2 id
-#> 1      1.86 1.46  1  1  1
-#> 2      2.12 1.32  1  1  1
-#> 3      2.67 1.26  1  1  1
-#> 4      3.40 1.10  1  1  1
-#> 5      3.82 1.26  1  1  1
-#> 6      3.86 1.35  1  1  1
-#> 7      4.10 1.55  1  1  2
-#> 8      4.55 2.13  1  1  2
-#> 9      6.05 2.26  1  1  2
-#> 10     1.05 0.61  1  1  3
+#>    obs_time     Y1 X1 X2 id
+#> 1      1.08 -0.905  1  0  1
+#> 2      4.11 -0.146  1  0  1
+#> 3      1.43  0.490  0  1  2
+#> 4      1.05 -0.336  0  0  3
+#> 5      1.75 -0.363  0  0  3
+#> 6      1.81 -0.082  0  0  3
+#> 7      2.39 -0.228  0  0  3
+#> 8      2.58 -0.389  0  0  3
+#> 9      3.29 -0.467  0  0  3
+#> 10     4.53 -0.409  0  0  3
 
 # rate of observed events
 mean(dat$survival_data$event) 
-#> [1] 0.607
+#> [1] 0.601
 
 # mean event time
 mean(subset(dat$survival_data, event)$y)
-#> [1] 3.94
+#> [1] 3.98
 
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 #>    0%   25%   50%   75%  100% 
-#> 0.033 2.287 3.648 5.401 9.767
+#> 0.033 2.332 3.725 5.442 9.767
 
 # fraction of observed markers per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
-#> [1] 5.1
+#> [1] 5.14
 ```
 
 Fit linear mixed model and see that we get estimates which are close to
@@ -356,23 +356,23 @@ local({
 })
 #> $gamma
 #>       [,1]
-#> [1,] 0.140
-#> [2,] 0.342
+#> [1,] 0.145
+#> [2,] 0.356
 #> 
 #> $B
 #>       [,1]
-#> [1,] 0.242
-#> [2,] 0.306
-#> [3,] 0.482
-#> [4,] 0.726
-#> [5,] 0.854
+#> [1,] 0.226
+#> [2,] 0.294
+#> [3,] 0.475
+#> [4,] 0.768
+#> [5,] 0.837
 #> 
 #> $Psi
 #>        [,1]   [,2]   [,3]   [,4]
-#> [1,]  0.967  0.184 -1.293 -0.393
-#> [2,]  0.184  1.237  0.340 -0.740
-#> [3,] -1.293  0.340  3.557  0.199
-#> [4,] -0.393 -0.740  0.199  1.642
+#> [1,]  1.006  0.190 -1.371 -0.423
+#> [2,]  0.190  1.256  0.357 -0.792
+#> [3,] -1.371  0.357  3.748  0.214
+#> [4,] -0.423 -0.792  0.214  1.691
 #> 
 #> $Sigma
 #>        [,1]
@@ -440,24 +440,24 @@ local({
 #> Call:
 #> coxph(formula = sformula, data = tdat)
 #> 
-#>   n= 10199, number of events= 1213 
+#>   n= 10284, number of events= 1202 
 #> 
 #>       coef exp(coef) se(coef)      z Pr(>|z|)    
-#> Z1 -0.1881    0.8285   0.0575  -3.27   0.0011 ** 
-#> Z2 -0.3394    0.7122   0.0578  -5.87  4.2e-09 ***
-#> Y1 -0.6350    0.5299   0.0382 -16.64  < 2e-16 ***
+#> Z1 -0.1528    0.8583   0.0578  -2.64   0.0082 ** 
+#> Z2 -0.3032    0.7385   0.0580  -5.23  1.7e-07 ***
+#> Y1 -0.6953    0.4989   0.0379 -18.35  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1     0.829       1.21     0.740     0.927
-#> Z2     0.712       1.40     0.636     0.798
-#> Y1     0.530       1.89     0.492     0.571
+#> Z1     0.858       1.17     0.766     0.961
+#> Z2     0.738       1.35     0.659     0.827
+#> Y1     0.499       2.00     0.463     0.537
 #> 
-#> Concordance= 0.638  (se = 0.008 )
-#> Likelihood ratio test= 315  on 3 df,   p=<2e-16
-#> Wald test            = 316  on 3 df,   p=<2e-16
-#> Score (logrank) test = 309  on 3 df,   p=<2e-16
+#> Concordance= 0.648  (se = 0.008 )
+#> Likelihood ratio test= 361  on 3 df,   p=<2e-16
+#> Wald test            = 362  on 3 df,   p=<2e-16
+#> Score (logrank) test = 352  on 3 df,   p=<2e-16
 ```
 
 Compare with the true value
