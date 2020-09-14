@@ -1,8 +1,11 @@
 
-# SimSurvNMarker (Simulate Survival time and Markers)
+# SimSurvNMarker: Simulate Survival time and Markers
 
 [![Build Status on
 Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
+[![](https://www.r-pkg.org/badges/version/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
+[![CRAN RStudio mirror
+downloads](http://cranlogs.r-pkg.org/badges/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
 
 The `SimSurvNMarker` package reasonably fast simulates from a joint
 survival and marker model. The package uses a combination of
@@ -137,11 +140,14 @@ polynomial is used and ![\\vec\\alpha =
 x\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20x_i
 "\\vec x_i") and ![\\vec
 z\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20z_i
-"\\vec z_i") are individual specific known covariates.
+"\\vec z_i") are individual specific known time-invariant covariates.
 
-We provide an example of how to use the package here and in
+We provide an example of how to use the package here, in
 [inst/test-data](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data)
-directory on Github. The former examples includes
+directory on Github, and at
+[rpubs.com/boennecd/SimSurvNMarker-ex](https://rpubs.com/boennecd/SimSurvNMarker-ex)
+where we show that we simulate from the correct model by using a
+simulation study. The former examples includes
 
   - using [polynomials](#example-polynomial) as the basis functions.
   - using [polynomials with derivatives in the log
@@ -157,20 +163,20 @@ The purpose/goal of this package is to
 
 ## Installation
 
-The package can be installed from Github using the`remotes` package.
+The package can be installed from Github using the`remotes` package:
 
 ``` r
 stopifnot(require(remotes)) # needs the remotes package
 install_github("boennecd/SimSurvNMarker")
 ```
 
-It can also be installed from CRAN using `install.packages`.
+It can also be installed from CRAN using `install.packages`:
 
 ``` r
 install.packages("SimSurvNMarker")
 ```
 
-## Example: Polynomial
+## Example with Polynomials
 
 We start with an example where we use polynomials as the basis
 functions. First, we assign the polynomial functions we will use.
@@ -195,10 +201,10 @@ b](https://render.githubusercontent.com/render/math?math=%5Cvec%20b
 "\\vec b") and ![\\vec
 g](https://render.githubusercontent.com/render/math?math=%5Cvec%20g
 "\\vec g"), and a second order random polynomial for the random term,
-![U\_i \\vec
-m(s)](https://render.githubusercontent.com/render/math?math=U_i%20%5Cvec%20m%28s%29
-"U_i \\vec m(s)"), in the latent mean function. We choose the following
-parameters for the baseline hazard.
+![U\_i^\\top \\vec
+m(s)](https://render.githubusercontent.com/render/math?math=U_i%5E%5Ctop%20%5Cvec%20m%28s%29
+"U_i^\\top \\vec m(s)"), in the latent mean function. We choose the
+following parameters for the baseline hazard.
 
 ``` r
 library(SimSurvNMarker)
@@ -216,6 +222,7 @@ par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
 plot(function(x) exp(drop(b_func(x) %*% omega) + delta),
      xlim = c(0, 2), ylim = c(0, 1.5), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i",  yaxs = "i", bty = "l")
+grid()
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -223,8 +230,7 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
      xlim = c(1e-4, 2.5),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
      yaxs = "i", bty = "l", ylim = c(0, 1.01))
-abline(h = .75, lty = 3)
-abline(h = .25, lty = 3)
+grid()
 ```
 
 <img src="man/figures/README-poly_base_haz-1.png" width="100%" />
@@ -232,13 +238,14 @@ abline(h = .25, lty = 3)
 Then we set the following parameters for the random effect, ![\\vec
 U\_i](https://render.githubusercontent.com/render/math?math=%5Cvec%20U_i
 "\\vec U_i"), and the parameters for the marker process. We also
-simulate a number of latent marker mean curves and observed values and
-plot the result. The dashed curve is the mean, ![\\vec\\mu\_i(s,
+simulate a number of latent markers’ mean curves and observed marker
+values and plot the result. The dashed curve is the mean,
+![\\vec\\mu\_i(s,
 \\vec 0)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%200%29
 "\\vec\\mu_i(s, \\vec 0)"), the fully drawn curve is the individual
 specific curve, ![\\vec\\mu\_i(s, \\vec
 U\_i)](https://render.githubusercontent.com/render/math?math=%5Cvec%5Cmu_i%28s%2C%20%5Cvec%20U_i%29
-"\\vec\\mu_i(s, \\vec U_i)"), the shaded areas are pointwise 95%
+"\\vec\\mu_i(s, \\vec U_i)"), the shaded areas are a pointwise 95%
 interval for each mean curve, and the points are observed markers,
 ![\\vec
 y\_{ij}](https://render.githubusercontent.com/render/math?math=%5Cvec%20y_%7Bij%7D
@@ -349,6 +356,7 @@ sim_surv_curves <- function(sig, Psi, delta, omega, alpha, B, m_func,
           col = rgb(0, 0, 0, .1), xaxs = "i", bty = "l", yaxs = "i", 
           ylim = c(0, max(hz, na.rm = TRUE)), xlab = "time", 
           ylab = "Hazard")
+  grid()
 
   # survival functions
   ys <- apply(Us, 3L, surv_func_joint,
@@ -359,8 +367,7 @@ sim_surv_curves <- function(sig, Psi, delta, omega, alpha, B, m_func,
   matplot(tis, ys, lty = 1, type = "l", col = rgb(0, 0, 0, .1),
           xaxs = "i", bty = "l", yaxs = "i", ylim = c(0, 1),
           xlab = "time", ylab = "Survival probability")
-  abline(h = .75, lty = 3)
-  abline(h = .25, lty = 3)
+  grid()
 }
 
 set.seed(1)
@@ -416,7 +423,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.472   0.021   0.491
+#>   0.474   0.000   0.474
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -453,7 +460,6 @@ linear mixed models for the markers as follows.
 
 ``` r
 library(lme4)
-#> Loading required package: Matrix
 
 # estimate the linear mixed model (skip this if you want and look at the 
 # estimates in the end)
@@ -592,8 +598,8 @@ sig
 #> [2,] 0.00 0.09
 ```
 
-Fit Cox model with only the observed markers (likely biased but gives us
-an idea about whether we are using the correct model).
+We then fit a Cox model with only the observed markers (likely biased
+but gives us an idea about whether we are using the correct model).
 
 ``` r
 local({
@@ -703,7 +709,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.600   0.028   0.627
+#>   0.552   0.032   0.583
 ```
 
 The first entries of the new data looks as follows.
@@ -734,7 +740,7 @@ head(dat$marker_data, 10)
 #> 10   0.4253 2.098 -0.124  1  0  1  2
 ```
 
-## Example: Natural Cubic Splines
+## Example with Natural Cubic Splines
 
 In this section, we will use natural cubic splines for the time-varying
 basis functions. We start by assigning all the variables that we will
@@ -744,7 +750,7 @@ pass to the functions in the package.
 # quadrature nodes
 gl_dat <- get_gl_rule(30L)
 
-# spline functions
+# knots for the spline functions
 b_ks <- seq(log(1), log(10), length.out = 4)
 m_ks <- seq(0, 10, length.out = 3)
 g_ks <- m_ks
@@ -777,6 +783,7 @@ gamma <- numeric()
 ```
 
 ``` r
+# spline functions
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
@@ -792,6 +799,7 @@ par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
 plot(function(x) exp(drop(b_func(x) %*% omega)),
      xlim = c(1e-8, 10), ylim = c(0, .61), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i", bty = "l")
+grid()
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -799,8 +807,7 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
      xlim = c(1e-4, 10),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
      yaxs = "i", bty = "l", ylim = c(0, 1.01))
-abline(h = .75, lty = 3)
-abline(h = .25, lty = 3)
+grid()
 ```
 
 <img src="man/figures/README-plot_wo_marker-1.png" width="100%" />
@@ -840,7 +847,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.585   0.014   0.598
+#>   0.585   0.039   0.622
 ```
 
 Finally, we show a few of the first rows along with some summary

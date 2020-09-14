@@ -15,8 +15,10 @@ knitr::opts_chunk$set(
 options(digits = 3)
 ```
 
-# SimSurvNMarker (Simulate Survival time and Markers)
+# SimSurvNMarker: Simulate Survival time and Markers
 [![Build Status on Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
+[![](https://www.r-pkg.org/badges/version/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
 
 The `SimSurvNMarker` package reasonably fast simulates from a joint survival 
 and marker model. The package uses a combination of Gauss–Legendre 
@@ -73,17 +75,20 @@ a B-spline, or a natural cubic spline. The expansion for the baseline
 hazard, $\vec b(t)$, is typically made on $\log t$ instead of $t$. 
 One reason is that the model reduces to a Weibull distribution
 when a first polynomial is used and $\vec\alpha = \vec 0$. $\vec x_i$ and 
-$\vec z_i$ are individual specific known covariates.
+$\vec z_i$ are individual specific known time-invariant covariates.
 
-We provide an example of how to use the package here and in 
+We provide an example of how to use the package here, in 
 [inst/test-data](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data) 
-directory on Github. The former examples includes
+directory on Github, and at 
+[rpubs.com/boennecd/SimSurvNMarker-ex](https://rpubs.com/boennecd/SimSurvNMarker-ex)
+where we show that we simulate from the correct model by using a 
+simulation study. The former examples includes
 
  - using [polynomials](#example-polynomial) as the basis functions.
  - using [polynomials with derivatives in the log hazard](#using-derivatives) as the basis functions.
  - using [natural cubic splines](#example-natural-cubic-splines) as the basis functions.
 
-The purpose/goal of this package is to 
+The purpose/goal of this package is to
 
  - allow the user to specify all components in R including the basis 
    functions. 
@@ -91,20 +96,20 @@ The purpose/goal of this package is to
 
 ## Installation
 
-The package can be installed from Github using the`remotes` package.
+The package can be installed from Github using the`remotes` package:
 
 ```{r how_to_install, eval = FALSE}
 stopifnot(require(remotes)) # needs the remotes package
 install_github("boennecd/SimSurvNMarker")
 ```
 
-It can also be installed from CRAN using `install.packages`. 
+It can also be installed from CRAN using `install.packages`: 
 
 ```{r CRAN_how_to_install, eval = FALSE}
 install.packages("SimSurvNMarker")
 ```
 
-## Example: Polynomial
+## Example with Polynomials
 We start with an example where we use polynomials as the basis functions. 
 First, we assign the polynomial functions we will use. 
 
@@ -125,7 +130,7 @@ m_func <- function(x){
 
 We use a third order polynomial for the two fixed terms, $\vec b$ and 
 $\vec g$, and a second order random polynomial for the random term, 
-$U_i \vec m(s)$, in the latent mean function. We choose the 
+$U_i^\top \vec m(s)$, in the latent mean function. We choose the 
 following parameters for the baseline hazard.
 
 ```{r attach_pkg}
@@ -144,6 +149,7 @@ par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
 plot(function(x) exp(drop(b_func(x) %*% omega) + delta),
      xlim = c(0, 2), ylim = c(0, 1.5), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i",  yaxs = "i", bty = "l")
+grid()
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -151,17 +157,16 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
      xlim = c(1e-4, 2.5),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
      yaxs = "i", bty = "l", ylim = c(0, 1.01))
-abline(h = .75, lty = 3)
-abline(h = .25, lty = 3)
+grid()
 ```
 
 Then we set the following parameters for the random effect, $\vec U_i$, and
 the parameters for the marker process. We also simulate a number of latent
-marker mean curves and observed values and plot the result. 
+markers' mean curves and observed marker values and plot the result. 
 The dashed curve is the mean, $\vec\mu_i(s, \vec 0)$, the 
 fully drawn curve is the individual specific curve, 
 $\vec\mu_i(s, \vec U_i)$,
-the shaded areas are pointwise 95% interval for each mean curve, and the 
+the shaded areas are a pointwise 95% interval for each mean curve, and the 
 points are observed markers, $\vec y_{ij}$.
 
 ```{r poly_marker_setup, fig.height=9, fig.width=9}
@@ -265,6 +270,7 @@ sim_surv_curves <- function(sig, Psi, delta, omega, alpha, B, m_func,
           col = rgb(0, 0, 0, .1), xaxs = "i", bty = "l", yaxs = "i", 
           ylim = c(0, max(hz, na.rm = TRUE)), xlab = "time", 
           ylab = "Hazard")
+  grid()
 
   # survival functions
   ys <- apply(Us, 3L, surv_func_joint,
@@ -275,8 +281,7 @@ sim_surv_curves <- function(sig, Psi, delta, omega, alpha, B, m_func,
   matplot(tis, ys, lty = 1, type = "l", col = rgb(0, 0, 0, .1),
           xaxs = "i", bty = "l", yaxs = "i", ylim = c(0, 1),
           xlab = "time", ylab = "Survival probability")
-  abline(h = .75, lty = 3)
-  abline(h = .25, lty = 3)
+  grid()
 }
 
 set.seed(1)
@@ -435,7 +440,7 @@ Psi
 sig
 ```
 
-Fit Cox model with only the observed markers (likely biased but gives us an 
+We then fit a Cox model with only the observed markers (likely biased but gives us an 
 idea about whether we are using the correct model).
 
 ```{r poly_est_coxph}
@@ -529,7 +534,7 @@ head(dat$marker_data, 10)
 rm(list = ls()[!ls() %in% c("sim_surv_curves", "show_mark_mean")])
 ```
 
-## Example: Natural Cubic Splines
+## Example with Natural Cubic Splines
 In this section, we will use natural cubic splines for the time-varying 
 basis functions. We start by assigning all the variables that we will pass 
 to the functions in the package.
@@ -538,7 +543,7 @@ to the functions in the package.
 # quadrature nodes
 gl_dat <- get_gl_rule(30L)
 
-# spline functions
+# knots for the spline functions
 b_ks <- seq(log(1), log(10), length.out = 4)
 m_ks <- seq(0, 10, length.out = 3)
 g_ks <- m_ks
@@ -571,6 +576,7 @@ gamma <- numeric()
 ```
 
 ```{r get_splines}
+# spline functions
 b_func <- get_ns_spline(b_ks, do_log = TRUE)
 m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
@@ -586,6 +592,7 @@ par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
 plot(function(x) exp(drop(b_func(x) %*% omega)),
      xlim = c(1e-8, 10), ylim = c(0, .61), xlab = "Time",
      ylab = "Hazard (no marker)", xaxs = "i", bty = "l")
+grid()
 
 # survival function without marker
 plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
@@ -593,8 +600,7 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
      xlim = c(1e-4, 10),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
      yaxs = "i", bty = "l", ylim = c(0, 1.01))
-abline(h = .75, lty = 3)
-abline(h = .25, lty = 3)
+grid()
 ```
 
 Next, we simulate individual specific markers. Each plot is for a given 
