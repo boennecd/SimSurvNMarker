@@ -108,6 +108,18 @@ public:
 #else
       { }
 #endif
+    // enforce positive diagonal entries of R and hence unique Q matrix
+    {
+      size_t const nr = qd.n_rows,
+                   nc = rd.n_cols;
+      for(size_t i = 0; i < nc; ++i)
+        if(rd.at(i, i) < 0){
+          double * const qc = qd.colptr(i);
+          for(size_t j = 0; j < nr; ++j)
+            qc[j] *= -1;
+        }
+    }
+
     inplace_trans(qd);
     return qd;
   })();

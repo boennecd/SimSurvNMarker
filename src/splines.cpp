@@ -239,10 +239,8 @@ void bs::operator()(vec &out, double const x, const int ders) const {
       add_term(2);
       add_term(3, delta);
 
-    } else if (ders==3) {
+    } else if (ders == 3)
       add_term(3);
-
-    }
 
     return;
   }

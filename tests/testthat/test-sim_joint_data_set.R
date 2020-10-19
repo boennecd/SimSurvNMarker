@@ -1,6 +1,5 @@
 context("Testing 'sim_joint_data_set'")
 
-
 for(f_name in c("no-B", "no-delta", "no-gamma", "one-marker", "w-all")){
   test_that(paste0("'", f_name, "' settings gives previous results"), {
     r_f_name_org <- file.path("test-data", paste0(f_name, ".R"))
@@ -34,6 +33,26 @@ for(f_name in c("no-B", "no-delta", "no-gamma", "one-marker", "w-all")){
       b_func <- get_ns_spline(b_ks, do_log = TRUE)
       m_func <- get_ns_spline(m_ks, do_log = FALSE)
       g_func <- get_ns_spline(g_ks, do_log = FALSE)
+
+      # we have to check that we get the same as w/ ns(). Otherwise, the
+      # test results are not valid.
+      tmps <- seq(1, 10, length.out = 15)
+
+      if(length(b_ks) > 0)
+        skip_if(!isTRUE(all.equal(unclass(ns(
+          log(tmps), knots = b_ks[-c(1, length(b_ks))],
+          Boundary.knots   = b_ks[ c(1, length(b_ks))], intercept = TRUE)),
+          b_func(tmps), check.attributes = FALSE)))
+      if(length(m_ks) > 0)
+        skip_if(!isTRUE(all.equal(unclass(ns(
+          tmps, knots      = m_ks[-c(1, length(m_ks))],
+          Boundary.knots   = m_ks[ c(1, length(m_ks))], intercept = TRUE)),
+          m_func(tmps), check.attributes = FALSE)))
+      if(length(g_ks) > 0)
+        skip_if(!isTRUE(all.equal(unclass(ns(
+          tmps, knots      = g_ks[-c(1, length(g_ks))],
+          Boundary.knots   = g_ks[ c(1, length(g_ks))], intercept = TRUE)),
+          g_func(tmps), check.attributes = FALSE)))
 
       gl_dat <- get_gl_rule(30L)
 

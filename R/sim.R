@@ -2,10 +2,19 @@
 
 #' Faster Pointwise Function than ns
 #'
-#' @param knots numeric vector with boundary and interior knots.
+#' @param knots sorted numeric vector with boundary and interior knots.
 #' @param intercept logical for whether to include an intercept.
 #' @param do_log logical for whether to evaluate the spline at \code{log(x)}
 #'               or \code{x}.
+#'
+#' @description
+#' Creates a function which can evaluate a natural cubic spline like
+#' \code{\link{ns}}.
+#'
+#' The result may differ between different BLAS and LAPACK
+#' implementations as the QR decomposition is not unique. However, the column space
+#' of the returned matrix will always be the same regardless of the BLAS and LAPACK
+#' implementation.
 #'
 #' @examples
 #' # compare with splines
@@ -16,18 +25,19 @@
 #' iks <- 2:4
 #'
 #' # we get the same
-#' stopifnot(isTRUE(all.equal(
-#'   unclass(ns(xs, knots = iks, Boundary.knots = bks, intercept = TRUE)),
-#'   get_ns_spline(knots = sort(c(iks, bks)), intercept = TRUE,
-#'                 do_log = FALSE)(xs),
-#'   check.attributes = FALSE)))
+#' if(require(Matrix)){
+#'   r1 <- unclass(ns(xs, knots = iks, Boundary.knots = bks, intercept = TRUE))
+#'   r2 <- get_ns_spline(knots = sort(c(iks, bks)), intercept = TRUE,
+#'                       do_log = FALSE)(xs)
 #'
-#' stopifnot(isTRUE(all.equal(
-#'   unclass(ns(log(xs), knots = log(iks), Boundary.knots = log(bks),
-#'              intercept = TRUE)),
-#'   get_ns_spline(knots = log(sort(c(iks, bks))), intercept = TRUE,
-#'                 do_log = TRUE)(xs),
-#'   check.attributes = FALSE)))
+#'   cat("Rank is correct:      ", rankMatrix(cbind(r1, r2)) == NCOL(r1), "\n")
+#'
+#'   r1 <- unclass(ns(log(xs), knots = log(iks), Boundary.knots = log(bks),
+#'                    intercept = TRUE))
+#'   r2 <- get_ns_spline(knots = log(sort(c(iks, bks))), intercept = TRUE,
+#'                       do_log = TRUE)(xs)
+#'   cat("Rank is correct (log):", rankMatrix(cbind(r1, r2)) == NCOL(r1), "\n")
+#' }
 #'
 #' # the latter is faster
 #' system.time(
