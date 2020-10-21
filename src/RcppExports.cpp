@@ -40,7 +40,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // glq
-Rcpp::NumericVector glq(SEXP lb, SEXP ub, SEXP nodes, SEXP weights, SEXP f, SEXP rho);
+SEXP glq(SEXP lb, SEXP ub, SEXP nodes, SEXP weights, SEXP f, SEXP rho);
 RcppExport SEXP _SimSurvNMarker_glq(SEXP lbSEXP, SEXP ubSEXP, SEXP nodesSEXP, SEXP weightsSEXP, SEXP fSEXP, SEXP rhoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

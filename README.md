@@ -423,7 +423,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.474   0.000   0.474
+#>   0.495   0.015   0.510
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -460,6 +460,7 @@ linear mixed models for the markers as follows.
 
 ``` r
 library(lme4)
+#> Loading required package: Matrix
 
 # estimate the linear mixed model (skip this if you want and look at the 
 # estimates in the end)
@@ -544,10 +545,10 @@ local({
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
 #> $gamma
-#>         [,1]      [,2]
-#> [1,]  0.1684 -0.384080
-#> [2,]  0.5224  0.000604
-#> [3,] -0.0767  0.219849
+#>         [,1]     [,2]
+#> [1,]  0.1684 -0.38410
+#> [2,]  0.5224  0.00064
+#> [3,] -0.0767  0.21982
 #> 
 #> $B
 #>        [,1]  [,2]
@@ -556,13 +557,13 @@ local({
 #> [3,] -0.466 0.893
 #> 
 #> $Psi
-#>         [,1]    [,2]     [,3]     [,4]    [,5]    [,6]
-#> [1,]  0.5245  0.0688 -0.16087  0.12002 -0.0286  0.1126
-#> [2,]  0.0688  0.3572 -0.24086 -0.03221 -0.0451  0.2572
-#> [3,] -0.1609 -0.2409  0.25861 -0.00229  0.0464 -0.1342
-#> [4,]  0.1200 -0.0322 -0.00229  0.16050 -0.0057  0.0469
-#> [5,] -0.0286 -0.0451  0.04644 -0.00570  0.0533 -0.0833
-#> [6,]  0.1126  0.2572 -0.13422  0.04693 -0.0833  0.4166
+#>         [,1]    [,2]     [,3]     [,4]     [,5]    [,6]
+#> [1,]  0.5252  0.0687 -0.16109  0.12032 -0.02847  0.1124
+#> [2,]  0.0687  0.3571 -0.24076 -0.03233 -0.04515  0.2574
+#> [3,] -0.1611 -0.2408  0.25862 -0.00231  0.04656 -0.1342
+#> [4,]  0.1203 -0.0323 -0.00231  0.16028 -0.00576  0.0469
+#> [5,] -0.0285 -0.0451  0.04656 -0.00576  0.05342 -0.0833
+#> [6,]  0.1124  0.2574 -0.13415  0.04690 -0.08328  0.4167
 #> 
 #> $Sigma
 #>       [,1]  [,2]
@@ -709,7 +710,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.552   0.032   0.583
+#>   0.554   0.038   0.592
 ```
 
 The first entries of the new data looks as follows.
@@ -847,7 +848,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.585   0.039   0.622
+#>   0.568   0.039   0.606
 ```
 
 Finally, we show a few of the first rows along with some summary

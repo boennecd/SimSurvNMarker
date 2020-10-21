@@ -2,56 +2,65 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+namespace {
+constexpr bool const do_check = false;
+}
+
 /* Performs Gauss–Legendre quadrature */
 // [[Rcpp::export(rng = false)]]
-Rcpp::NumericVector glq(
+SEXP glq(
     SEXP lb, SEXP ub, SEXP nodes, SEXP weights, SEXP f, SEXP rho){
-  using Rcpp::NumericVector;
-
   R_len_t const n_out = Rf_length(lb),
               n_nodes = Rf_length(weights);
-  if(Rf_length(ub) != n_out)
-    throw std::invalid_argument("lb length != ub length");
-  if(Rf_length(weights) != n_nodes)
-    throw std::invalid_argument("nodes length != weights length");
-  if(!Rf_isFunction(f))
-    throw std::invalid_argument("f is not a function");
-  /* should check that rho is an env...*/
+  if(do_check){
+    if(TYPEOF(lb) != REALSXP or TYPEOF(ub) != REALSXP or
+         TYPEOF(nodes) != REALSXP or TYPEOF(weights) != REALSXP)
+      throw std::invalid_argument("some inputs are not numeric");
+    if(Rf_length(ub) != n_out)
+      throw std::invalid_argument("lb length != ub length");
+    if(Rf_length(weights) != n_nodes)
+      throw std::invalid_argument("nodes length != weights length");
+    if(!Rf_isFunction(f))
+      throw std::invalid_argument("f is not a function");
+    if(!Rf_isEnvironment(rho))
+      throw std::invalid_argument("rho is not an environment");
+  }
 
-  NumericVector out(n_out);
-  SEXP R_fcall = PROTECT(Rf_lang2(f, R_NilValue)),
-    node_arg   = PROTECT(Rf_allocVector(REALSXP, n_nodes));
+  SEXP out     = PROTECT(Rf_allocVector(REALSXP, n_out)),
+       R_fcall = PROTECT(Rf_lang2(f, R_NilValue)),
+      node_arg = PROTECT(Rf_allocVector(REALSXP, n_nodes));
 
   double const * const nodes_start   = REAL(nodes),
                * const weights_start = REAL(weights),
-               * const nodes_end     = nodes_start + n_nodes,
-               * const weights_end   = weights_start + n_nodes;
-  double * const arg_start = REAL(node_arg);
+               *       ubp = REAL(ub),
+               *       lbp = REAL(lb);
+  double * const arg_start = REAL(node_arg),
+         *       o_i       = REAL(out);
 
-  double const *ub_i = REAL(ub),
-               *lb_i = REAL(lb);
-  for(R_len_t i = 0; i < n_out; ++i, ++ub_i, ++lb_i){
-    double &o_i = out[i];
-    double const d1 = (*ub_i - *lb_i) / 2.,
-                 d2 = (*ub_i + *lb_i) / 2.;
+  for(R_len_t i = 0; i < n_out; ++i, ++ubp, ++lbp, ++o_i){
+    double const d1 = (*ubp - *lbp) / 2.,
+                 d2 = (*ubp + *lbp) / 2.;
 
-    o_i = 0.;
-    double const *n = nodes_start;
+    *o_i = 0.;
     double * a = arg_start;
-    for(; n != nodes_end; ++n, ++a)
-      *a = d1 * *n + d2;
+    double const * n = nodes_start;
+    for(R_len_t j = 0; j < n_nodes; ++j)
+      *a++ = d1 * *n++ + d2;
     SETCADR(R_fcall, node_arg);
     SEXP ans = Rf_eval(R_fcall, rho);
+    if(do_check)
+      if(TYPEOF(ans) != REALSXP or Rf_length(ans) != n_nodes)
+        throw std::runtime_error("invalid output of f");
 
     double const * v = REAL(ans),
                  * w = weights_start;
-    for(; w != weights_end; ++w, ++v)
-      o_i += *w * *v;
+    for(R_len_t j = 0; j < n_nodes; ++j)
+      *o_i += *w++ * *v++;
 
-    o_i *= d1;
+    *o_i *= d1;
   }
 
-  UNPROTECT(2);
+  UNPROTECT(3);
 
   return out;
 }

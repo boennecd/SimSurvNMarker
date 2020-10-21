@@ -1,4 +1,4 @@
-.time_eps <- 1e-16
+.time_eps <- .Machine$double.eps^3
 
 #' Faster Pointwise Function than ns
 #'
@@ -75,18 +75,6 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
       matrix(0, nrow = length(x), ncol = 0L)
   })
 
-.surv_func_inner <- function(ti, omega, b_func, gl_dat){
-  lb <- .time_eps
-  if(ti < lb)
-    return(0)
-  ub <- ti
-
-
-  nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
-  f <- exp(drop(b_func(nodes) %*% omega))
-  -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
-}
-
 #' Evaluates the Survival Function without a Marker
 #'
 #' @description
@@ -130,9 +118,14 @@ get_ns_spline <- function(knots, intercept = TRUE, do_log = TRUE)
 #' @export
 eval_surv_base_fun <- function(
   ti, omega, b_func, gl_dat = get_gl_rule(30L), delta = NULL){
-  cum_haz_fac <- vapply(
-    ti, .surv_func_inner, FUN.VALUE = numeric(1L),
-    omega = omega, b_func = b_func, gl_dat = gl_dat)
+  func <- function(x)
+    -exp(drop(b_func(x) %*% omega))
+
+  is_ok <- ti > .time_eps
+  cum_haz_fac <- numeric(length(ti))
+  cum_haz_fac[is_ok] <- glq(
+    lb = rep(.time_eps, sum(is_ok)), ub = ti[is_ok], nodes = gl_dat$node,
+    weights = gl_dat$weight, rho = environment(), f = func)
 
   if(length(delta) > 0)
     exp(exp(delta) * cum_haz_fac)
@@ -193,13 +186,17 @@ eval_surv_base_fun <- function(
 #'
 #' @export
 eval_marker <- function(ti, B, g_func, U, m_func, offset){
-  out <- matrix(0., max(NCOL(B), NCOL(U), 1L), length(ti))
+  nc <- length(ti)
+  out <-
+    if(length(offset) == 0L)
+      matrix(0., max(NCOL(B), NCOL(U), 1L), nc)
+    else
+      matrix(rep.int(offset, nc), max(NCOL(B), NCOL(U), 1L), nc)
+
   if(length(B) > 0)
     eval_marker_cpp(B = B, m = g_func(ti), Sout = out)
   if(length(U) > 0)
     eval_marker_cpp(B = U, m = m_func(ti), Sout = out)
-  if(length(offset) > 0)
-    out <- out + offset
 
   drop(out)
 }
@@ -326,22 +323,6 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
   list(obs_time = obs_time, y_obs = y_obs)
 }
 
-.surv_func_joint_inner <- function(ti, B, U, omega, alpha, b_func, m_func,
-                                   g_func, gl_dat){
-  lb <- .time_eps
-  if(ti < lb)
-    return(0)
-  ub <- ti
-
-  nodes <- (ub - lb) / 2 * gl_dat$node + (ub + lb) / 2
-  f <- exp(
-    drop(b_func(nodes) %*% omega +
-           drop(alpha %*% eval_marker(
-             ti = nodes, B = B, U = U, m_func = m_func, g_func = g_func,
-             offset = NULL))))
-  -(ub - lb) / 2 * drop(gl_dat$weight %*% f)
-}
-
 #' Evaluates the Conditional Survival Function Given the Random Effects
 #'
 #' @description
@@ -404,10 +385,18 @@ sim_marker <- function(B, U, sigma_chol, r_n_marker, r_obs_time, m_func,
 #' @export
 surv_func_joint <- function(ti, B, U, omega, delta, alpha, b_func, m_func,
                             gl_dat = get_gl_rule(30L), g_func, offset){
-  cum_haz_fac <- vapply(
-    ti, .surv_func_joint_inner, FUN.VALUE = numeric(1L),
-    B = B, U = U, omega = omega, alpha = alpha, b_func = b_func,
-    m_func = m_func, g_func = g_func, gl_dat = gl_dat)
+  func <- function(x)
+    -exp(
+      drop(b_func(x) %*% omega +
+             drop(alpha %*% eval_marker(
+               ti = x, B = B, U = U, m_func = m_func, g_func = g_func,
+               offset = NULL))))
+
+  is_ok <- ti > .time_eps
+  cum_haz_fac <- numeric(length(ti))
+  cum_haz_fac[is_ok] <- glq(
+    lb = rep(.time_eps, sum(is_ok)), ub = ti[is_ok], nodes = gl_dat$node,
+    weights = gl_dat$weight, rho = environment(), f = func)
 
   if(length(delta) > 0)
     cum_haz_fac <- cum_haz_fac * exp(delta)
