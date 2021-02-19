@@ -12,3 +12,4 @@
 ^ref\.bib
 ^cran-comments\.md$
 ^CRAN-RELEASE$
+^\.github$

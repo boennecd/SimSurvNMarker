@@ -1,8 +1,7 @@
 
 # SimSurvNMarker: Simulate Survival time and Markers
 
-[![Build Status on
-Travis](https://travis-ci.org/boennecd/SimSurvNMarker.svg?branch=master,osx)](https://travis-ci.org/boennecd/SimSurvNMarker)
+[![R-CMD-check](https://github.com/boennecd/SimSurvNMarker/workflows/R-CMD-check/badge.svg)](https://github.com/boennecd/SimSurvNMarker/actions)
 [![](https://www.r-pkg.org/badges/version/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
 [![CRAN RStudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
@@ -11,8 +10,7 @@ The `SimSurvNMarker` package reasonably fast simulates from a joint
 survival and marker model. The package uses a combination of
 Gauss–Legendre quadrature and one dimensional root finding to simulate
 the event times as described by Crowther and Lambert (2013).
-Specifically, the package can simulate from the
-model
+Specifically, the package can simulate from the model
 
 <!-- $$\begin{align*} -->
 
@@ -423,7 +421,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.495   0.015   0.510
+#>   0.464   0.047   0.511
 ```
 
 The first entries of the survival data and the observed markers looks as
@@ -460,7 +458,6 @@ linear mixed models for the markers as follows.
 
 ``` r
 library(lme4)
-#> Loading required package: Matrix
 
 # estimate the linear mixed model (skip this if you want and look at the 
 # estimates in the end)
@@ -545,10 +542,10 @@ local({
   list(gamma = gamma, B = B, Psi = Psi, Sigma = Sigma)
 })
 #> $gamma
-#>         [,1]     [,2]
-#> [1,]  0.1684 -0.38410
-#> [2,]  0.5224  0.00064
-#> [3,] -0.0767  0.21982
+#>         [,1]      [,2]
+#> [1,]  0.1684 -0.384104
+#> [2,]  0.5224  0.000604
+#> [3,] -0.0767  0.219848
 #> 
 #> $B
 #>        [,1]  [,2]
@@ -557,13 +554,13 @@ local({
 #> [3,] -0.466 0.893
 #> 
 #> $Psi
-#>         [,1]    [,2]     [,3]     [,4]     [,5]    [,6]
-#> [1,]  0.5252  0.0687 -0.16109  0.12032 -0.02847  0.1124
-#> [2,]  0.0687  0.3571 -0.24076 -0.03233 -0.04515  0.2574
-#> [3,] -0.1611 -0.2408  0.25862 -0.00231  0.04656 -0.1342
-#> [4,]  0.1203 -0.0323 -0.00231  0.16028 -0.00576  0.0469
-#> [5,] -0.0285 -0.0451  0.04656 -0.00576  0.05342 -0.0833
-#> [6,]  0.1124  0.2574 -0.13415  0.04690 -0.08328  0.4167
+#>         [,1]    [,2]     [,3]     [,4]    [,5]    [,6]
+#> [1,]  0.5247  0.0687 -0.16088  0.12023 -0.0285  0.1125
+#> [2,]  0.0687  0.3572 -0.24080 -0.03208 -0.0450  0.2571
+#> [3,] -0.1609 -0.2408  0.25861 -0.00238  0.0464 -0.1342
+#> [4,]  0.1202 -0.0321 -0.00238  0.16060 -0.0057  0.0470
+#> [5,] -0.0285 -0.0450  0.04644 -0.00570  0.0533 -0.0832
+#> [6,]  0.1125  0.2571 -0.13418  0.04703 -0.0832  0.4165
 #> 
 #> $Sigma
 #>       [,1]  [,2]
@@ -710,7 +707,7 @@ system.time(dat <- sim_joint_data_set(
   m_func_surv = m_func_surv, g_func_surv = g_func_surv, 
   use_fixed_latent = FALSE))
 #>    user  system elapsed 
-#>   0.554   0.038   0.592
+#>   0.567   0.035   0.601
 ```
 
 The first entries of the new data looks as follows.
@@ -848,7 +845,7 @@ system.time(dat <- sim_joint_data_set(
   r_right_cens = r_right_cens, r_n_marker = r_n_marker, 
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 #>    user  system elapsed 
-#>   0.568   0.039   0.606
+#>   0.593   0.039   0.632
 ```
 
 Finally, we show a few of the first rows along with some summary

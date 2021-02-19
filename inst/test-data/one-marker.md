@@ -215,7 +215,7 @@ system.time(dat <- sim_joint_data_set(
   r_left_trunc = r_left_trunc, r_right_cens = r_right_cens, 
   r_n_marker = r_n_marker, r_x = r_x, r_obs_time = r_obs_time, y_max = 10))
 #>    user  system elapsed 
-#>    2.02    0.04    2.06
+#>   2.188   0.049   2.237
 ```
 
 Show stats
@@ -369,9 +369,9 @@ local({
 #> 
 #> $Psi
 #>        [,1]   [,2]   [,3]   [,4]
-#> [1,]  1.007  0.190 -1.372 -0.423
-#> [2,]  0.190  1.256  0.357 -0.792
-#> [3,] -1.372  0.357  3.748  0.213
+#> [1,]  1.007  0.189 -1.372 -0.423
+#> [2,]  0.189  1.256  0.358 -0.792
+#> [3,] -1.372  0.358  3.749  0.213
 #> [4,] -0.423 -0.792  0.213  1.691
 #> 
 #> $Sigma

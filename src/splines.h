@@ -62,7 +62,7 @@ public:
 private:
   int set_cursor(const double x) const;
   void diff_table(const double x, const int ndiff) const;
-  double slow_evaluate(const double x, int nder) const;
+  void derivs(vec &b, const double x, int const ders) const;
   /* fast evaluation of basis functions */
   void basis_funcs(vec &b, const double x) const;
 };

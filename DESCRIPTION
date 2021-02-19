@@ -1,10 +1,11 @@
 Package: SimSurvNMarker
 Type: Package
 Title: Simulate Survival Time and Markers
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(person("Benjamin", "Christoffersen", 
                     email = "boennecd@gmail.com", 
-                    role = c("cre", "aut")), 
+                    role = c("cre", "aut"), 
+                    comment = c(ORCID = "0000-0002-7182-1346")), 
              person("Mark", "Clements",  
                     role = "cph"), 
              person("Ignace", "Bogaert", 
@@ -30,3 +31,5 @@ Imports:
     Rcpp
 SystemRequirements: C++11
 VignetteBuilder: R.rsp
+URL: https://github.com/boennecd/SimSurvNMarker
+BugReports: https://github.com/boennecd/SimSurvNMarker/issues
