@@ -20,7 +20,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fastgl.h"
-#include "cassert"
 #include <array>
 #include <memory>
 #include <RcppArmadillo.h>
@@ -355,8 +354,6 @@ QuadPair<double> GLPairS(size_t const n, size_t const k)
 QuadPair<double> GLPair(size_t const n, size_t const k)
 {
 	// Sanity check [also implies l > 0]
-	assert(n >= k);
-	assert(k > 0);
 	if(n < 101)
 		return(GLPairTabulated(n, k-1));
 	else
