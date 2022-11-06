@@ -1,7 +1,7 @@
 Package: SimSurvNMarker
 Type: Package
 Title: Simulate Survival Time and Markers
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: c(person("Benjamin", "Christoffersen", 
                     email = "boennecd@gmail.com", 
                     role = c("cre", "aut"), 
@@ -29,7 +29,7 @@ LinkingTo:
     RcppArmadillo
 Imports: 
     Rcpp
-SystemRequirements: C++11
+SystemRequirements: C++14
 VignetteBuilder: R.rsp
 URL: https://github.com/boennecd/SimSurvNMarker
 BugReports: https://github.com/boennecd/SimSurvNMarker/issues
