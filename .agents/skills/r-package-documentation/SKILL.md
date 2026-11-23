@@ -13,7 +13,7 @@ The workflow below covers READMEs. For other documentation, use the source and w
 1. Read DESCRIPTION, the README, and the repository instructions.
 2. Trace the README build through scripts, configuration, and generated-file notices. A vignette can supply both README.md and an HTML article.
 3. Edit the maintained source. For a hand-written README, edit README.md directly.
-4. Identify the audience, the package purpose, and the installation method. Check each example against the current R interface.
+4. Identify the audience, the package purpose, and the installation method. Check the package page on CRAN before giving installation instructions. If CRAN archived the package, identify a working source and link the archive. Check each example against the current R interface.
 5. Keep technical terms consistent with the package. Explain the inputs, the result, and what to look for in a plot or table.
 
 ## Add badges
@@ -38,7 +38,7 @@ The helper can edit the README. Inspect its implementation when the repository g
    If GitHub turns a continuation line beginning with `+ ` into a list item, move the plus sign to the preceding line.
 4. Inspect the writer options. Remove legacy `--webtex` arguments. With current rmarkdown and Pandoc, use `rmarkdown::github_document(math_method = "default")`.
 5. Regenerate each tracked output with the repository build command. Check the generated Markdown for native delimiters and remaining equation-image URLs.
-6. Check the GitHub preview for missing symbols, visible TeX, broken alignment, and clipped rows. Check ordinary figures, badges, and heading links separately.
+6. Check the GitHub preview for missing symbols, visible TeX, broken alignment, and clipped rows. GitHub can recognize a math block and still reject a macro during typesetting. Use `\mathrm{diag}` and `\mathrm{vec}` if GitHub rejects `\operatorname`. Check ordinary figures, badges, and heading links separately.
 7. If a reviewer finds a rendering issue, reproduce it in GitHub. Add the verified fix to this skill after checking the revised preview.
 
 [GitHub math syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions) · [rmarkdown GitHub output](https://pkgs.rstudio.com/rmarkdown/reference/github_document.html)

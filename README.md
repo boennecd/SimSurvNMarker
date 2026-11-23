@@ -14,16 +14,21 @@ times in R.
 
 ## Installation
 
-Install the released package from CRAN.
-
-``` r
-install.packages(pkgs = "SimSurvNMarker")
-```
-
-To install the development version, use the `remotes` package.
+Use the `remotes` package to install the development version from
+GitHub.
 
 ``` r
 remotes::install_github(repo = "boennecd/SimSurvNMarker")
+```
+
+CRAN archived SimSurvNMarker on February 15, 2026. To install release
+0.1.3 from the [CRAN
+archive](https://cran.r-project.org/src/contrib/Archive/SimSurvNMarker/),
+use:
+
+``` r
+remotes::install_version(package = "SimSurvNMarker", version = "0.1.3",
+                         repos = "https://cloud.r-project.org")
 ```
 
 ## Joint model
@@ -37,25 +42,25 @@ $$\begin{aligned}
   &\sim N^{(r)}(\vec\mu_i(s_{ij}, \vec u_i), \Sigma) \\
 \vec\mu_i(s, \vec u)
   &= \Gamma^\top\vec x_i + B^\top\vec g(s) + U^\top\vec m(s) \\
-  &= (I \otimes \vec x_i^\top)\operatorname{vec}(\Gamma) +
-     (I \otimes \vec g(s)^\top)\operatorname{vec}(B) +
+  &= (I \otimes \vec x_i^\top)\mathrm{vec}(\Gamma) +
+     (I \otimes \vec g(s)^\top)\mathrm{vec}(B) +
      (I \otimes \vec m(s)^\top)\vec u \\
 \vec U_i &\sim N^{(K)}(\vec 0, \Psi)
 \end{aligned}$$
 
-Here $\vec u = \operatorname{vec}(U)$ stacks the columns of the
-random-effect matrix $U$. The association parameters $\vec\alpha$ give
-the change in log hazard per unit increase in each latent marker mean,
-with the other means fixed.
+Here $\vec u = \mathrm{vec}(U)$ stacks the columns of the random-effect
+matrix $U$. The association parameters $\vec\alpha$ give the change in
+log hazard per unit increase in each latent marker mean, with the other
+means fixed.
 
 $$\begin{aligned}
 h(t \mid \vec u)
   &= \exp\left(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta
       + \vec\alpha^\top\vec\mu_i(t, \vec u)\right) \\
   &= \exp\Bigl(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta \\
-  &\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes \vec x_i^\top)\operatorname{vec}(\Gamma) \\
-  &\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes \vec g(t)^\top)\operatorname{vec}(B) \\
-  &\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes \vec m(t)^\top)\vec u\Bigr).
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec x_i^\top)\mathrm{vec}(\Gamma) \\
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec g(t)^\top)\mathrm{vec}(B) \\
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec m(t)^\top)\vec u\Bigr).
 \end{aligned}$$
 
 The vectors $\vec x_i$ and $\vec z_i$ contain known, time-invariant
@@ -480,41 +485,23 @@ error can bias the association estimates.
 ``` r
 local({
   library(package = "survival")
-  tdat <- tmerge(dat$survival_data, dat$survival_data, id = id, 
-                 tstart = left_trunc, tstop = y, ev = event(y, event))
-  
-  for(i in seq_along(alpha)){
-    new_call <- substitute(tmerge(
-      tdat, dat$marker_data, id = id, tdc(obs_time, YVAR)),
-      list(YVAR = as.name(paste0("Y", i))))
-    names(new_call)[length(new_call)] <- paste0("Y", i)
-    tdat <- eval(new_call)
-  }
-  tdat <- na.omit(tdat)
-  
-  sformula <- Surv(time = tstart, time2 = tstop, event = ev) ~ 1
-  for(i in seq_along(delta_vec)){
-    new_call <- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0("Z", i))))
-    sformula <- eval(new_call)
-  }
-  for(i in seq_along(alpha)){
-    new_call <- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0("Y", i))))
-    sformula <- eval(new_call)
-  }
-  
-  fit <- coxph(sformula, tdat)
-  print(summary(fit))  
+  intervals <- tmerge(data1 = dat$survival_data, data2 = dat$survival_data,
+                      id = id, tstart = left_trunc, tstop = y, ev = event(y, event))
+  intervals <- tmerge(data1 = intervals, data2 = dat$marker_data, id = id,
+                      Y1 = tdc(obs_time, Y1), Y2 = tdc(obs_time, Y2))
+  fit <- coxph(formula = Surv(time = tstart, time2 = tstop, event = ev) ~
+                 Z2 + Z3 + Y1 + Y2, data = intervals)
+  print(summary(object = fit))
   invisible(fit)
 })
 #> Call:
-#> coxph(formula = sformula, data = tdat)
+#> coxph(formula = Surv(time = tstart, time2 = tstop, event = ev) ~ 
+#>     Z2 + Z3 + Y1 + Y2, data = intervals)
 #> 
 #>   n= 4042, number of events= 535 
+#>    (1000 observations deleted due to missingness)
 #> 
 #>       coef exp(coef) se(coef)     z Pr(>|z|)    
-#> Z1      NA        NA   0.0000    NA       NA    
 #> Z2 -0.5894    0.5546   0.1172 -5.03  5.0e-07 ***
 #> Z3  0.2733    1.3143   0.1013  2.70    0.007 ** 
 #> Y1  0.1900    1.2092   0.0445  4.27  1.9e-05 ***
@@ -523,7 +510,6 @@ local({
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
 #>    exp(coef) exp(-coef) lower .95 upper .95
-#> Z1        NA         NA        NA        NA
 #> Z2     0.555      1.803     0.441     0.698
 #> Z3     1.314      0.761     1.078     1.603
 #> Y1     1.209      0.827     1.108     1.319
@@ -535,12 +521,12 @@ local({
 #> Score (logrank) test = 165  on 4 df,   p=<2e-16
 ```
 
-Compare the fitted coefficients with the coefficients used in the
-simulation.
+The Cox baseline hazard absorbs the intercept. Compare the estimates for
+Z2, Z3, Y1, and Y2 with their simulation coefficients.
 
 ``` r
-delta_vec
-#> [1] -0.5 -0.5  0.5
+delta_vec[-1]
+#> [1] -0.5  0.5
 alpha
 #> [1] 0.5 0.9
 ```

@@ -383,11 +383,14 @@ time-dependent basis functions, covariates, left-truncation times, and
 right-censoring times in R.</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
-<p>Install the released package from CRAN.</p>
-<pre class="r"><code>install.packages(pkgs = &quot;SimSurvNMarker&quot;)</code></pre>
-<p>To install the development version, use the <code>remotes</code>
-package.</p>
+<p>Use the <code>remotes</code> package to install the development
+version from GitHub.</p>
 <pre class="r"><code>remotes::install_github(repo = &quot;boennecd/SimSurvNMarker&quot;)</code></pre>
+<p>CRAN archived SimSurvNMarker on February 15, 2026. To install release
+0.1.3 from the <a href="https://cran.r-project.org/src/contrib/Archive/SimSurvNMarker/">CRAN
+archive</a>, use:</p>
+<pre class="r"><code>remotes::install_version(package = &quot;SimSurvNMarker&quot;, version = &quot;0.1.3&quot;,
+                         repos = &quot;https://cloud.r-project.org&quot;)</code></pre>
 </div>
 <div id="joint-model" class="section level2">
 <h2>Joint model</h2>
@@ -398,28 +401,26 @@ the event hazard.</p>
   &amp;\sim N^{(r)}(\vec\mu_i(s_{ij}, \vec u_i), \Sigma) \\
 \vec\mu_i(s, \vec u)
   &amp;= \Gamma^\top\vec x_i + B^\top\vec g(s) + U^\top\vec m(s) \\
-  &amp;= (I \otimes \vec x_i^\top)\operatorname{vec}(\Gamma) +
-     (I \otimes \vec g(s)^\top)\operatorname{vec}(B) +
+  &amp;= (I \otimes \vec x_i^\top)\mathrm{vec}(\Gamma) +
+     (I \otimes \vec g(s)^\top)\mathrm{vec}(B) +
      (I \otimes \vec m(s)^\top)\vec u \\
 \vec U_i &amp;\sim N^{(K)}(\vec 0, \Psi)
 \end{aligned}\]</span></p>
-<p>Here <span class="math inline">\(\vec u =
-\operatorname{vec}(U)\)</span> stacks the columns of the random-effect
-matrix <span class="math inline">\(U\)</span>. The association
-parameters <span class="math inline">\(\vec\alpha\)</span> give the
-change in log hazard per unit increase in each latent marker mean, with
-the other means fixed.</p>
+<p>Here <span class="math inline">\(\vec u = \mathrm{vec}(U)\)</span>
+stacks the columns of the random-effect matrix <span class="math inline">\(U\)</span>. The association parameters <span class="math inline">\(\vec\alpha\)</span> give the change in log hazard
+per unit increase in each latent marker mean, with the other means
+fixed.</p>
 <p><span class="math display">\[\begin{aligned}
 h(t \mid \vec u)
   &amp;= \exp\left(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta
       + \vec\alpha^\top\vec\mu_i(t, \vec u)\right) \\
   &amp;= \exp\Bigl(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta \\
-  &amp;\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes
-\vec x_i^\top)\operatorname{vec}(\Gamma) \\
-  &amp;\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes
-\vec g(t)^\top)\operatorname{vec}(B) \\
-  &amp;\qquad + \vec 1^\top (\operatorname{diag}(\vec\alpha) \otimes
-\vec m(t)^\top)\vec u\Bigr).
+  &amp;\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec
+x_i^\top)\mathrm{vec}(\Gamma) \\
+  &amp;\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec
+g(t)^\top)\mathrm{vec}(B) \\
+  &amp;\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec
+m(t)^\top)\vec u\Bigr).
 \end{aligned}\]</span></p>
 <p>The vectors <span class="math inline">\(\vec x_i\)</span> and <span class="math inline">\(\vec z_i\)</span> contain known, time-invariant
 covariates. The functions <span class="math inline">\(\vec
@@ -804,41 +805,23 @@ sig
 Measurement error can bias the association estimates.</p>
 <pre class="r"><code>local({
   library(package = &quot;survival&quot;)
-  tdat &lt;- tmerge(dat$survival_data, dat$survival_data, id = id, 
-                 tstart = left_trunc, tstop = y, ev = event(y, event))
-  
-  for(i in seq_along(alpha)){
-    new_call &lt;- substitute(tmerge(
-      tdat, dat$marker_data, id = id, tdc(obs_time, YVAR)),
-      list(YVAR = as.name(paste0(&quot;Y&quot;, i))))
-    names(new_call)[length(new_call)] &lt;- paste0(&quot;Y&quot;, i)
-    tdat &lt;- eval(new_call)
-  }
-  tdat &lt;- na.omit(tdat)
-  
-  sformula &lt;- Surv(time = tstart, time2 = tstop, event = ev) ~ 1
-  for(i in seq_along(delta_vec)){
-    new_call &lt;- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0(&quot;Z&quot;, i))))
-    sformula &lt;- eval(new_call)
-  }
-  for(i in seq_along(alpha)){
-    new_call &lt;- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0(&quot;Y&quot;, i))))
-    sformula &lt;- eval(new_call)
-  }
-  
-  fit &lt;- coxph(sformula, tdat)
-  print(summary(fit))  
+  intervals &lt;- tmerge(data1 = dat$survival_data, data2 = dat$survival_data,
+                      id = id, tstart = left_trunc, tstop = y, ev = event(y, event))
+  intervals &lt;- tmerge(data1 = intervals, data2 = dat$marker_data, id = id,
+                      Y1 = tdc(obs_time, Y1), Y2 = tdc(obs_time, Y2))
+  fit &lt;- coxph(formula = Surv(time = tstart, time2 = tstop, event = ev) ~
+                 Z2 + Z3 + Y1 + Y2, data = intervals)
+  print(summary(object = fit))
   invisible(fit)
 })
 #&gt; Call:
-#&gt; coxph(formula = sformula, data = tdat)
+#&gt; coxph(formula = Surv(time = tstart, time2 = tstop, event = ev) ~ 
+#&gt;     Z2 + Z3 + Y1 + Y2, data = intervals)
 #&gt; 
 #&gt;   n= 4042, number of events= 535 
+#&gt;    (1000 observations deleted due to missingness)
 #&gt; 
 #&gt;       coef exp(coef) se(coef)     z Pr(&gt;|z|)    
-#&gt; Z1      NA        NA   0.0000    NA       NA    
 #&gt; Z2 -0.5894    0.5546   0.1172 -5.03  5.0e-07 ***
 #&gt; Z3  0.2733    1.3143   0.1013  2.70    0.007 ** 
 #&gt; Y1  0.1900    1.2092   0.0445  4.27  1.9e-05 ***
@@ -847,7 +830,6 @@ Measurement error can bias the association estimates.</p>
 #&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 #&gt; 
 #&gt;    exp(coef) exp(-coef) lower .95 upper .95
-#&gt; Z1        NA         NA        NA        NA
 #&gt; Z2     0.555      1.803     0.441     0.698
 #&gt; Z3     1.314      0.761     1.078     1.603
 #&gt; Y1     1.209      0.827     1.108     1.319
@@ -857,10 +839,10 @@ Measurement error can bias the association estimates.</p>
 #&gt; Likelihood ratio test= 171  on 4 df,   p=&lt;2e-16
 #&gt; Wald test            = 162  on 4 df,   p=&lt;2e-16
 #&gt; Score (logrank) test = 165  on 4 df,   p=&lt;2e-16</code></pre>
-<p>Compare the fitted coefficients with the coefficients used in the
-simulation.</p>
-<pre class="r"><code>delta_vec
-#&gt; [1] -0.5 -0.5  0.5
+<p>The Cox baseline hazard absorbs the intercept. Compare the estimates
+for Z2, Z3, Y1, and Y2 with their simulation coefficients.</p>
+<pre class="r"><code>delta_vec[-1]
+#&gt; [1] -0.5  0.5
 alpha
 #&gt; [1] 0.5 0.9</code></pre>
 <div id="using-derivatives" class="section level3">
