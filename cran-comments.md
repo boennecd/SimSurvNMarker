@@ -1,6 +1,7 @@
-## Resubmission
+## New submission
 
-CRAN archived SimSurvNMarker 0.1.3 on 2026-02-15. Version 0.1.4 removes
+This is the first submission of SimSurvNMarker 0.1.4. CRAN archived
+version 0.1.3 on 2026-02-15. Version 0.1.4 removes
 the C++14 requests from DESCRIPTION and src/Makevars. R now selects the
 C++ standard. The examples and test fixtures use the current `dim`
 argument to `structure()`.
