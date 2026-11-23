@@ -9,14 +9,14 @@ dput(omega)
 dput(delta)
 #> c(-0.1, -0.3)
 dput(gamma)
-#> structure(c(0.11, 0.33), .Dim = 2:1)
+#> structure(c(0.11, 0.33), dim = 2:1)
 dput(B)
-#> structure(c(0.26, 0.3, 0.48, 0.8, 0.83), .Dim = c(5L, 1L))
+#> structure(c(0.26, 0.3, 0.48, 0.8, 0.83), dim = c(5L, 1L))
 dput(sig) # Sigma
-#> structure(0.02, .Dim = c(1L, 1L))
+#> structure(0.02, dim = c(1L, 1L))
 dput(Psi)
 #> structure(c(1.02, 0.18, -1.27, -0.39, 0.18, 1.33, 0.47, -0.74, 
-#> -1.27, 0.47, 3.63, 0.2, -0.39, -0.74, 0.2, 1.56), .Dim = c(4L, 
+#> -1.27, 0.47, 3.63, 0.2, -0.39, -0.74, 0.2, 1.56), dim = c(4L,
 #> 4L))
 dput(n_obs)
 #> 2000L

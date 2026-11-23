@@ -23,12 +23,12 @@ Assign parameters
 alpha <- c(-0.42, 0.23)
 omega <- c(-2.28, -1.69)
 delta <- c(0.03, 0.23, 0.11, 0.23)
-gamma <- structure(c(0.06, 0.2, -0.18, -0.27, 0.23, 0.16), .Dim = 3:2)
-B <- structure(c(-0.68, 0.99, 0.06, 0.03, -0.97, 0.39), .Dim = 3:2)
-sig <- structure(c(0.01, 0, 0, 0.04), .Dim = c(2L, 2L))
+gamma <- structure(c(0.06, 0.2, -0.18, -0.27, 0.23, 0.16), dim = 3:2)
+B <- structure(c(-0.68, 0.99, 0.06, 0.03, -0.97, 0.39), dim = 3:2)
+sig <- structure(c(0.01, 0, 0, 0.04), dim = c(2L, 2L))
 Psi <- structure(c(1.97, -0.24, -0.63, 0.29, -0.24, 0.35, -0.04, 0.16, 
                    -0.63, -0.04, 3.22, -1.39, 0.29, 0.16, -1.39, 3.1),
-                 .Dim = c(4L, 4L))
+                 dim = c(4L, 4L))
 n_obs <- 2000L
 
 n_y <- length(alpha)
