@@ -1,0 +1,4 @@
+interface:
+  display_name: "R Package Documentation"
+  short_description: "Write and check READMEs for R packages"
+  default_prompt: "Use $r-package-documentation to update my R package README and check its rendered examples and equations."
