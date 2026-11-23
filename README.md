@@ -21,16 +21,6 @@ GitHub.
 remotes::install_github(repo = "boennecd/SimSurvNMarker")
 ```
 
-CRAN archived SimSurvNMarker on February 15, 2026. To install release
-0.1.3 from the [CRAN
-archive](https://cran.r-project.org/src/contrib/Archive/SimSurvNMarker/),
-use:
-
-``` r
-remotes::install_version(package = "SimSurvNMarker", version = "0.1.3",
-                         repos = "https://cloud.r-project.org")
-```
-
 ## Joint model
 
 At visit $j$, individual $i$ has a vector of $r$ marker measurements
