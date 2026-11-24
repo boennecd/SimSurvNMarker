@@ -12,5 +12,5 @@ with R 4.6.2 and R-devel (r90959). Both checks finished with 0 errors,
 0 warnings, and 1 NOTE.
 
 On macOS Sequoia 1.52 with a M1 chip and with devtools::check_win_devel(), and 
-devtools::check_win_oldrelease(). There is just on NOTE about it being a new 
+devtools::check_win_oldrelease(), here is just on NOTE about it being a new 
 submission.
