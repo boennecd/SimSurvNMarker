@@ -1,11 +1,10 @@
 library(rmarkdown)
-library(reshape2)
 (function(){
   setwd("vignettes")
 
-  render("SimSurvNMarker.Rmd", output_format = "html_document")
-  render("SimSurvNMarker.Rmd", output_format = github_document(
-    pandoc_args = "--webtex=https://render.githubusercontent.com/render/math?math="),
+  render(input = "SimSurvNMarker.Rmd", output_format = "html_document")
+  render(input = "SimSurvNMarker.Rmd", output_format = github_document(
+    math_method = "default", html_preview = FALSE),
     output_file = "README.md")
   file.copy("README.md", file.path("..", "README.md"), overwrite = TRUE)
   unlink("README.md")

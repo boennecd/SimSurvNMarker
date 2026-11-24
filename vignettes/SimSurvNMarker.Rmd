@@ -15,103 +15,76 @@ knitr::opts_chunk$set(
 options(digits = 3)
 ```
 
-# SimSurvNMarker: Simulate Survival time and Markers
-[![R-CMD-check](https://github.com/boennecd/SimSurvNMarker/workflows/R-CMD-check/badge.svg)](https://github.com/boennecd/SimSurvNMarker/actions)
-[![](https://www.r-pkg.org/badges/version/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
+# SimSurvNMarker
 
-The `SimSurvNMarker` package reasonably fast simulates from a joint survival 
-and marker model. The package uses a combination of Gauss–Legendre 
-quadrature and one dimensional root finding to simulate the event times 
-as described by @Crowther13. Specifically, the package can simulate from 
-the model 
+[![R-CMD-check](https://github.com/boennecd/SimSurvNMarker/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/boennecd/SimSurvNMarker/actions/workflows/R-CMD-check.yaml)
+[![CRAN version](https://www.r-pkg.org/badges/version/SimSurvNMarker)](https://CRAN.R-project.org/package=SimSurvNMarker)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/last-month/SimSurvNMarker)](https://cranlogs.r-pkg.org/)
 
-<!-- $$\begin{align*} -->
-<!-- \vec Y_{ij} \mid \vec U_i = \vec u_i -->
-<!--   &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma) -->
-<!--   \\ -->
-<!-- \vec\mu_i(s, \vec u) &= -->
-<!--   \Gamma^\top \vec x_i + B^\top\vec g(s) + U^\top\vec m(s) -->
-<!--   \\ -->
-<!-- &= \left(I \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
-<!--      + \left(I \otimes \vec g(s)^\top\right)\text{vec} B -->
-<!--      + \left(I \otimes \vec m(s)^\top\right) \vec u -->
-<!--   \\ -->
-<!-- \vec U_i &\sim N^{(K)}(\vec 0, \Psi) -->
-<!--   \\ -->
-<!-- h(t\mid \vec u) &= \exp\left( -->
-<!--   \vec\omega^\top\vec b(t) + -->
-<!--   \vec z_i^\top\vec\delta + -->
-<!--   \vec\alpha^\top\vec\mu_i(t, \vec u) -->
-<!--   \right) -->
-<!--   \\ -->
-<!-- &= \exp\Bigg( -->
-<!--   \vec\omega^\top\vec b(t) + -->
-<!--   \vec z_i^\top\vec\delta -->
-<!--   + \vec 1^\top\left( -->
-<!--   \text{diag}(\vec \alpha) \otimes \vec x_i^\top\right)\text{vec}\Gamma -->
-<!--   + \vec 1^\top\left( -->
-<!--   \text{diag}(\vec \alpha) \otimes \vec g(t)^\top\right)\text{vec} B \\ -->
-<!-- &\hspace{50pt}+ \vec 1^\top\left( -->
-<!--   \text{diag}(\vec \alpha) \otimes \vec m(t)^\top\right)\vec u -->
-<!--   \Bigg) -->
-<!-- \end{align*}$$ -->
-
-$$\begin{align*}\vec Y_{ij}\mid\vec U_i =\vec u_i &\sim N^{(r)}(\vec \mu_i(s_{ij}, \vec u_i), \Sigma)\\\vec\mu_i(s, \vec u)&=\Gamma^\top\vec x_i+B^\top\vec g(s)+U^\top\vec m(s)\\&=\left(I\otimes\vec x_i^\top\right)\text{vec}\Gamma+\left(I\otimes\vec g(s)^\top\right)\text{vec}B+\left(I\otimes\vec m(s)^\top\right)\vec u\\\vec U_i &\sim N^{(K)}(\vec 0,\Psi)\end{align*}$$
-
-$$\begin{align*}h(t\mid\vec u)&=\exp\left(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec\alpha^\top\vec\mu_i(t, \vec u)\right)\\&=\exp\Bigg(\vec\omega^\top\vec b(t)+\vec z_i^\top\vec\delta+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec x_i^\top\right)\text{vec}\Gamma+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec g(t)^\top\right)\text{vec} B\\&\hspace{50pt}+\vec 1^\top\left(\text{diag}(\vec\alpha)\otimes\vec m(t)^\top\right)\vec u\Bigg)\end{align*}$$
-
-where $\vec Y_{ij}\in\mathbb R^{n_y}$ is individual $i$'s 
-$j$th observed marker at time $s_{ij}$, 
-$U_i\in\mathbb R^K$ is individual $i$'s random effect, and 
-$h$ is the instantaneous hazard rate for the time-to-event outcome. 
-$\vec\alpha$ is the so-called
-association parameter. It shows the strength of the relation between the 
-latent mean function, $\vec\mu_i(t,\vec u)$, and the log of the 
-instantaneous rate, $h(t\mid \vec u)$. $\vec m(t)$, $\vec g(t)$ 
-and $\vec b(t)$ are 
-basis expansions of time. As an example, these can be a polynomial, 
-a B-spline, or a natural cubic spline. The expansion for the baseline
-hazard, $\vec b(t)$, is typically made on $\log t$ instead of $t$. 
-One reason is that the model reduces to a Weibull distribution
-when a first polynomial is used and $\vec\alpha = \vec 0$. $\vec x_i$ and 
-$\vec z_i$ are individual specific known time-invariant covariates.
-
-We provide an example of how to use the package here, in 
-[inst/test-data](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data) 
-directory on Github, and at 
-[rpubs.com/boennecd/SimSurvNMarker-ex](https://rpubs.com/boennecd/SimSurvNMarker-ex)
-where we show that we simulate from the correct model by using a 
-simulation study. The former examples includes
-
- - using [polynomials](#example-polynomial) as the basis functions.
- - using [polynomials with derivatives in the log hazard](#using-derivatives) as the basis functions.
- - using [natural cubic splines](#example-natural-cubic-splines) as the basis functions.
-
-The purpose/goal of this package is to
-
- - allow the user to specify all components in R including the basis 
-   functions. 
- - simulate reasonably fast from the model given this requirement.
+SimSurvNMarker simulates event times and repeated marker measurements from a joint model.
+Use `sim_joint_data_set()` to specify time-dependent basis functions, covariates,
+left-truncation times, and right-censoring times in R.
 
 ## Installation
 
-The package can be installed from Github using the`remotes` package:
+Use the `remotes` package to install the development version from GitHub.
 
 ```{r how_to_install, eval = FALSE}
-stopifnot(require(remotes)) # needs the remotes package
-install_github("boennecd/SimSurvNMarker")
+remotes::install_github(repo = "boennecd/SimSurvNMarker")
 ```
 
-It can also be installed from CRAN using `install.packages`: 
+## Joint model
 
-```{r CRAN_how_to_install, eval = FALSE}
-install.packages("SimSurvNMarker")
-```
+At visit $j$, individual $i$ has a vector of $r$ marker measurements
+$\vec Y_{ij}$ at time $s_{ij}$. The $K$ random effects $\vec U_i$ link
+the marker trajectories to the event hazard.
 
-## Example with Polynomials
-We start with an example where we use polynomials as the basis functions. 
-First, we assign the polynomial functions we will use. 
+$$
+\begin{aligned}
+\vec Y_{ij} \mid \vec U_i = \vec u_i
+  &\sim N^{(r)}(\vec\mu_i(s_{ij}, \vec u_i), \Sigma) \\
+\vec\mu_i(s, \vec u)
+  &= \Gamma^\top\vec x_i + B^\top\vec g(s) + U^\top\vec m(s) \\
+  &= (I \otimes \vec x_i^\top)\mathrm{vec}(\Gamma) +
+     (I \otimes \vec g(s)^\top)\mathrm{vec}(B) +
+     (I \otimes \vec m(s)^\top)\vec u \\
+\vec U_i &\sim N^{(K)}(\vec 0, \Psi)
+\end{aligned}
+$$
+
+Here $\vec u = \mathrm{vec}(U)$ stacks the columns of the random-effect matrix $U$.
+The association parameters $\vec\alpha$ give the change in log hazard per unit
+increase in each latent marker mean, with the other means fixed.
+
+$$
+\begin{aligned}
+h(t \mid \vec u)
+  &= \exp\left(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta
+      + \vec\alpha^\top\vec\mu_i(t, \vec u)\right) \\
+  &= \exp\Bigl(\vec\omega^\top\vec b(t) + \vec z_i^\top\vec\delta \\
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec x_i^\top)\mathrm{vec}(\Gamma) \\
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec g(t)^\top)\mathrm{vec}(B) \\
+  &\qquad + \vec 1^\top (\mathrm{diag}(\vec\alpha) \otimes \vec m(t)^\top)\vec u\Bigr).
+\end{aligned}
+$$
+
+The vectors $\vec x_i$ and $\vec z_i$ contain known, time-invariant covariates.
+The functions $\vec m(t)$, $\vec g(t)$, and $\vec b(t)$ can use polynomials, B-splines, or natural cubic splines.
+A baseline log hazard linear in $\log t$ gives a Weibull model when $\vec\alpha = \vec 0$ and the slope exceeds $-1$.
+The package simulates event times with Gauss–Legendre quadrature and one-dimensional root finding, as described by @Crowther13.
+
+## Examples
+
+- [Use polynomial basis functions](#example-with-polynomials).
+- [Use the marker slope in the hazard](#using-derivatives).
+- [Use natural cubic splines](#example-with-natural-cubic-splines).
+
+The [test data directory](https://github.com/boennecd/SimSurvNMarker/tree/master/inst/test-data) contains more examples.
+A [simulation study](https://rpubs.com/boennecd/SimSurvNMarker-ex) compares estimates with the parameters used to generate the data.
+
+## Example with polynomials
+
+Define the polynomial basis functions.
 
 ```{r poly_assign}
 b_func <- function(x){
@@ -128,13 +101,10 @@ m_func <- function(x){
 }
 ```
 
-We use a third order polynomial for the two fixed terms, $\vec b$ and 
-$\vec g$, and a second order random polynomial for the random term, 
-$U_i^\top \vec m(s)$, in the latent mean function. We choose the 
-following parameters for the baseline hazard.
+Use cubic polynomials for $\vec b$ and $\vec g$ and a quadratic polynomial for the random term $U^\top\vec m(s)$.
 
 ```{r attach_pkg}
-library(SimSurvNMarker)
+library(package = "SimSurvNMarker")
 ```
 
 ```{r poly_base_haz}
@@ -142,7 +112,7 @@ omega <- c(1.4, -1.2, -2.1)
 delta <- -.5 # the intercept
 
 # quadrature nodes
-gl_dat <- get_gl_rule(30L)
+gl_dat <- get_gl_rule(n = 30L)
 
 # hazard function without marker
 par(mar = c(5, 5, 1, 1), mfcol = c(1, 2))
@@ -152,7 +122,7 @@ plot(function(x) exp(drop(b_func(x) %*% omega) + delta),
 grid()
 
 # survival function without marker
-plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
+plot(function(x) eval_surv_base_fun(ti = x, omega = omega, b_func = b_func, 
                                     gl_dat = gl_dat, delta = delta), 
      xlim = c(1e-4, 2.5),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
@@ -160,21 +130,17 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
 grid()
 ```
 
-Then we set the following parameters for the random effect, $\vec U_i$, and
-the parameters for the marker process. We also simulate a number of latent
-markers' mean curves and observed marker values and plot the result. 
-The dashed curve is the mean, $\vec\mu_i(s, \vec 0)$, the 
-fully drawn curve is the individual specific curve, 
-$\vec\mu_i(s, \vec U_i)$,
-the shaded areas are a pointwise 95% interval for each mean curve, and the 
-points are observed markers, $\vec y_{ij}$.
+Simulate the marker measurements for 16 individuals.
+The dashed curves show the population means $\vec\mu_i(s, \vec 0)$.
+The solid curves show the individual means $\vec\mu_i(s, \vec U_i)$.
+Shading gives the pointwise 95% intervals for individual means. Points show the observed markers.
 
 ```{r poly_marker_setup, fig.height=9, fig.width=9}
 r_n_marker <- function(id)
-  # the number of markers is Poisson distributed
+  # one visit plus a Poisson draw
   rpois(1, 10) + 1L
 r_obs_time <- function(id, n_markes)
-  # the observations times are uniform distributed 
+  # draw observation times uniformly 
   sort(runif(n_markes, 0, 2))
 
 Psi <- structure(c(0.18, 0.05, -0.05, 0.1, -0.02, 0.06, 0.05, 0.34, -0.25, 
@@ -237,9 +203,7 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
                g_func = g_func, ymax = 2)
 ```
 
-As an example, we simulate the random effects and plot the conditional 
-hazards and survival functions. We start by assigning the association 
-parameter, $\vec\alpha$.
+Set the association parameters and draw 100 sets of random effects. Plot the conditional hazard and survival curves for each set.
 
 ```{r poly_show_cond_surv}
 alpha <- c(.5, .9)
@@ -290,9 +254,7 @@ sim_surv_curves(sig = sig, Psi = Psi, delta = delta, omega = omega,
                 b_func = b_func, ymax = 2)
 ```
 
-We end by assigning the functions to get the covariates, coefficients for 
-the fixed effects, the left-truncation function, and right-censoring 
-function. 
+Define the covariates, fixed effects, and functions for left truncation and right censoring.
 
 ```{r poly_assign_residuals}
 r_z <- function(id)
@@ -316,8 +278,7 @@ delta_vec <- c(delta, -.5, .5)
 gamma <- matrix(c(.25, .5, 0, -.4, 0, .3), 3, 2)
 ```
 
-A full data set can now be simulated as follows. We consider the time it 
-takes in seconds by using the `system.time` function. 
+Simulate 1,000 individuals and measure the run time.
 
 ```{r poly_sim_full, cache = 1}
 set.seed(70483614)
@@ -329,8 +290,7 @@ system.time(dat <- sim_joint_data_set(
   r_obs_time = r_obs_time, y_max = 2, gamma = gamma, r_x = r_x))
 ```
 
-The first entries of the survival data and the observed markers looks as 
-follows.
+Inspect the first survival records and marker measurements.
 
 ```{r poly_show_stats_sim_dat}
 # survival data
@@ -340,14 +300,11 @@ head(dat$survival_data)
 head(dat$marker_data, 10)
 ```
 
-To illustrate that we simulate from the correct model, we can estimate a 
-linear mixed models for the markers as follows. 
+Fit a linear mixed model to the simulated marker measurements.
 
 ```{r poly_est_lme, cache = 1, dependson = "poly_sim_full"}
-library(lme4)
+library(package = "lme4")
 
-# estimate the linear mixed model (skip this if you want and look at the 
-# estimates in the end)
 local({
   m_dat <- dat$marker_data
   n_y <- NCOL(gamma)
@@ -360,7 +317,7 @@ local({
   if(d_x > 0)
     id_vars <- c(id_vars, paste0("X", seq_len(d_x)))
   
-  lme_dat <- melt(m_dat, id.vars = id_vars, measure.vars = Y_names, 
+  lme_dat <- reshape2::melt(data = m_dat, id.vars = id_vars, measure.vars = Y_names, 
                   variable.name = "XXTHEVARIABLEXX", 
                   value.name = "XXTHEVALUEXX")
   
@@ -430,8 +387,7 @@ local({
 })
 ```
 
-Although we assume equal noise variance, the estimates are close to the 
-true values.
+Compare the estimates with the simulation parameters below. The fitted model assumes equal residual variances for the two markers.
 
 ```{r comp_poly_est_lme}
 gamma
@@ -440,54 +396,32 @@ Psi
 sig
 ```
 
-We then fit a Cox model with only the observed markers (likely biased but gives us an 
-idea about whether we are using the correct model).
+Fit a Cox model with the most recent observed marker values. Measurement error can bias the association estimates.
 
 ```{r poly_est_coxph}
 local({
-  library(survival)
-  tdat <- tmerge(dat$survival_data, dat$survival_data, id = id, 
-                 tstart = left_trunc, tstop = y, ev = event(y, event))
-  
-  for(i in seq_along(alpha)){
-    new_call <- substitute(tmerge(
-      tdat, dat$marker_data, id = id, tdc(obs_time, YVAR)),
-      list(YVAR = as.name(paste0("Y", i))))
-    names(new_call)[length(new_call)] <- paste0("Y", i)
-    tdat <- eval(new_call)
-  }
-  tdat <- na.omit(tdat)
-  
-  sformula <- Surv(left_trunc, y, ev) ~ 1
-  for(i in seq_along(delta_vec)){
-    new_call <- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0("Z", i))))
-    sformula <- eval(new_call)
-  }
-  for(i in seq_along(alpha)){
-    new_call <- substitute(update(sformula, . ~ . + XVAR), 
-                           list(XVAR = as.name(paste0("Y", i))))
-    sformula <- eval(new_call)
-  }
-  
-  fit <- coxph(sformula, tdat)
-  print(summary(fit))  
+  library(package = "survival")
+  intervals <- tmerge(data1 = dat$survival_data, data2 = dat$survival_data,
+                      id = id, tstart = left_trunc, tstop = y, ev = event(y, event))
+  intervals <- tmerge(data1 = intervals, data2 = dat$marker_data, id = id,
+                      Y1 = tdc(obs_time, Y1), Y2 = tdc(obs_time, Y2))
+  fit <- coxph(formula = Surv(time = tstart, time2 = tstop, event = ev) ~
+                 Z2 + Z3 + Y1 + Y2, data = intervals)
+  print(summary(object = fit))
   invisible(fit)
 })
 ```
 
-This is close-ish to the true values.
+The Cox baseline hazard absorbs the intercept. Compare the estimates for Z2, Z3, Y1, and Y2 with their simulation coefficients.
 
 ```{r comp_poly_est_coxph}
-delta_vec
+delta_vec[-1]
 alpha
 ```
 
-### Using Derivatives
-It is possible to use derivatives of the latent mean, 
-$\vec\mu_i(s, \vec u)$, with respect to time in the hazard. As an example, 
-we consider the first-order derivative below and plot conditional hazards
-and survival functions simulated from the new model. 
+### Using derivatives
+
+Use the first derivative of the latent mean in the hazard. Plot the resulting conditional hazard and survival curves.
 
 ```{r poly_derivs}
 g_func_surv <- function(x){
@@ -505,7 +439,7 @@ sim_surv_curves(sig = sig, Psi = Psi, delta = delta, omega = omega,
                 g_func = g_func_surv, b_func = b_func, ymax = 2)
 ```
 
-A new data set can now be simulated as follows. 
+Simulate a data set with the marker slopes in the hazard.
 
 ```{r get_data_poly_derivs, cache = 1}
 set.seed(70483614)
@@ -520,7 +454,7 @@ system.time(dat <- sim_joint_data_set(
   use_fixed_latent = FALSE))
 ```
 
-The first entries of the new data looks as follows.
+Inspect the first survival records and marker measurements.
 
 ```{r derivs_poly_show_stats_sim_dat}
 # survival data
@@ -534,14 +468,13 @@ head(dat$marker_data, 10)
 rm(list = ls()[!ls() %in% c("sim_surv_curves", "show_mark_mean")])
 ```
 
-## Example with Natural Cubic Splines
-In this section, we will use natural cubic splines for the time-varying 
-basis functions. We start by assigning all the variables that we will pass 
-to the functions in the package.
+## Example with natural cubic splines
+
+Define the spline knots, sampling functions, and model parameters.
 
 ```{r model_params, cache = 1}
 # quadrature nodes
-gl_dat <- get_gl_rule(30L)
+gl_dat <- get_gl_rule(n = 30L)
 
 # knots for the spline functions
 b_ks <- seq(log(1), log(10), length.out = 4)
@@ -582,9 +515,7 @@ m_func <- get_ns_spline(m_ks, do_log = FALSE)
 g_func <- get_ns_spline(g_ks, do_log = FALSE)
 ```
 
-Notice that we use the `get_ns_spline` functions which reduces the 
-computation time a lot. We show the baseline hazard function and the 
-survival function without the marker below.
+Use `get_ns_spline()` to construct the spline bases. Plot the hazard and survival functions without the marker contribution.
 
 ```{r plot_wo_marker}
 # hazard function without marker
@@ -595,7 +526,7 @@ plot(function(x) exp(drop(b_func(x) %*% omega)),
 grid()
 
 # survival function without marker
-plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func, 
+plot(function(x) eval_surv_base_fun(ti = x, omega = omega, b_func = b_func, 
                                     gl_dat = gl_dat, delta = delta), 
      xlim = c(1e-4, 10),
      xlab = "Time", ylab = "Survival probability (no marker)", xaxs = "i",
@@ -603,8 +534,7 @@ plot(function(x) eval_surv_base_fun(x, omega = omega, b_func = b_func,
 grid()
 ```
 
-Next, we simulate individual specific markers. Each plot is for a given 
-individual.
+Simulate marker measurements. Each panel shows one individual.
 
 ```{r show_sim_marker, fig.height=9, fig.width=9}
 set.seed(1)
@@ -612,8 +542,7 @@ show_mark_mean(B = B, Psi = Psi, sigma = sig, m_func = m_func,
                g_func = g_func, ymax = 10)
 ```
 
-We sample a number of random effects and plot the hazard curves and survival 
-functions given these random effects below. 
+Draw random effects and plot the corresponding conditional hazard and survival curves.
 
 ```{r show_draw_surv_curves}
 set.seed(1)
@@ -622,7 +551,7 @@ sim_surv_curves(sig = sig, Psi = Psi, delta = delta, omega = omega,
                 b_func = b_func, ymax = 10)
 ```
 
-We end by drawing a data set.
+Simulate 1,000 individuals with the spline model.
 
 ```{r sim_dat, cache = 1, dependson = "model_params"}
 set.seed(70483614)
@@ -635,7 +564,7 @@ system.time(dat <- sim_joint_data_set(
   r_obs_time = r_obs_time, y_max = 10, gamma = gamma, r_x = r_x))
 ```
 
-Finally, we show a few of the first rows along with some summary statistics.
+Inspect the first records and summarize the observed events and marker counts.
 
 ```{r show_stats_sim_dat}
 # survival data
@@ -657,7 +586,7 @@ mean(subset(dat$survival_data, event & Z1 == 0L)$y)
 # quantiles of the event time
 quantile(subset(dat$survival_data, event)$y)
 
-# fraction of observed markers per individual
+# mean number of marker visits per individual
 NROW(dat$marker_data) / NROW(dat$survival_data)
 ```
 
